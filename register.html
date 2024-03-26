@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <section class="container">
+        <div class="logo">
+            <h1>Controle Financeiro</h1>
+        </div>
+        <div class="register">
+            <form method="POST" action="register.php">
+                <label>
+                    <span class="input-label">Usuário:</span>
+                    <input type="text" name="username" required>
+                </label>
+                <label>
+                    <spanclass="input-label">Senha:</span>
+                    <input type="password" name="password" required>
+                </label>
+                <label>
+                    <span class="input-label">E-mail:</span>
+                    <input type="email" name="email" required>
+                </label>
+                <button type="submit" name="register">Registrar</button>
+            </form>
+        </div>
+    </section>
+    <script src="scripts.js"></script>
+</body>
+</html>
