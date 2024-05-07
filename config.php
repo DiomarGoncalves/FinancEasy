@@ -1,12 +1,15 @@
 <?php
-$servername = "sqlite:database.db";
-$username = "";
+$servername = "localhost";
+$username = "root";
 $password = "";
+$dbname = "controlefinanceiro";
 
-try {
-    $conn = new PDO($servername);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch(PDOException $e) {
-    echo "Erro ao conectar ao banco de dados: " . $e->getMessage();
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
+echo "Connected successfully";
 ?>
