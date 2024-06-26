@@ -1,0 +1,24 @@
+<h2>Cartões</h2>
+<form id="add-card-form">
+  <label for="card-name">Nome do Cartão:</label>
+  <input type="text" id="card-name" required />
+  <label for="card-limit">Limite:</label>
+  <input type="number" id="card-limit" required />
+  <label for="card-due-date">Data de Vencimento:</label>
+  <input type="date" id="card-due-date" required />
+  <button type="submit">Adicionar Cartão</button>
+</form>
+<h2>Cartões Cadastrados</h2>
+<table class="table table-dark">
+  <thead>
+    <tr>
+      <th scope="col">Nome do Cartão</th>
+      <th scope="col">Limite</th>
+      <th scope="col">Vencimento</th>
+      <th scope="col">Ações</th>
+    </tr>
+  </thead>
+  <tbody id="cards-table">
+
+  </tbody>
+</table>
