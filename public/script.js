@@ -20,7 +20,6 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       });
   }
-  
 
   function setupCardsPage() {
     const form = document.getElementById("add-card-form");
@@ -161,25 +160,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function deleteExpense(id) {
       fetch(`http://localhost:3015/api/monthly-expenses/${id}`, {
-        method: 'DELETE'
+        method: "DELETE",
       })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Error deleting expense');
-        }
-        return response.json();
-      })
-      .then(data => {
-        if (data.error) {
-          console.error('Error deleting expense:', data.error);
-        } else {
-          console.log('Expense deleted successfully');
-          loadExpenses(); // Reload expenses to reflect the deletion
-        }
-      })
-      .catch(error => {
-        console.error('Error deleting expense:', error);
-      });
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Error deleting expense");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          if (data.error) {
+            console.error("Error deleting expense:", data.error);
+          } else {
+            console.log("Expense deleted successfully");
+            loadExpenses(); // Reload expenses to reflect the deletion
+          }
+        })
+        .catch((error) => {
+          console.error("Error deleting expense:", error);
+        });
     }
 
     function loadCards() {
@@ -240,18 +239,24 @@ document.addEventListener("DOMContentLoaded", function () {
             </tr>
           </thead>
           <tbody>
-            ${data.cardSpending && Array.isArray(data.cardSpending) ? 
-              data.cardSpending.map(spending => `
+            ${
+              data.cardSpending && Array.isArray(data.cardSpending)
+                ? data.cardSpending
+                    .map(
+                      (spending) => `
                 <tr>
                   <td>${spending.cardName}</td>
                   <td>${spending.amount}</td>
                 </tr>
-              `).join('') : '<tr><td colspan="2">Nenhum dado disponível</td></tr>'}
+              `
+                    )
+                    .join("")
+                : '<tr><td colspan="2">Nenhum dado disponível</td></tr>'
+            }
           </tbody>
         </table>
       `;
     }
-    
   }
 
   navLinks.forEach((link) => {
