@@ -3,11 +3,14 @@ document.addEventListener("DOMContentLoaded", function () {
   const navLinks = document.querySelectorAll("nav a");
   const resetButton = document.getElementById("reset-db");
 
+  let currentPage = "home";
+
   function loadPage(page) {
     fetch(`pages/${page}.html`)
       .then((response) => response.text())
       .then((data) => {
         content.innerHTML = data;
+        currentPage = page; // Atualiza a página atual
         if (page === "cards") {
           setupCardsPage();
         } else if (page === "monthly-expenses") {
@@ -17,6 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       });
   }
+  
 
   function setupCardsPage() {
     const form = document.getElementById("add-card-form");
@@ -157,17 +161,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function deleteExpense(id) {
       fetch(`http://localhost:3015/api/monthly-expenses/${id}`, {
-        method: "DELETE",
+        method: 'DELETE'
       })
-        .then((response) => response.json())
-        .then((data) => {
-          if (data.error) {
-            console.error("Error deleting expense:", data.error);
-          } else {
-            console.log("Expense deleted successfully");
-            loadExpenses(); // Reload expenses to reflect the deletion
-          }
-        });
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error deleting expense');
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (data.error) {
+          console.error('Error deleting expense:', data.error);
+        } else {
+          console.log('Expense deleted successfully');
+          loadExpenses(); // Reload expenses to reflect the deletion
+        }
+      })
+      .catch(error => {
+        console.error('Error deleting expense:', error);
+      });
     }
 
     function loadCards() {

@@ -1,7 +1,7 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
 const bodyParser = require('body-parser');
-const cors = require('cors');
+const cors = require('cors'); // Importe o middleware CORS
 
 const app = express();
 const db = new sqlite3.Database('database/database.db');
@@ -54,22 +54,15 @@ app.post('/api/monthly-expenses', (req, res) => {
   });
 });
 
-// Rota para gerar relatório de um mês específico
-app.get('/api/reports/:month', (req, res) => {
-  const month = req.params.month;
-  // Lógica para gerar o relatório do mês específico
-  // Substitua com a lógica apropriada usando o banco de dados
-  db.all('SELECT * FROM monthly_expenses WHERE month = ?', [month], (err, rows) => {
+// DELETE endpoint for monthly expenses
+app.delete('/api/monthly-expenses/:id', (req, res) => {
+  const { id } = req.params;
+  db.run('DELETE FROM monthly_expenses WHERE id = ?', [id], function(err) {
     if (err) {
       res.status(500).json({ error: err.message });
       return;
     }
-    // Aqui você processa os dados do relatório conforme necessário e envia como resposta
-    const reportData = {
-      totalSpent: calculateTotalSpent(rows), // Exemplo de função para calcular total gasto
-      // Outros dados do relatório que você deseja incluir
-    };
-    res.json(reportData);
+    res.json({ message: 'Expense deleted successfully' });
   });
 });
 
@@ -82,15 +75,6 @@ app.post('/api/reset-db', (req, res) => {
     res.json({ message: 'Database reset successfully' });
   });
 });
-
-// Função de exemplo para calcular o total gasto
-function calculateTotalSpent(expenses) {
-  let total = 0;
-  expenses.forEach(expense => {
-    total += expense.amount;
-  });
-  return total;
-}
 
 // Start the server
 const PORT = process.env.PORT || 3015;
