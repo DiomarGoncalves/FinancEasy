@@ -3,14 +3,23 @@ document.addEventListener("DOMContentLoaded", function () {
   const navLinks = document.querySelectorAll("nav a");
   const resetButton = document.getElementById("reset-db");
 
-  let currentPage = "home";
+  // Função para carregar a página inicial a partir da localStorage
+  function loadInitialPage() {
+    const savedPage = localStorage.getItem("currentPage");
+    if (savedPage) {
+      loadPage(savedPage);
+    } else {
+      loadPage("home");
+    }
+  }
 
+  // Modifique a função loadPage para salvar a página atual na localStorage
   function loadPage(page) {
+    localStorage.setItem("currentPage", page);
     fetch(`pages/${page}.html`)
       .then((response) => response.text())
       .then((data) => {
         content.innerHTML = data;
-        currentPage = page; // Atualiza a página atual
         if (page === "cards") {
           setupCardsPage();
         } else if (page === "monthly-expenses") {
@@ -20,6 +29,8 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       });
   }
+
+    document.addEventListener("DOMContentLoaded", loadInitialPage);
 
   function setupCardsPage() {
     const form = document.getElementById("add-card-form");
@@ -214,7 +225,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     function generateReport(month) {
-      fetch(`http://localhost:3015/api/reports/${month}`)
+      fetch(`http://localhost:3015/api/monthly-expenses/${month}`)
         .then((response) => response.json())
         .then((data) => {
           if (data.error) {
@@ -227,7 +238,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function renderReport(data) {
       reportContent.innerHTML = `
-        <p>Total Gasto: ${data.totalSpent}</p>
+        <p>Total Gasto: ${data.amount}</p>
         <p>Total Recebido: ${data.totalIncome}</p>
         <p>Saldo Final: ${data.balance}</p>
         <h3>Gastos por Cartão</h3>
@@ -240,8 +251,8 @@ document.addEventListener("DOMContentLoaded", function () {
           </thead>
           <tbody>
             ${
-              data.cardSpending && Array.isArray(data.cardSpending)
-                ? data.cardSpending
+              data.card_id && Array.isArray(data.card_id)
+                ? data.card_id
                     .map(
                       (spending) => `
                 <tr>

@@ -9,7 +9,7 @@ const db = new sqlite3.Database('database/database.db');
 // Middleware
 app.use(bodyParser.json());
 app.use(express.static('public'));
-app.use(cors()); // Use o middleware CORS
+app.use(cors());
 
 // API endpoints
 app.get('/api/cards', (req, res) => {
@@ -54,15 +54,19 @@ app.post('/api/monthly-expenses', (req, res) => {
   });
 });
 
-// DELETE endpoint for monthly expenses
-app.delete('/api/monthly-expenses/:id', (req, res) => {
-  const { id } = req.params;
-  db.run('DELETE FROM monthly_expenses WHERE id = ?', [id], function(err) {
+// Endpoint para gerar relatório mensal
+app.get('/api/monthly-expenses/:month', (req, res) => {
+  const month = req.params.month;
+  db.get('SELECT * FROM monthly_expenses WHERE month = ?', [month], (err, row) => {
     if (err) {
       res.status(500).json({ error: err.message });
       return;
     }
-    res.json({ message: 'Expense deleted successfully' });
+    if (!row) {
+      res.status(404).json({ error: 'No report found for the specified month' });
+      return;
+    }
+    res.json(row);
   });
 });
 

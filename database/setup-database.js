@@ -1,5 +1,6 @@
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('database/database.db');
+
 db.serialize(() => {
     // Criação das tabelas
     db.run(`
@@ -47,6 +48,16 @@ db.serialize(() => {
             due_date TEXT NOT NULL,
             paid INTEGER NOT NULL,
             FOREIGN KEY (card_id) REFERENCES cards (id)
+        )
+    `);
+
+    db.run(`
+        CREATE TABLE IF NOT EXISTS reports (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            month TEXT NOT NULL,
+            totalSpent REAL NOT NULL,
+            totalIncome REAL NOT NULL,
+            balance REAL NOT NULL
         )
     `);
 });

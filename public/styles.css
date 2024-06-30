@@ -7,6 +7,8 @@
 body {
   background-color: #000000c7;
   color: #b9b9b9de;
+  display: flex;
+  flex-direction: column;
 }
 header {
   background-color: #333;
@@ -51,10 +53,13 @@ footer {
   background-color: #272727;
   color: #ffffff;
   padding: 10px 20px;
-  position: fixed;
+  position: absolute;
   bottom: 0;
   width: 100%;
   text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 /* botão */
