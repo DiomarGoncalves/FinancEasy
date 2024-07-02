@@ -13,9 +13,20 @@ body {
 header {
   background-color: #333;
   color: #fff;
-  padding: 15px;
+  display: flex;
+  padding: 10px;
+  flex-direction: column;
+  align-items: center;
 }
 
+/* home*/
+
+.banner-home{
+  background-image: url(images/banner1.jpg);
+  width: 100%;
+}
+
+/* home */
 header h1 {
   margin: 0;
   font-family: Arial, Helvetica, sans-serif;
@@ -39,34 +50,28 @@ nav ul li a {
 }
 
 /* Estilo para o main */
-main {
-  padding: 20px;
+.container{
+  display: flex;
+  margin: 15px;
+  max-width: 80%;
 }
-
+main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
 .summary,
 .actions {
   margin-bottom: 30px;
 }
 
-/* Estilo para o footer */
-footer {
-  background-color: #272727;
-  color: #ffffff;
-  padding: 10px 20px;
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  text-align: center;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
 
 /* botão */
-button {
+.bbutton {
   height: 50px;
   margin: 5px;
-  width: 120px;
+  width: 160px;
   background: #333;
   -webkit-box-pack: center;
   -ms-flex-pack: center;
@@ -89,7 +94,7 @@ button {
     inset 5px 5px 10px #212121, inset -5px -5px 10px #212121;
 }
 
-button:hover {
+.bbutton:hover {
   -webkit-box-shadow: 1px 1px 13px #20232e, -1px -1px 13px #545b78;
   box-shadow: 1px 1px 13px #20232e, -1px -1px 13px #545b78;
   color: #d6d6d6;
@@ -97,7 +102,7 @@ button:hover {
   transition: 500ms;
 }
 
-button:active {
+.bbutton:active {
   -webkit-box-shadow: 1px 1px 13px #20232e, -1px -1px 33px #545b78;
   box-shadow: 1px 1px 13px #20232e, -1px -1px 33px #545b78;
   color: #d6d6d6;

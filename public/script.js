@@ -2,20 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const content = document.getElementById("content");
   const navLinks = document.querySelectorAll("nav a");
   const resetButton = document.getElementById("reset-db");
-
-  // Função para carregar a página inicial a partir da localStorage
-  function loadInitialPage() {
-    const savedPage = localStorage.getItem("currentPage");
-    if (savedPage) {
-      loadPage(savedPage);
-    } else {
-      loadPage("home");
-    }
-  }
-
-  // Modifique a função loadPage para salvar a página atual na localStorage
   function loadPage(page) {
-    localStorage.setItem("currentPage", page);
     fetch(`pages/${page}.html`)
       .then((response) => response.text())
       .then((data) => {
@@ -30,8 +17,23 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   }
 
-    document.addEventListener("DOMContentLoaded", loadInitialPage);
+  // Função para carregar a página de cartões
+  function loadPage(page) {
+    fetch(`pages/${page}.html`)
+      .then((response) => response.text())
+      .then((data) => {
+        content.innerHTML = data;
+        if (page === "cards") {
+          setupCardsPage();
+        } else if (page === "monthly-expenses") {
+          setupMonthlyExpensesPage();
+        } else if (page === "reports") {
+          setupReportsPage();
+        }
+      });
+  }
 
+  // Função para configurar a página de cartões
   function setupCardsPage() {
     const form = document.getElementById("add-card-form");
     const cardsList = document.getElementById("cards-list");
@@ -44,6 +46,7 @@ document.addEventListener("DOMContentLoaded", function () {
       addCard(cardName, cardLimit, cardDueDate);
     });
 
+    // Função para adicionar um cartão
     function addCard(name, limite, dueDate) {
       fetch("http://localhost:3015/api/cards", {
         method: "POST",
@@ -58,11 +61,12 @@ document.addEventListener("DOMContentLoaded", function () {
             console.error("Error adding card:", data.error);
           } else {
             console.log("Card added successfully");
-            loadCards(); // Reload cards to include the new one
+            loadCards(); // Recarrega os cartões para incluir o novo
           }
         });
     }
 
+    // Função para carregar os cartões
     function loadCards() {
       fetch("http://localhost:3015/api/cards")
         .then((response) => response.json())
@@ -75,32 +79,80 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+    // Função para renderizar os cartões na tabela
     function renderCards(cards) {
       const cardsTable = document.getElementById("cards-table");
       cardsTable.innerHTML = ""; // Limpa o conteúdo anterior da tabela
       cards.forEach((card) => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
-          <td>${card.name}</td>
-          <td>${card.limite}</td>
-          <td>${card.due_date}</td>
-          <td>
-            <button data-id="${card.id}" class="view-card">Ver Detalhes</button>
-          </td>
-        `;
+        <td>${card.name}</td>
+        <td>${card.limite}</td>
+        <td>${card.due_date}</td>
+        <td>
+          <button data-id="${card.id}" class="btn btn-primary edit-card-button" data-toggle="modal" data-target="#editCardModal">Editar</button>
+          <button data-id="${card.id}" class="btn btn-danger delete-card-button" data-toggle="modal" data-target="#deleteCardModal">Excluir</button>
+        </td>
+      `;
         cardsTable.appendChild(tr);
       });
-      // Adicionar evento para botão de ver detalhes (opcional)
-      cardsTable.querySelectorAll(".view-card").forEach((button) => {
+
+      // Adicionar event listeners para botões de editar e excluir
+      cardsTable.querySelectorAll(".edit-card-button").forEach((button) => {
         button.addEventListener("click", function () {
           const cardId = this.getAttribute("data-id");
-          // Lógica para exibir detalhes do cartão conforme necessário
-          console.log(`Detalhes do cartão ${cardId}`);
+          fetch(`http://localhost:3015/api/cards/${cardId}`)
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.error) {
+                console.error("Error loading card details:", data.error);
+              } else {
+                // Preencher o formulário de edição com os detalhes do cartão
+                document.getElementById("edit-card-id").value = data.card.id;
+                document.getElementById("edit-card-name").value = data.card.name;
+                document.getElementById("edit-card-limit").value = data.card.limite;
+                document.getElementById("edit-card-due-date").value =
+                  data.card.due_date;
+              }
+            })
+            .catch((error) => {
+              console.error("Error fetching card details:", error);
+            });
+        });
+      });
+      
+
+      cardsTable.querySelectorAll(".delete-card-button").forEach((button) => {
+        button.addEventListener("click", function () {
+          const cardId = this.getAttribute("data-id");
+          document
+            .getElementById("confirmDeleteCardButton")
+            .addEventListener("click", function () {
+              deleteCard(cardId);
+            });
         });
       });
     }
 
-    loadCards(); // Load cards on page load
+    loadCards(); // Carregar os cartões ao carregar a página
+  }
+
+  // Função para excluir um cartão
+  function deleteCard(cardId) {
+    fetch(`http://localhost:3015/api/cards/${cardId}`, {
+      method: "DELETE",
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Erro ao excluir o cartão.");
+        }
+        console.log("Cartão excluído com sucesso.");
+        $("#deleteCardModal").modal("hide"); // Fecha o modal após a exclusão
+        loadCards(); // Recarrega a lista de cartões
+      })
+      .catch((error) => {
+        console.error("Erro ao excluir o cartão:", error);
+      });
   }
 
   function setupMonthlyExpensesPage() {
@@ -157,7 +209,7 @@ document.addEventListener("DOMContentLoaded", function () {
           <td>${expense.month}</td>
           <td>${expense.amount}</td>
           <td>${expense.card_id}</td>
-          <td><button data-id="${expense.id}" class="delete-expense">Excluir</button></td>
+          <td><button data-id="${expense.id}" class="delete-expense bbutton">Excluir</button></td>
         `;
         expensesTable.appendChild(tr);
       });
@@ -237,6 +289,8 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function renderReport(data) {
+      console.log("Data received for report:", data); // Verifique o conteúdo de data no console
+    
       reportContent.innerHTML = `
         <p>Total Gasto: ${data.amount}</p>
         <p>Total Recebido: ${data.totalIncome}</p>
@@ -245,8 +299,8 @@ document.addEventListener("DOMContentLoaded", function () {
         <table class="table table-dark">
           <thead>
             <tr>
-              <th scope="col" >Cartão</th>
-              <th scope="col" >Valor Gasto</th>
+              <th scope="col">Cartão</th>
+              <th scope="col">Valor Gasto</th>
             </tr>
           </thead>
           <tbody>
@@ -295,4 +349,10 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   loadPage("home");
+});
+const myCarouselElement = document.querySelector('#myCarousel');
+
+const carousel = new bootstrap.Carousel(myCarouselElement, {
+  interval: 2000,
+  touch: false
 });
