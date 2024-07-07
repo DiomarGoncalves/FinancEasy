@@ -2,6 +2,8 @@ document.addEventListener("DOMContentLoaded", function () {
   const content = document.getElementById("content");
   const navLinks = document.querySelectorAll("nav a");
   const resetButton = document.getElementById("reset-db");
+
+  loadPage("home");
   function loadPage(page) {
     fetch(`pages/${page}.html`)
       .then((response) => response.text())
@@ -17,21 +19,6 @@ document.addEventListener("DOMContentLoaded", function () {
       });
   }
 
-  // Função para carregar a página de cartões
-  function loadPage(page) {
-    fetch(`pages/${page}.html`)
-      .then((response) => response.text())
-      .then((data) => {
-        content.innerHTML = data;
-        if (page === "cards") {
-          setupCardsPage();
-        } else if (page === "monthly-expenses") {
-          setupMonthlyExpensesPage();
-        } else if (page === "reports") {
-          setupReportsPage();
-        }
-      });
-  }
 
   // Função para configurar a página de cartões
   function setupCardsPage() {
@@ -48,7 +35,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Função para adicionar um cartão
     function addCard(name, limite, dueDate) {
-      fetch("http://localhost:3015/api/cards", {
+      fetch("http://localhost:3016/api/cards", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -68,7 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Função para carregar os cartões
     function loadCards() {
-      fetch("http://localhost:3015/api/cards")
+      fetch("http://localhost:3016/api/cards")
         .then((response) => response.json())
         .then((data) => {
           if (data.error) {
@@ -101,7 +88,7 @@ document.addEventListener("DOMContentLoaded", function () {
       cardsTable.querySelectorAll(".edit-card-button").forEach((button) => {
         button.addEventListener("click", function () {
           const cardId = this.getAttribute("data-id");
-          fetch(`http://localhost:3015/api/cards/${cardId}`)
+          fetch(`http://localhost:3016/api/cards/${cardId}`)
             .then((response) => response.json())
             .then((data) => {
               if (data.error) {
@@ -120,7 +107,6 @@ document.addEventListener("DOMContentLoaded", function () {
             });
         });
       });
-      
 
       cardsTable.querySelectorAll(".delete-card-button").forEach((button) => {
         button.addEventListener("click", function () {
@@ -139,7 +125,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Função para excluir um cartão
   function deleteCard(cardId) {
-    fetch(`http://localhost:3015/api/cards/${cardId}`, {
+    fetch(`http://localhost:3016/api/cards/${cardId}`, {
       method: "DELETE",
     })
       .then((response) => {
@@ -171,7 +157,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     function addOrEditExpense(month, amount, cardId) {
-      fetch("http://localhost:3015/api/monthly-expenses", {
+      fetch("http://localhost:3016/api/monthly-expenses", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -190,7 +176,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function loadExpenses() {
-      fetch("http://localhost:3015/api/monthly-expenses")
+      fetch("http://localhost:3016/api/monthly-expenses")
         .then((response) => response.json())
         .then((data) => {
           if (data.error) {
@@ -222,7 +208,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function deleteExpense(id) {
-      fetch(`http://localhost:3015/api/monthly-expenses/${id}`, {
+      fetch(`http://localhost:3016/api/monthly-expenses/${id}`, {
         method: "DELETE",
       })
         .then((response) => {
@@ -245,7 +231,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     function loadCards() {
-      fetch("http://localhost:3015/api/cards")
+      fetch("http://localhost:3016/api/cards")
         .then((response) => response.json())
         .then((data) => {
           if (data.error) {
@@ -277,7 +263,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     function generateReport(month) {
-      fetch(`http://localhost:3015/api/monthly-expenses/${month}`)
+      fetch(`http://localhost:3016/api/monthly-expenses/${month}`)
         .then((response) => response.json())
         .then((data) => {
           if (data.error) {
@@ -334,7 +320,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   resetButton.addEventListener("click", function () {
     if (confirm("Você tem certeza que deseja zerar o banco de dados?")) {
-      fetch("http://localhost:3015/api/reset-db", {
+      fetch("http://localhost:3016/api/reset-db", {
         method: "POST",
       })
         .then((response) => response.json())
@@ -347,12 +333,4 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
   });
-
-  loadPage("home");
-});
-const myCarouselElement = document.querySelector('#myCarousel');
-
-const carousel = new bootstrap.Carousel(myCarouselElement, {
-  interval: 2000,
-  touch: false
 });
