@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+      crossorigin="anonymous"
+    />
+    <style>
+    body {
+    background-color: #121212;
+    color: white;
+    }
+
+    .form-control, .form-select {
+        border-color: #333;
+    }
+
+    .form-control:focus, .form-select:focus {
+        box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        border-color: #555;
+    }
+
+    </style>
+    <title>Despesas</title>
+  </head>
+  <body>
+  <div class="container-fluid mt-4">
+    <a href="/" class="btn btn-light mb-3">Voltar para o inicio</a>
+      <h1>Controle de Despesas</h1>
+      <div class="container mt-5 bg-dark text-white p-4 rounded">
+        <h2 class="mb-4">Adicionar Despesa</h2>
+        <form id="despesaForm" class="needs-validation" novalidate>
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="estabelecimento" class="form-label">Estabelecimento</label>
+                    <input type="text" name="estabelecimento" class="form-control bg-dark text-white" placeholder="Nome do estabelecimento" required>
+                    <div class="invalid-feedback">Por favor, insira o nome do estabelecimento.</div>
+                </div>
+                <div class="col-md-6">
+                    <label for="data" class="form-label">Data</label>
+                    <input type="date" name="data" class="form-control bg-dark text-white" required>
+                    <div class="invalid-feedback">Por favor, selecione uma data.</div>
+                </div>
+            </div>
+    
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label for="valor" class="form-label">Valor</label>
+                    <input type="number" name="valor" class="form-control bg-dark text-white" placeholder="Valor da despesa" required>
+                    <div class="invalid-feedback">Por favor, insira o valor da despesa.</div>
+                </div>
+                <div class="col-md-6">
+                    <label for="forma_pagamento" class="form-label">Forma de Pagamento</label>
+                    <select name="forma_pagamento" class="form-select bg-dark text-white" required>
+                        <option value="">Selecione</option>
+                        <option value="avista">À Vista</option>
+                        <option value="parcelado">Parcelado</option>
+                    </select>
+                    <div class="invalid-feedback">Por favor, selecione a forma de pagamento.</div>
+                </div>
+            </div>
+    
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label for="numero_parcelas" class="form-label">Número de Parcelas</label>
+                    <input type="number" name="numero_parcelas" class="form-control bg-dark text-white" placeholder="Número de parcelas" required>
+                    <div class="invalid-feedback">Por favor, insira o número de parcelas.</div>
+                </div>
+                <div class="col-md-4">
+                    <label for="valor_parcela" class="form-label">Valor da Parcela</label>
+                    <input type="number" name="valor_parcela" class="form-control bg-dark text-white" placeholder="Valor de cada parcela" required>
+                    <div class="invalid-feedback">Por favor, insira o valor de cada parcela.</div>
+                </div>
+                <div class="col-md-4">
+                    <label for="parcelas_restantes" class="form-label">Parcelas Restantes</label>
+                    <input type="number" name="parcelas_restantes" class="form-control bg-dark text-white" placeholder="Parcelas restantes" readonly>
+                    <div class="invalid-feedback">Esse campo será preenchido automaticamente.</div>
+                </div>
+            </div>
+    
+            <button type="submit" class="btn btn-primary">Adicionar Despesa</button>
+        </form>
+    </div>
+  </div>
+
+  <div class="container-fluid mt-5">
+    <h2 class="text-white mb-4">Lista de Despesas</h2>
+    <div class="table-responsive">
+        <table class="table table-dark table-striped table-bordered w-100" id="despesasTable" style="max-height: 10vh;">
+            <thead>
+                <tr>
+                    <th scope="col">Estabelecimento</th>
+                    <th scope="col">Data</th>
+                    <th scope="col">Valor</th>
+                    <th scope="col">Forma de Pagamento</th>
+                    <th scope="col">Número de Parcelas</th>
+                    <th scope="col">Parcelas Restantes</th>
+                    <th scope="col">Valor da Parcela</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Exemplo Estabelecimento</td>
+                    <td>12/10/2023</td>
+                    <td>R$ 150,00</td>
+                    <td>Parcelado</td>
+                    <td>6</td>
+                    <td>3</td>
+                </tr>
+                <!-- Adicione mais linhas conforme necessário -->
+            </tbody>
+        </table>
+    </div>
+  </div>
+
+
+    <script>
+      // Função para carregar despesas
+      async function loadDespesas() {
+        const response = await fetch("/despesas");
+        const despesas = await response.json();
+        const tableBody = document.querySelector("#despesasTable tbody");
+        tableBody.innerHTML = "";
+
+        despesas.forEach((despesa) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+                    <td>${despesa.estabelecimento}</td>
+                    <td>${despesa.data}</td>
+                    <td>${despesa.valor}</td>
+                    <td>${despesa.forma_pagamento}</td>
+                    <td>${despesa.numero_parcelas}</td>
+                    <td>${despesa.parcelas_restantes}</td>
+                    <td>${despesa.valor_parcela}</td>
+                `;
+          tableBody.appendChild(row);
+        });
+      }
+
+      // Função para adicionar despesa
+      document
+        .getElementById("despesaForm")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const formData = new FormData(event.target);
+          const data = Object.fromEntries(formData.entries());
+
+          // Exiba os dados no console para verificação
+          console.log(data);
+
+          // Verifica se todos os campos estão preenchidos
+          if (
+            !data.estabelecimento ||
+            !data.data ||
+            !data.valor ||
+            !data.forma_pagamento ||
+            !data.numero_parcelas ||
+            !data.parcelas_restantes ||
+            !data.valor_parcela
+          ) {
+            alert("Por favor, preencha todos os campos.");
+            return;
+          }
+
+          try {
+            // Envia os dados ao servidor
+            const response = await fetch("/despesas/add", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify(data),
+            });
+
+            // Verifique a resposta do servidor
+            const result = await response.json();
+            console.log(result);
+
+            if (response.ok) {
+              alert("Despesa adicionada com sucesso!");
+              event.target.reset(); // Limpar o formulário
+            } else {
+              alert("Erro ao adicionar despesa.");
+            }
+          } catch (error) {
+            console.error("Erro:", error);
+          }
+        });
+      loadDespesas();
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
