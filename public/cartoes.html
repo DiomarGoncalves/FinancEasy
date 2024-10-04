@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cartões</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+        }
+
+        .btn-back {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Lista de Cartões</h1>
+
+        <!-- Botão para adicionar novo cartão -->
+        <a href="/cartoes/novo" class="btn btn-light mb-4">Adicionar Novo Cartão</a>
+
+        <!-- Tabela de cartões -->
+        <table class="table table-dark table-striped">
+            <thead>
+                <tr>
+                    <th>Nome do Cartão</th>
+                    <th>Banco</th>
+                    <th>Limite</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="listaCartoes">
+                <!-- Os cartões serão listados aqui -->
+            </tbody>
+        </table>
+
+        <!-- Botão para voltar à home -->
+        <a href="/" class="btn btn-light btn-back">Voltar para a Home</a>
+    </div>
+
+    <script>
+        // Função para carregar cartões do banco de dados
+        function loadCartoes() {
+            fetch('/cartoes/loadCartoes')
+                .then(response => response.json())
+                .then(cartoes => {
+                    const tbody = document.getElementById('listaCartoes');
+                    tbody.innerHTML = ''; // Limpa a tabela existente
+                    cartoes.forEach(cartao => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${cartao.nome}</td>
+                            <td>${cartao.banco}</td>
+                            <td>${cartao.limite}</td>
+                            <td>
+                                <a href="/cartoes/${encodeURIComponent(cartao.nome)}" class="btn btn-light">Ver Detalhes</a>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Erro ao carregar cartões:', error));
+        }
+        // Chama a função para carregar os cartões ao carregar a página
+        window.onload = loadCartoes;
+    </script>
+</body>
+</html>
