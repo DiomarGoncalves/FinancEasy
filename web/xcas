@@ -1,0 +1,172 @@
+const { app, BrowserWindow, ipcMain } = require('electron');
+const path = require('path');
+const db = require('./db');
+
+function createWindow() {
+    const mainWindow = new BrowserWindow({
+        width: 800,
+        height: 600,
+        webPreferences: {
+            preload: path.join(__dirname, 'preload.js'),
+            nodeIntegration: false,
+            contextIsolation: true
+        }
+    });
+
+    mainWindow.loadFile(path.join(__dirname, 'public', 'index.html')); // Carrega o arquivo HTML principal
+}
+
+app.whenReady().then(() => {
+    createWindow();
+
+    app.on('activate', () => {
+        if (BrowserWindow.getAllWindows().length === 0) {
+            createWindow();
+        }
+    });
+});
+
+app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+        app.quit();
+    }
+});
+
+// IPC Handlers para despesas
+ipcMain.handle('add-despesa', async (event, despesa) => {
+    const { estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id } = despesa;
+
+    return new Promise((resolve, reject) => {
+        const sql = `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) 
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+        db.run(sql, [estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id], function (err) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve({ id: this.lastID });
+            }
+        });
+    });
+});
+
+ipcMain.handle('get-despesas', async () => {
+    return new Promise((resolve, reject) => {
+        db.all(`SELECT * FROM despesas`, [], (err, rows) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
+    });
+});
+
+ipcMain.handle('delete-despesa', async (event, id) => {
+    return new Promise((resolve, reject) => {
+        const sql = `DELETE FROM despesas WHERE id = ?`;
+        db.run(sql, [id], function (err) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve({ changes: this.changes });
+            }
+        });
+    });
+});
+
+ipcMain.handle('pay-despesa', async (event, id) => {
+    return new Promise((resolve, reject) => {
+        const sql = `SELECT * FROM despesas WHERE id = ?`;
+        db.get(sql, [id], (err, despesa) => {
+            if (err) {
+                reject(err);
+            } else {
+                const insertSql = `INSERT INTO historico_despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id, data_pagamento) 
+                                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                const deleteSql = `DELETE FROM despesas WHERE id = ?`;
+                const data_pagamento = new Date().toISOString().split('T')[0];
+
+                db.run(insertSql, [despesa.estabelecimento, despesa.data, despesa.valor, despesa.forma_pagamento, despesa.numero_parcelas, despesa.parcelas_restantes, despesa.valor_parcela, despesa.cartao_id, data_pagamento], function (err) {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        db.run(deleteSql, [id], function (err) {
+                            if (err) {
+                                reject(err);
+                            } else {
+                                resolve({ changes: this.changes });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    });
+});
+
+ipcMain.handle('get-cartoes', async () => {
+    return new Promise((resolve, reject) => {
+        db.all(`SELECT * FROM cartoes`, [], (err, rows) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
+    });
+});
+
+ipcMain.handle('add-cartao', async (event, cartao) => {
+    const { nome, banco, limite } = cartao;
+
+    return new Promise((resolve, reject) => {
+        const sql = `INSERT INTO cartoes (nome, banco, limite) VALUES (?, ?, ?)`;
+        db.run(sql, [nome, banco, limite], function (err) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve({ id: this.lastID });
+            }
+        });
+    });
+});
+
+ipcMain.handle('delete-cartao', async (event, id) => {
+    return new Promise((resolve, reject) => {
+        const sql = `DELETE FROM cartoes WHERE id = ?`;
+        db.run(sql, [id], function (err) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve({ changes: this.changes });
+            }
+        });
+    });
+});
+
+ipcMain.handle('update-cartao', async (event, cartao) => {
+    const { id, nome, banco, limite } = cartao;
+
+    return new Promise((resolve, reject) => {
+        const sql = `UPDATE cartoes SET nome = ?, banco = ?, limite = ? WHERE id = ?`;
+        db.run(sql, [nome, banco, limite, id], function (err) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve({ changes: this.changes });
+            }
+        });
+    });
+});
+
+ipcMain.handle('get-historico-despesas', async () => {
+    return new Promise((resolve, reject) => {
+        db.all(`SELECT * FROM historico_despesas`, [], (err, rows) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
+    });
+});

@@ -1,85 +1,133 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cartões</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
             background-color: #121212;
-            color: #ffffff;
+            color: #fff;
         }
-
-        .container {
-            margin-top: 50px;
+        .form-control,
+        .form-select {
+            background-color: #444;
+            color: #fff;
+            border-color: #333;
         }
-
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        table {
-            width: 100%;
-        }
-
-        .btn-back {
-            margin-bottom: 20px;
+        .form-control:focus,
+        .form-select:focus {
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+            border-color: #555;
         }
     </style>
+    <title>Lista de Cartões</title>
 </head>
 <body>
-    <div class="container">
+    <div class="container-fluid mt-4">
+        <a href="index.html" class="btn btn-light mb-3">Voltar para o inicio</a>
         <h1>Lista de Cartões</h1>
+        <div class="table-responsive">
+            <table class="table table-dark table-striped table-bordered w-100" id="cartoesTable">
+                <thead>
+                    <tr>
+                        <th scope="col">Nome</th>
+                        <th scope="col">Banco</th>
+                        <th scope="col">Limite</th>
+                        <th scope="col">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Linhas serão adicionadas dinamicamente -->
+                </tbody>
+            </table>
+        </div>
+        <a href="novoCartao.html" class="btn btn-light mt-4">Adicionar Novo Cartão</a>
+    </div>
 
-        <!-- Botão para adicionar novo cartão -->
-        <a href="/cartoes/novo" class="btn btn-light mb-4">Adicionar Novo Cartão</a>
-
-        <!-- Tabela de cartões -->
-        <table class="table table-dark table-striped">
-            <thead>
-                <tr>
-                    <th>Nome do Cartão</th>
-                    <th>Banco</th>
-                    <th>Limite</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody id="listaCartoes">
-                <!-- Os cartões serão listados aqui -->
-            </tbody>
-        </table>
-
-        <!-- Botão para voltar à home -->
-        <a href="/" class="btn btn-light btn-back">Voltar para a Home</a>
+    <!-- Modal para editar cartão -->
+    <div class="modal fade" id="editCartaoModal" tabindex="-1" aria-labelledby="editCartaoModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content bg-dark text-white">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editCartaoModalLabel">Editar Cartão</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editCartaoForm">
+                        <input type="hidden" id="editCartaoId">
+                        <div class="mb-3">
+                            <label for="editNome" class="form-label">Nome do Cartão</label>
+                            <input type="text" class="form-control" id="editNome" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editBanco" class="form-label">Banco</label>
+                            <input type="text" class="form-control" id="editBanco" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editLimite" class="form-label">Limite</label>
+                            <input type="number" class="form-control" id="editLimite" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Função para carregar cartões do banco de dados
-        function loadCartoes() {
-            fetch('/cartoes/loadCartoes')
-                .then(response => response.json())
-                .then(cartoes => {
-                    const tbody = document.getElementById('listaCartoes');
-                    tbody.innerHTML = ''; // Limpa a tabela existente
-                    cartoes.forEach(cartao => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>${cartao.nome}</td>
-                            <td>${cartao.banco}</td>
-                            <td>${cartao.limite}</td>
-                            <td>
-                                <a href="/cartoes/${encodeURIComponent(cartao.nome)}" class="btn btn-light">Ver Detalhes</a>
-                            </td>
-                        `;
-                        tbody.appendChild(row);
-                    });
-                })
-                .catch(error => console.error('Erro ao carregar cartões:', error));
+        async function loadCartoes() {
+            const cartoes = await window.controle.invoke('get-cartoes');
+            const tableBody = document.querySelector("#cartoesTable tbody");
+            tableBody.innerHTML = ""; // Limpar tabela
+
+            cartoes.forEach((cartao) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${cartao.nome}</td>
+                    <td>${cartao.banco}</td>
+                    <td>${cartao.limite}</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" onclick="showEditModal(${cartao.id}, '${cartao.nome}', '${cartao.banco}', ${cartao.limite})">Editar</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteCartao(${cartao.id})">Excluir</button>
+                    </td>
+                `;
+                tableBody.appendChild(row); // Adicionar linha à tabela
+            });
         }
-        // Chama a função para carregar os cartões ao carregar a página
-        window.onload = loadCartoes;
+
+        async function deleteCartao(id) {
+            if (confirm('Tem certeza que deseja excluir este cartão?')) {
+                await window.controle.invoke('delete-cartao', id);
+                loadCartoes(); // Atualizar a lista de cartões
+            }
+        }
+
+        function showEditModal(id, nome, banco, limite) {
+            document.getElementById('editCartaoId').value = id;
+            document.getElementById('editNome').value = nome;
+            document.getElementById('editBanco').value = banco;
+            document.getElementById('editLimite').value = limite;
+            const editModal = new bootstrap.Modal(document.getElementById('editCartaoModal'));
+            editModal.show();
+        }
+
+        document.getElementById('editCartaoForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const id = document.getElementById('editCartaoId').value;
+            const nome = document.getElementById('editNome').value;
+            const banco = document.getElementById('editBanco').value;
+            const limite = document.getElementById('editLimite').value;
+
+            await window.controle.invoke('update-cartao', { id, nome, banco, limite: parseFloat(limite) });
+            const editModal = bootstrap.Modal.getInstance(document.getElementById('editCartaoModal'));
+            editModal.hide();
+            loadCartoes(); // Atualizar a lista de cartões
+        });
+
+        loadCartoes();
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
 </body>
 </html>
