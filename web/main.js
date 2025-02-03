@@ -308,6 +308,7 @@ ipcMain.handle('get-despesas-filtradas', async (event, filtros) => {
         const sql = `SELECT * FROM despesas WHERE data BETWEEN ? AND ?`;
         db.all(sql, [dataInicio, dataFim], (err, rows) => {
             if (err) {
+                console.error('Erro ao buscar despesas:', err); // Log de erro
                 reject(err);
             } else {
                 console.log('Despesas filtradas no banco de dados:', rows); // Log para depuração
@@ -324,6 +325,7 @@ ipcMain.handle('get-receitas-filtradas', async (event, filtros) => {
         const sql = `SELECT * FROM receitas WHERE data BETWEEN ? AND ?`;
         db.all(sql, [dataInicio, dataFim], (err, rows) => {
             if (err) {
+                console.error('Erro ao buscar receitas:', err); // Log de erro
                 reject(err);
             } else {
                 console.log('Receitas filtradas no banco de dados:', rows); // Log para depuração
@@ -332,7 +334,6 @@ ipcMain.handle('get-receitas-filtradas', async (event, filtros) => {
         });
     });
 });
-
 // IPC Handler para calcular saldo
 ipcMain.handle('calcular-saldo', async () => {
     return new Promise((resolve, reject) => {
