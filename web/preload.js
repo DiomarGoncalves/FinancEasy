@@ -24,5 +24,6 @@ contextBridge.exposeInMainWorld('controle', {
     deleteReceita: (id) => ipcRenderer.invoke('delete-receita', id),
     getDespesasFiltradas: (filtros) => ipcRenderer.invoke('get-despesas-filtradas', filtros),
     getReceitasFiltradas: (filtros) => ipcRenderer.invoke('get-receitas-filtradas', filtros),
-    calcularSaldo: () => ipcRenderer.invoke('calcular-saldo')
+    calcularSaldo: () => ipcRenderer.invoke('calcular-saldo'),
+    inserirDespesasAnoCompleto: () => ipcRenderer.invoke('inserir-despesas-ano-completo'),
 });

@@ -208,31 +208,82 @@ function saveConfig(config) {
 function inserirValoresTeste() {
     return new Promise((resolve, reject) => {
         const sqls = [
-            `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Loja A', '2023-01-01', 100.00, 'Crédito', 1, 0, 100.00, 1)`,
-            `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Loja B', '2023-02-01', 200.00, 'Débito', 2, 1, 100.00, 2)`,
+            `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Loja A', '2025-01-01', 100.00, 'Crédito', 1, 0, 100.00, 1)`,
+            `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Loja B', '2025-02-01', 200.00, 'Débito', 2, 1, 100.00, 2)`,
             `INSERT INTO cartoes (nome, banco, limite) VALUES ('Cartão A', 'Banco A', 1000.00)`,
-            `INSERT INTO cartoes (nome, banco, limite) VALUES ('Cartão B', 'Banco B', 2000.00)`
+            `INSERT INTO cartoes (nome, banco, limite) VALUES ('Cartão B', 'Banco B', 2000.00)`,
+            `INSERT INTO historico_despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id, data_pagamento) VALUES ('Loja A', '2025-01-01', 100.00, 'Crédito', 1, 0, 100.00, 1, '2025-01-02')`,
+            `INSERT INTO historico_despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id, data_pagamento) VALUES ('Loja B', '2025-02-01', 200.00, 'Débito', 2, 1, 100.00, 2, '2025-02-02')`,
+            `INSERT INTO receitas (descricao, data, valor, forma_recebimento) VALUES ('Salário', '2025-01-15', 3000.00, 'Transferência')`,
+            `INSERT INTO receitas (descricao, data, valor, forma_recebimento) VALUES ('Freelance', '2025-02-10', 1500.00, 'Dinheiro')`
         ];
         db.serialize(() => {
-            sqls.forEach(sql => db.run(sql, (err) => {
-                if (err) reject(err);
-            }));
+            sqls.forEach(sql => {
+                db.run(sql, (err) => {
+                    if (err) {
+                        console.error('Erro ao executar SQL:', sql, err); // Log de erro
+                        reject(err);
+                    }
+                });
+            });
             resolve();
         });
     });
 }
 
+function inserirDespesasAnoCompleto() {
+    return new Promise((resolve, reject) => {
+        const sqls = [
+            `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Supermercado', '2025-01-15', 150.00, 'Crédito', 1, 0, 150.00, 1)`,
+            `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Padaria', '2025-02-10', 50.00, 'Débito', 1, 0, 50.00, 2)`,
+            `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Farmácia', '2025-03-05', 75.00, 'Dinheiro', 1, 0, 75.00, NULL)`,
+            `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Restaurante', '2025-04-20', 200.00, 'Crédito', 2, 1, 100.00, 1)`,
+            `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Posto de Gasolina', '2025-05-18', 120.00, 'Débito', 1, 0, 120.00, 2)`,
+            `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Cinema', '2025-06-25', 60.00, 'Dinheiro', 1, 0, 60.00, NULL)`,
+            `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Loja de Roupas', '2025-07-12', 300.00, 'Crédito', 3, 2, 100.00, 1)`,
+            `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Supermercado', '2025-08-08', 180.00, 'Débito', 1, 0, 180.00, 2)`,
+            `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Padaria', '2025-09-14', 40.00, 'Dinheiro', 1, 0, 40.00, NULL)`,
+            `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Farmácia', '2025-10-22', 90.00, 'Crédito', 1, 0, 90.00, 1)`,
+            `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Restaurante', '2025-11-30', 250.00, 'Débito', 1, 0, 250.00, 2)`,
+            `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Posto de Gasolina', '2025-12-05', 100.00, 'Dinheiro', 1, 0, 100.00, NULL)`
+        ];
+        db.serialize(() => {
+            sqls.forEach(sql => {
+                db.run(sql, (err) => {
+                    if (err) {
+                        console.error('Erro ao executar SQL:', sql, err); // Log de erro
+                        reject(err);
+                    }
+                });
+            });
+            resolve();
+        });
+    });
+}
+
+// Adicione um manipulador IPC para chamar essa função
+ipcMain.handle('inserir-despesas-ano-completo', async () => {
+    await inserirDespesasAnoCompleto();
+    return 'Despesas inseridas para todos os meses do ano de 2025';
+});
 // Função para limpar o banco de dados
 function limparBanco() {
     return new Promise((resolve, reject) => {
         const sqls = [
             `DELETE FROM despesas`,
-            `DELETE FROM cartoes`
+            `DELETE FROM cartoes`,
+            `DELETE FROM historico_despesas`,
+            `DELETE FROM receitas`
         ];
         db.serialize(() => {
-            sqls.forEach(sql => db.run(sql, (err) => {
-                if (err) reject(err);
-            }));
+            sqls.forEach(sql => {
+                db.run(sql, (err) => {
+                    if (err) {
+                        console.error('Erro ao executar SQL:', sql, err); // Log de erro
+                        reject(err);
+                    }
+                });
+            });
             resolve();
         });
     });
@@ -306,6 +357,7 @@ ipcMain.handle('get-despesas-filtradas', async (event, filtros) => {
     console.log('Filtros recebidos:', filtros); // Log para depuração
     return new Promise((resolve, reject) => {
         const sql = `SELECT * FROM despesas WHERE data BETWEEN ? AND ?`;
+        console.log('Executando SQL:', sql, [dataInicio, dataFim]); // Log para depuração
         db.all(sql, [dataInicio, dataFim], (err, rows) => {
             if (err) {
                 console.error('Erro ao buscar despesas:', err); // Log de erro
@@ -320,15 +372,15 @@ ipcMain.handle('get-despesas-filtradas', async (event, filtros) => {
 
 ipcMain.handle('get-receitas-filtradas', async (event, filtros) => {
     const { dataInicio, dataFim } = filtros;
-    console.log('Filtros recebidos:', filtros); // Log para depuração
+    // console.log('Filtros recebidos:', filtros); // Log para depuração
     return new Promise((resolve, reject) => {
         const sql = `SELECT * FROM receitas WHERE data BETWEEN ? AND ?`;
         db.all(sql, [dataInicio, dataFim], (err, rows) => {
             if (err) {
-                console.error('Erro ao buscar receitas:', err); // Log de erro
+                // console.error('Erro ao buscar receitas:', err); // Log de erro
                 reject(err);
             } else {
-                console.log('Receitas filtradas no banco de dados:', rows); // Log para depuração
+                // console.log('Receitas filtradas no banco de dados:', rows); // Log para depuração
                 resolve(rows);
             }
         });

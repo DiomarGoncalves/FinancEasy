@@ -1,208 +1,569 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Relatórios</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        body {
-            background-color: #121212;
-            color: #fff;
-        }
-        .form-control,
-        .form-select {
-            background-color: #444;
-            color: #fff;
-            border-color: #333;
-        }
-        .form-control:focus,
-        .form-select:focus {
-            box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
-            border-color: #555;
-        }
-        .hidden {
-            display: none;
-        }
-        .menu {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .menu button {
-            margin: 10px;
-        }
+      body {
+        background-color: #121212;
+        color: #fff;
+      }
+      .container {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+      }
+      .form-control,
+      .form-select {
+        background-color: #444;
+        color: #fff;
+        border-color: #333;
+      }
+      .form-control:focus,
+      .form-select:focus {
+        box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        border-color: #555;
+      }
+      .modal-content {
+        background-color: #333;
+        color: #ffffff;
+      }
+      .modal-header,
+      .modal-footer {
+        border-color: #444;
+      }
+      .btn-primary {
+        background-color: #007bff;
+        border-color: #007bff;
+      }
+      .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+      }
+      .hidden {
+        display: none;
+      }
+      .menu {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .menu button {
+        margin: 10px;
+      }
+      .dashboards {
+        display: flex;
+        flex-wrap: wrap;
+        flex-direction: column;
+        align-content: center;
+      }
+      canvas {
+        max-width: 200%;
+        max-height: 200%;
+        margin: 20px 0;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <div class="menu">
-            <button class="btn btn-primary" onclick="showForm('despesasForm')">Filtrar Despesas</button>
-            <button class="btn btn-primary" onclick="showForm('receitasForm')">Filtrar Receitas</button>
-            <button class="btn btn-primary" onclick="calcularSaldo()">Calcular Saldo</button>
+      <a href="index.html" class="btn btn-light mb-3">Voltar para o início</a>
+      <div class="dashboards">
+        <div>
+          <h2>Despesas Mensais</h2>
+          <canvas id="despesasMensaisChart"></canvas>
         </div>
+        <div>
+          <h2>Receitas Mensais</h2>
+          <canvas id="receitasMensaisChart"></canvas>
+        </div>
+        <div>
+          <h2>Saldo Mensal</h2>
+          <canvas id="saldoMensalChart"></canvas>
+        </div>
+        <div>
+          <h2>Formas de Pagamento</h2>
+          <canvas id="formasPagamentoChart"></canvas>
+        </div>
+      </div>
+      <div class="menu">
+        <button class="btn btn-primary" onclick="showForm('despesasForm')">
+          Filtrar Despesas
+        </button>
+        <button class="btn btn-primary" onclick="showForm('receitasForm')">
+          Filtrar Receitas
+        </button>
+        <button class="btn btn-primary" onclick="calcularSaldo()">
+          Calcular Saldo
+        </button>
+        <button class="btn btn-primary" onclick="abrirMesModal()">
+          Gerar Relatório Mensal
+        </button>
+      </div>
 
-        <div id="despesasForm" class="hidden">
-            <h2>Filtrar Despesas</h2>
-            <form id="formDespesas">
-                <div class="mb-3">
-                    <label for="dataInicioDespesas" class="form-label">Data Início</label>
-                    <input type="date" class="form-control" id="dataInicioDespesas" name="dataInicioDespesas">
-                </div>
-                <div class="mb-3">
-                    <label for="dataFimDespesas" class="form-label">Data Fim</label>
-                    <input type="date" class="form-control" id="dataFimDespesas" name="dataFimDespesas">
-                </div>
-                <button type="button" class="btn btn-light" onclick="filtrarDespesas()">Filtrar</button>
-                <button type="button" class="btn btn-secondary" onclick="hideForm('despesasForm')">Cancelar</button>
-            </form>
-            <h3>Pré-visualização</h3>
-            <table class="table table-dark table-striped" id="previewDespesasTable">
-                <thead>
-                    <tr>
-                        <th>Estabelecimento</th>
-                        <th>Data</th>
-                        <th>Valor</th>
-                        <th>Forma de Pagamento</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Linhas serão adicionadas dinamicamente -->
-                </tbody>
-            </table>
-            <button class="btn btn-success" onclick="gerarRelatorioDespesas()">Gerar Relatório</button>
-        </div>
+      <div id="despesasForm" class="hidden">
+        <h2>Filtrar Despesas</h2>
+        <form id="formDespesas">
+          <div class="mb-3">
+            <label for="dataInicioDespesas" class="form-label"
+              >Data Início</label
+            >
+            <input
+              type="date"
+              class="form-control"
+              id="dataInicioDespesas"
+              name="dataInicioDespesas"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="dataFimDespesas" class="form-label">Data Fim</label>
+            <input
+              type="date"
+              class="form-control"
+              id="dataFimDespesas"
+              name="dataFimDespesas"
+            />
+          </div>
+          <button
+            type="button"
+            class="btn btn-light"
+            onclick="filtrarDespesas()"
+          >
+            Filtrar
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            onclick="hideForm('despesasForm')"
+          >
+            Cancelar
+          </button>
+        </form>
+        <h3>Pré-visualização</h3>
+        <table class="table table-dark table-striped" id="previewDespesasTable">
+          <thead>
+            <tr>
+              <th>Estabelecimento</th>
+              <th>Data</th>
+              <th>Valor</th>
+              <th>Forma de Pagamento</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Linhas serão adicionadas dinamicamente -->
+          </tbody>
+        </table>
+        <button class="btn btn-success" onclick="gerarRelatorioDespesas()">
+          Gerar Relatório
+        </button>
+      </div>
 
-        <div id="receitasForm" class="hidden">
-            <h2>Filtrar Receitas</h2>
-            <form id="formReceitas">
-                <div class="mb-3">
-                    <label for="dataInicioReceitas" class="form-label">Data Início</label>
-                    <input type="date" class="form-control" id="dataInicioReceitas" name="dataInicioReceitas">
+      <div id="receitasForm" class="hidden">
+        <h2>Filtrar Receitas</h2>
+        <form id="formReceitas">
+          <div class="mb-3">
+            <label for="dataInicioReceitas" class="form-label"
+              >Data Início</label
+            >
+            <input
+              type="date"
+              class="form-control"
+              id="dataInicioReceitas"
+              name="dataInicioReceitas"
+            />
+          </div>
+          <div class="mb-3">
+            <label for="dataFimReceitas" class="form-label">Data Fim</label>
+            <input
+              type="date"
+              class="form-control"
+              id="dataFimReceitas"
+              name="dataFimReceitas"
+            />
+          </div>
+          <button
+            type="button"
+            class="btn btn-light"
+            onclick="filtrarReceitas()"
+          >
+            Filtrar
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            onclick="hideForm('receitasForm')"
+          >
+            Cancelar
+          </button>
+        </form>
+        <h3>Pré-visualização</h3>
+        <table class="table table-dark table-striped" id="previewReceitasTable">
+          <thead>
+            <tr>
+              <th>Descrição</th>
+              <th>Data</th>
+              <th>Valor</th>
+              <th>Forma de Recebimento</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Linhas serão adicionadas dinamicamente -->
+          </tbody>
+        </table>
+        <button class="btn btn-success" onclick="gerarRelatorioReceitas()">
+          Gerar Relatório
+        </button>
+      </div>
+
+      <!-- Modal para selecionar o mês -->
+      <div class="modal" id="mesModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Selecionar Mês</h5>
+            </div>
+            <div class="modal-body">
+              <form id="mesForm">
+                <div class="form-group">
+                  <label for="mesInput">Mês (1-12)</label>
+                  <input
+                    type="number"
+                    class="form-control"
+                    id="mesInput"
+                    min="1"
+                    max="12"
+                    required
+                  />
                 </div>
-                <div class="mb-3">
-                    <label for="dataFimReceitas" class="form-label">Data Fim</label>
-                    <input type="date" class="form-control" id="dataFimReceitas" name="dataFimReceitas">
-                </div>
-                <button type="button" class="btn btn-light" onclick="filtrarReceitas()">Filtrar</button>
-                <button type="button" class="btn btn-secondary" onclick="hideForm('receitasForm')">Cancelar</button>
-            </form>
-            <h3>Pré-visualização</h3>
-            <table class="table table-dark table-striped" id="previewReceitasTable">
-                <thead>
-                    <tr>
-                        <th>Descrição</th>
-                        <th>Data</th>
-                        <th>Valor</th>
-                        <th>Forma de Recebimento</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Linhas serão adicionadas dinamicamente -->
-                </tbody>
-            </table>
-            <button class="btn btn-success" onclick="gerarRelatorioReceitas()">Gerar Relatório</button>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-primary"
+                onclick="submitMesForm()"
+              >
+                Gerar Relatório
+              </button>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-dismiss="modal"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
         </div>
+      </div>
     </div>
 
     <script>
-        function showForm(formId) {
-            document.getElementById(formId).classList.remove('hidden');
-        }
+      async function gerarGraficos() {
+        const dataAtual = new Date();
+        const anoAtual = dataAtual.getFullYear();
+        const dataInicio = `${anoAtual}-01-01`;
+        const dataFim = `${anoAtual}-12-31`; // Último dia do ano
 
-        function hideForm(formId) {
-            document.getElementById(formId).classList.add('hidden');
-        }
+        const despesas = await window.controle.getDespesasFiltradas({
+          dataInicio,
+          dataFim,
+        });
+        const receitas = await window.controle.getReceitasFiltradas({
+          dataInicio,
+          dataFim,
+        });
 
-        async function filtrarDespesas() {
-            const dataInicio = document.getElementById('dataInicioDespesas').value;
-            const dataFim = document.getElementById('dataFimDespesas').value;
-            const filtros = { dataInicio, dataFim };
-            console.log('Filtros:', filtros); // Log para depuração
-            const despesas = await window.controle.getDespesasFiltradas(filtros);
-            console.log('Despesas filtradas:', despesas); // Log para depuração
-            const tableBody = document.querySelector("#previewDespesasTable tbody");
-            tableBody.innerHTML = ""; // Limpar tabela
+        console.log("Despesas:", despesas); // Log para depuração
+        console.log("Receitas:", receitas); // Log para depuração
 
-            despesas.forEach((despesa) => {
-                const row = document.createElement("tr");
-                row.innerHTML = `
+        const despesasMensais = Array(12).fill(0);
+        const receitasMensais = Array(12).fill(0);
+        const formasPagamento = {};
+
+        despesas.forEach((despesa) => {
+          const mes = new Date(despesa.data).getMonth();
+          despesasMensais[mes] += despesa.valor;
+
+          if (formasPagamento[despesa.forma_pagamento]) {
+            formasPagamento[despesa.forma_pagamento] += despesa.valor;
+          } else {
+            formasPagamento[despesa.forma_pagamento] = despesa.valor;
+          }
+        });
+
+        receitas.forEach((receita) => {
+          const mes = new Date(receita.data).getMonth();
+          receitasMensais[mes] += receita.valor;
+        });
+
+        const saldoMensal = receitasMensais.map(
+          (receita, index) => receita - despesasMensais[index]
+        );
+
+        new Chart(document.getElementById("despesasMensaisChart"), {
+          type: "bar",
+          data: {
+            labels: [
+              "Jan",
+              "Feb",
+              "Mar",
+              "Apr",
+              "May",
+              "Jun",
+              "Jul",
+              "Aug",
+              "Sep",
+              "Oct",
+              "Nov",
+              "Dec",
+            ],
+            datasets: [
+              {
+                label: "Despesas Mensais",
+                data: despesasMensais,
+                backgroundColor: "rgba(255, 99, 132, 0.2)",
+                borderColor: "rgba(255, 99, 132, 1)",
+                borderWidth: 1,
+              },
+            ],
+          },
+        });
+
+        new Chart(document.getElementById("receitasMensaisChart"), {
+          type: "bar",
+          data: {
+            labels: [
+              "Jan",
+              "Feb",
+              "Mar",
+              "Apr",
+              "May",
+              "Jun",
+              "Jul",
+              "Aug",
+              "Sep",
+              "Oct",
+              "Nov",
+              "Dec",
+            ],
+            datasets: [
+              {
+                label: "Receitas Mensais",
+                data: receitasMensais,
+                backgroundColor: "rgba(75, 192, 192, 0.2)",
+                borderColor: "rgba(75, 192, 192, 1)",
+                borderWidth: 1,
+              },
+            ],
+          },
+        });
+
+        new Chart(document.getElementById("saldoMensalChart"), {
+          type: "line",
+          data: {
+            labels: [
+              "Jan",
+              "Feb",
+              "Mar",
+              "Apr",
+              "May",
+              "Jun",
+              "Jul",
+              "Aug",
+              "Sep",
+              "Oct",
+              "Nov",
+              "Dec",
+            ],
+            datasets: [
+              {
+                label: "Saldo Mensal",
+                data: saldoMensal,
+                backgroundColor: "rgba(153, 102, 255, 0.2)",
+                borderColor: "rgba(153, 102, 255, 1)",
+                borderWidth: 1,
+              },
+            ],
+          },
+        });
+
+        const formasPagamentoLabels = Object.keys(formasPagamento);
+        const formasPagamentoData = Object.values(formasPagamento);
+
+        new Chart(document.getElementById("formasPagamentoChart"), {
+          type: "pie",
+          data: {
+            labels: formasPagamentoLabels,
+            datasets: [
+              {
+                label: "Formas de Pagamento",
+                data: formasPagamentoData,
+                backgroundColor: [
+                  "rgba(255, 99, 132, 0.2)",
+                  "rgba(54, 162, 235, 0.2)",
+                  "rgba(255, 206, 86, 0.2)",
+                  "rgba(75, 192, 192, 0.2)",
+                  "rgba(153, 102, 255, 0.2)",
+                  "rgba(255, 159, 64, 0.2)",
+                ],
+                borderColor: [
+                  "rgba(255, 99, 132, 1)",
+                  "rgba(54, 162, 235, 1)",
+                  "rgba(255, 206, 86, 1)",
+                  "rgba(75, 192, 192, 1)",
+                  "rgba(153, 102, 255, 1)",
+                  "rgba(255, 159, 64, 1)",
+                ],
+                borderWidth: 1,
+              },
+            ],
+          },
+        });
+      }
+
+      // Chame a função para gerar os gráficos quando a página carregar
+      window.onload = gerarGraficos;
+      function showForm(formId) {
+        document.getElementById(formId).classList.remove("hidden");
+      }
+
+      function hideForm(formId) {
+        document.getElementById(formId).classList.add("hidden");
+      }
+
+      async function filtrarDespesas() {
+        const dataInicio = document.getElementById("dataInicioDespesas").value;
+        const dataFim = document.getElementById("dataFimDespesas").value;
+        const filtros = { dataInicio, dataFim };
+        console.log("Filtros:", filtros); // Log para depuração
+        const despesas = await window.controle.getDespesasFiltradas(filtros);
+        console.log("Despesas filtradas:", despesas); // Log para depuração
+        const tableBody = document.querySelector("#previewDespesasTable tbody");
+        tableBody.innerHTML = ""; // Limpar tabela
+
+        despesas.forEach((despesa) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
                     <td>${despesa.estabelecimento}</td>
                     <td>${despesa.data}</td>
                     <td>R$ ${despesa.valor.toFixed(2)}</td>
                     <td>${despesa.forma_pagamento}</td>
                 `;
-                tableBody.appendChild(row); // Adicionar linha à tabela
-            });
-        }
+          tableBody.appendChild(row); // Adicionar linha à tabela
+        });
+      }
 
-        async function filtrarReceitas() {
-            const dataInicio = document.getElementById('dataInicioReceitas').value;
-            const dataFim = document.getElementById('dataFimReceitas').value;
-            const filtros = { dataInicio, dataFim };
-            console.log('Filtros:', filtros); // Log para depuração
-            const receitas = await window.controle.getReceitasFiltradas(filtros);
-            console.log('Receitas filtradas:', receitas); // Log para depuração
-            const tableBody = document.querySelector("#previewReceitasTable tbody");
-            tableBody.innerHTML = ""; // Limpar tabela
+      function gerarRelatorioDespesas() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.text("Relatório de Despesas", 10, 10);
+        doc.autoTable({
+          html: "#previewDespesasTable",
+          didDrawPage: (data) => {
+            // Adicionar o total gasto no final da página
+            const pageHeight = doc.internal.pageSize.height;
+            const totalGasto = Array.from(data.table.body).reduce(
+              (acc, row) => {
+                const valorText = row.cells[2]?.textContent || "0";
+                const valor = parseFloat(valorText.replace("R$ ", ""));
+                return acc + (isNaN(valor) ? 0 : valor);
+              },
+              0
+            );
+            doc.text(
+              `Total Gasto: R$ ${totalGasto.toFixed(2)}`,
+              10,
+              pageHeight - 10
+            );
+          },
+        });
+        doc.save("relatorio_despesas.pdf");
+      }
 
-            receitas.forEach((receita) => {
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${receita.descricao}</td>
-                    <td>${receita.data}</td>
-                    <td>R$ ${receita.valor.toFixed(2)}</td>
-                    <td>${receita.forma_recebimento}</td>
-                `;
-                tableBody.appendChild(row); // Adicionar linha à tabela
-            });
-        }
+      function gerarRelatorioReceitas() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.text("Relatório de Receitas", 10, 10);
+        doc.autoTable({
+          html: "#previewReceitasTable",
+          didDrawPage: (data) => {
+            // Adicionar o total recebido no final da página
+            const pageHeight = doc.internal.pageSize.height;
+            const totalRecebido = Array.from(data.table.body).reduce(
+              (acc, row) => {
+                const valorText = row.cells[2]?.textContent || "0";
+                const valor = parseFloat(valorText.replace("R$ ", ""));
+                return acc + (isNaN(valor) ? 0 : valor);
+              },
+              0
+            );
+            doc.text(
+              `Total Recebido: R$ ${totalRecebido.toFixed(2)}`,
+              10,
+              pageHeight - 10
+            );
+          },
+        });
+        doc.save("relatorio_receitas.pdf");
+      }
 
-        async function calcularSaldo() {
-            const { saldo } = await window.controle.calcularSaldo();
-            alert(`Saldo atual: R$ ${saldo.toFixed(2)}`);
-        }
+      function abrirMesModal() {
+        const mesModal = new bootstrap.Modal(document.getElementById('mesModal'));
+        mesModal.show();
+    }
 
-        function gerarRelatorioDespesas() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            doc.text("Relatório de Despesas", 10, 10);
-            doc.autoTable({
-                html: '#previewDespesasTable',
-                didDrawPage: (data) => {
-                    // Adicionar o total gasto no final da página
-                    const pageHeight = doc.internal.pageSize.height;
-                    const totalGasto = Array.from(data.table.body).reduce((acc, row) => {
-                        const valor = parseFloat(row.cells[2].textContent.replace('R$ ', ''));
-                        return acc + (isNaN(valor) ? 0 : valor);
-                    }, 0);
-                    doc.text(`Total Gasto: R$ ${totalGasto.toFixed(2)}`, 10, pageHeight - 10);
-                }
-            });
-            doc.save('relatorio_despesas.pdf');
-        }
+    async function submitMesForm() {
+        const mes = document.getElementById('mesInput').value;
+        const ano = new Date().getFullYear();
+        const dataInicio = `${ano}-${mes.padStart(2, '0')}-01`;
+        const dataFim = new Date(ano, mes, 0).toISOString().split('T')[0]; // Último dia do mês
 
-        function gerarRelatorioReceitas() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            doc.text("Relatório de Receitas", 10, 10);
-            doc.autoTable({
-                html: '#previewReceitasTable',
-                didDrawPage: (data) => {
-                    // Adicionar o total recebido no final da página
-                    const pageHeight = doc.internal.pageSize.height;
-                    const totalRecebido = Array.from(data.table.body).reduce((acc, row) => {
-                        const valor = parseFloat(row.cells[2].textContent.replace('R$ ', ''));
-                        return acc + (isNaN(valor) ? 0 : valor);
-                    }, 0);
-                    doc.text(`Total Recebido: R$ ${totalRecebido.toFixed(2)}`, 10, pageHeight - 10);
-                }
-            });
-            doc.save('relatorio_receitas.pdf');
-        }
+        const despesas = await window.controle.getDespesasFiltradas({ dataInicio, dataFim });
+        const receitas = await window.controle.getReceitasFiltradas({ dataInicio, dataFim });
+
+        console.log('Despesas:', despesas); // Log para depuração
+        console.log('Receitas:', receitas); // Log para depuração
+
+        const totalDespesas = despesas.reduce((acc, despesa) => acc + despesa.valor, 0);
+        const totalReceitas = receitas.reduce((acc, receita) => acc + receita.valor, 0);
+        const saldo = totalReceitas - totalDespesas;
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.text(`Relatório Mensal - ${mes}/${ano}`, 10, 10);
+        doc.text(`Total de Despesas: R$ ${totalDespesas.toFixed(2)}`, 10, 20);
+        doc.text(`Total de Receitas: R$ ${totalReceitas.toFixed(2)}`, 10, 30);
+        doc.text(`Saldo: R$ ${saldo.toFixed(2)}`, 10, 40);
+
+        doc.autoTable({
+            head: [['Descrição', 'Data', 'Valor', 'Forma de Pagamento']],
+            body: despesas.map(despesa => [despesa.estabelecimento, despesa.data, `R$ ${despesa.valor.toFixed(2)}`, despesa.forma_pagamento]),
+            startY: 50,
+            theme: 'striped',
+            headStyles: { fillColor: [255, 0, 0] },
+            margin: { top: 10 }
+        });
+
+        doc.autoTable({
+            head: [['Descrição', 'Data', 'Valor', 'Forma de Recebimento']],
+            body: receitas.map(receita => [receita.descricao, receita.data, `R$ ${receita.valor.toFixed(2)}`, receita.forma_recebimento]),
+            startY: doc.previousAutoTable.finalY + 10,
+            theme: 'striped',
+            headStyles: { fillColor: [0, 255, 0] },
+            margin: { top: 10 }
+        });
+
+        doc.save(`relatorio_mensal_${mes}_${ano}.pdf`);
+    }
     </script>
-</body>
+  </body>
 </html>

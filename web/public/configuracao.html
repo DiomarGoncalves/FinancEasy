@@ -49,9 +49,19 @@
             <button type="submit" class="btn btn-light">Salvar Configurações</button>
         </form>
         <button class="btn btn-warning mt-3" id="inserirTeste">Inserir Valores de Teste</button>
+        <button class="btn btn-primary mt-3" onclick="inserirDespesasAnoCompleto()">Inserir Despesas para Todos os Meses de 2025</button>
         <button class="btn btn-danger mt-3" id="limparBanco">Limpar Banco de Dados</button>
     </div>
     <script>
+        async function inserirDespesasAnoCompleto() {
+            try {
+                const resultado = await window.controle.inserirDespesasAnoCompleto();
+                alert(resultado);
+            } catch (error) {
+                console.error('Erro ao inserir despesas:', error);
+                alert('Erro ao inserir despesas. Verifique o console para mais detalhes.');
+            }
+        }
         document.addEventListener('DOMContentLoaded', async () => {
             const config = await window.controle.loadConfig();
             document.getElementById('tema').value = config.tema;
@@ -72,7 +82,7 @@
 
         document.getElementById('inserirTeste').addEventListener('click', async () => {
             await window.controle.inserirValoresTeste();
-            alert('Valores de teste inseridos com sucesso!');
+            // alert('Valores de teste inseridos com sucesso!');
         });
 
         document.getElementById('limparBanco').addEventListener('click', async () => {
@@ -82,3 +92,6 @@
     </script>
 </body>
 </html>
+
+
+<!-- AINDA ESTA EM DESENVOLVIMENTO POR ISSO HÁ MUITOS ERRINHOS -->
