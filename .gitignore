@@ -1,0 +1,37 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+.env
+
+# SQLite
+localdata/
+database.db
+database.sqlite
+*.sqlite3
+*.db-wal
+*.db-shm
+
+# Electron / Build
+dist/
+out/
+build/
+*.asar
+*.exe
+*.dmg
+*.app
+
+# Logs e arquivos temporários
+logs/
+*.log
+*.temp
+temp/
+cache/
+
+# IDEs e editores
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
