@@ -16,7 +16,7 @@ function createWindow() {
     });
     mainWindow.maximize();
 
-    mainWindow.loadFile(path.join(__dirname, 'public', 'index.html')); // Carrega o arquivo HTML principal
+    mainWindow.loadFile(path.join(__dirname, 'public', 'home.html')); // Carrega o arquivo HTML principal
 }
 
 app.whenReady().then(() => {

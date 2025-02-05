@@ -15,11 +15,10 @@ database.sqlite
 *.db-shm
 
 # Electron / Build
-dis/
+dist/
 out/
 build/
 *.asar
-*.exe
 *.dmg
 *.app
 
