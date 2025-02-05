@@ -1,3 +1,4 @@
+require('electron-reload')(__dirname);
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
@@ -13,6 +14,7 @@ function createWindow() {
             contextIsolation: true
         }
     });
+    mainWindow.maximize();
 
     mainWindow.loadFile(path.join(__dirname, 'public', 'index.html')); // Carrega o arquivo HTML principal
 }
@@ -372,15 +374,15 @@ ipcMain.handle('get-despesas-filtradas', async (event, filtros) => {
 
 ipcMain.handle('get-receitas-filtradas', async (event, filtros) => {
     const { dataInicio, dataFim } = filtros;
-    // console.log('Filtros recebidos:', filtros); // Log para depuração
+    console.log('Filtros recebidos:', filtros); // Log para depuração
     return new Promise((resolve, reject) => {
         const sql = `SELECT * FROM receitas WHERE data BETWEEN ? AND ?`;
         db.all(sql, [dataInicio, dataFim], (err, rows) => {
             if (err) {
-                // console.error('Erro ao buscar receitas:', err); // Log de erro
+                console.error('Erro ao buscar receitas:', err); // Log de erro
                 reject(err);
             } else {
-                // console.log('Receitas filtradas no banco de dados:', rows); // Log para depuração
+                console.log('Receitas filtradas no banco de dados:', rows); // Log para depuração
                 resolve(rows);
             }
         });

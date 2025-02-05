@@ -15,7 +15,7 @@ database.sqlite
 *.db-shm
 
 # Electron / Build
-dist/
+dis/
 out/
 build/
 *.asar

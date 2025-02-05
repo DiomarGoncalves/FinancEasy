@@ -101,14 +101,16 @@
         <button class="btn btn-primary" onclick="showForm('receitasForm')">
           Filtrar Receitas
         </button>
-        <button class="btn btn-primary" onclick="calcularSaldo()">
+        <!-- <button class="btn btn-primary" onclick="calcularSaldo()">
           Calcular Saldo
-        </button>
+        </button> -->
         <button class="btn btn-primary" onclick="abrirMesModal()">
           Gerar Relatório Mensal
         </button>
       </div>
-
+      <!-- <div>
+        <h3 id="saldo">Saldo: R$ 0,00</h3>
+      </div> -->
       <div id="despesasForm" class="hidden">
         <h2>Filtrar Despesas</h2>
         <form id="formDespesas">
@@ -160,6 +162,7 @@
           <tbody>
             <!-- Linhas serão adicionadas dinamicamente -->
           </tbody>
+          <h3 id="totalDespesas">totalDespesas: R$ 0,00</h3>
         </table>
         <button class="btn btn-success" onclick="gerarRelatorioDespesas()">
           Gerar Relatório
@@ -217,6 +220,7 @@
           <tbody>
             <!-- Linhas serão adicionadas dinamicamente -->
           </tbody>
+          <h3 id="totalReceitas">totalReceitas: R$ 0,00</h3>
         </table>
         <button class="btn btn-success" onclick="gerarRelatorioReceitas()">
           Gerar Relatório
@@ -267,6 +271,9 @@
     </div>
 
     <script>
+      let totalDespesas = 0;
+      let totalReceitas = 0;
+
       async function gerarGraficos() {
         const dataAtual = new Date();
         const anoAtual = dataAtual.getFullYear();
@@ -449,6 +456,7 @@
         console.log("Despesas filtradas:", despesas); // Log para depuração
         const tableBody = document.querySelector("#previewDespesasTable tbody");
         tableBody.innerHTML = ""; // Limpar tabela
+        totalDespesas = 0;
 
         despesas.forEach((despesa) => {
           const row = document.createElement("tr");
@@ -459,7 +467,33 @@
                     <td>${despesa.forma_pagamento}</td>
                 `;
           tableBody.appendChild(row); // Adicionar linha à tabela
+          totalDespesas += despesa.valor; // Atualizar total de despesas
         });
+        document.getElementById('totalDespesas').innerText = `Total Despesas: R$ ${totalDespesas.toFixed(2)}`;
+      }
+      async function filtrarReceitas() {
+        const dataInicio = document.getElementById("dataInicioReceitas").value;
+        const dataFim = document.getElementById("dataFimReceitas").value;
+        const filtros = { dataInicio, dataFim };
+        console.log("Filtros:", filtros); // Log para depuração
+        const Receitas = await window.controle.getReceitasFiltradas(filtros);
+        console.log("Receitas filtradas:", Receitas); // Log para depuração
+        const tableBody = document.querySelector("#previewReceitasTable tbody");
+        tableBody.innerHTML = ""; // Limpar tabela
+        totalReceitas = 0;
+
+        Receitas.forEach((Receitas) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+                    <td>${Receitas.descricao}</td>
+                    <td>${Receitas.data}</td>
+                    <td>R$ ${Receitas.valor.toFixed(2)}</td>
+                    <td>${Receitas.forma_recebimento}</td>
+                `;
+          tableBody.appendChild(row); // Adicionar linha à tabela
+          totalReceitas += Receitas.valor; // Atualizar total de Receitas
+        });
+        document.getElementById('totalReceitas').innerText = `Total Receitas: R$ ${totalReceitas.toFixed(2)}`;
       }
 
       function gerarRelatorioDespesas() {
@@ -517,24 +551,63 @@
       }
 
       function abrirMesModal() {
-        const mesModal = new bootstrap.Modal(document.getElementById('mesModal'));
+        const mesModal = new bootstrap.Modal(
+          document.getElementById("mesModal")
+        );
         mesModal.show();
-    }
+      }
 
-    async function submitMesForm() {
-        const mes = document.getElementById('mesInput').value;
+      // function calcularSaldo() {
+      //   // Obtém os elementos de entrada de receita e despesa
+      //   const receitas = document.querySelectorAll(".receita");
+      //   const despesas = document.querySelectorAll(".despesa");
+
+      //   // Calcula o total de receitas
+      //   let totalReceitas = 0;
+      //   receitas.forEach((receita) => {
+      //     totalReceitas += parseFloat(receita.textContent) || 0;
+      //   });
+
+      //   // Calcula o total de despesas
+      //   let totalDespesas = 0;
+      //   despesas.forEach((despesa) => {
+      //     totalDespesas += parseFloat(despesa.textContent) || 0;
+      //   });
+
+      //   // Calcula o saldo
+      //   const saldo = totalReceitas - totalDespesas;
+
+      //   // Exibe o saldo em um elemento com id 'saldo'
+      //   const saldoElement = document.getElementById("saldo");
+      //   saldoElement.textContent = `Saldo: R$ ${saldo.toFixed(2)}`;
+      // }
+
+      async function submitMesForm() {
+        const mes = document.getElementById("mesInput").value;
         const ano = new Date().getFullYear();
-        const dataInicio = `${ano}-${mes.padStart(2, '0')}-01`;
-        const dataFim = new Date(ano, mes, 0).toISOString().split('T')[0]; // Último dia do mês
+        const dataInicio = `${ano}-${mes.padStart(2, "0")}-01`;
+        const dataFim = new Date(ano, mes, 0).toISOString().split("T")[0]; // Último dia do mês
 
-        const despesas = await window.controle.getDespesasFiltradas({ dataInicio, dataFim });
-        const receitas = await window.controle.getReceitasFiltradas({ dataInicio, dataFim });
+        const despesas = await window.controle.getDespesasFiltradas({
+          dataInicio,
+          dataFim,
+        });
+        const receitas = await window.controle.getReceitasFiltradas({
+          dataInicio,
+          dataFim,
+        });
 
-        console.log('Despesas:', despesas); // Log para depuração
-        console.log('Receitas:', receitas); // Log para depuração
+        console.log("Despesas:", despesas); // Log para depuração
+        console.log("Receitas:", receitas); // Log para depuração
 
-        const totalDespesas = despesas.reduce((acc, despesa) => acc + despesa.valor, 0);
-        const totalReceitas = receitas.reduce((acc, receita) => acc + receita.valor, 0);
+        const totalDespesas = despesas.reduce(
+          (acc, despesa) => acc + despesa.valor,
+          0
+        );
+        const totalReceitas = receitas.reduce(
+          (acc, receita) => acc + receita.valor,
+          0
+        );
         const saldo = totalReceitas - totalDespesas;
 
         const { jsPDF } = window.jspdf;
@@ -545,25 +618,35 @@
         doc.text(`Saldo: R$ ${saldo.toFixed(2)}`, 10, 40);
 
         doc.autoTable({
-            head: [['Descrição', 'Data', 'Valor', 'Forma de Pagamento']],
-            body: despesas.map(despesa => [despesa.estabelecimento, despesa.data, `R$ ${despesa.valor.toFixed(2)}`, despesa.forma_pagamento]),
-            startY: 50,
-            theme: 'striped',
-            headStyles: { fillColor: [255, 0, 0] },
-            margin: { top: 10 }
+          head: [["Descrição", "Data", "Valor", "Forma de Pagamento"]],
+          body: despesas.map((despesa) => [
+            despesa.estabelecimento,
+            despesa.data,
+            `R$ ${despesa.valor.toFixed(2)}`,
+            despesa.forma_pagamento,
+          ]),
+          startY: 50,
+          theme: "striped",
+          headStyles: { fillColor: [255, 0, 0] },
+          margin: { top: 10 },
         });
 
         doc.autoTable({
-            head: [['Descrição', 'Data', 'Valor', 'Forma de Recebimento']],
-            body: receitas.map(receita => [receita.descricao, receita.data, `R$ ${receita.valor.toFixed(2)}`, receita.forma_recebimento]),
-            startY: doc.previousAutoTable.finalY + 10,
-            theme: 'striped',
-            headStyles: { fillColor: [0, 255, 0] },
-            margin: { top: 10 }
+          head: [["Descrição", "Data", "Valor", "Forma de Recebimento"]],
+          body: receitas.map((receita) => [
+            receita.descricao,
+            receita.data,
+            `R$ ${receita.valor.toFixed(2)}`,
+            receita.forma_recebimento,
+          ]),
+          startY: doc.previousAutoTable.finalY + 10,
+          theme: "striped",
+          headStyles: { fillColor: [0, 255, 0] },
+          margin: { top: 10 },
         });
 
         doc.save(`relatorio_mensal_${mes}_${ano}.pdf`);
-    }
+      }
     </script>
   </body>
 </html>
