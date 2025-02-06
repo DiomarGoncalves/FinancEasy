@@ -2,7 +2,7 @@ require('electron-reload')(__dirname);
 const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const fs = require('fs');
-const db = require('./db');
+const db = require('./database/db');
 
 function createWindow() {
     const mainWindow = new BrowserWindow({
@@ -16,7 +16,7 @@ function createWindow() {
     });
     mainWindow.maximize();
 
-    mainWindow.loadFile(path.join(__dirname, 'public', 'home.html')); // Carrega o arquivo HTML principal
+    mainWindow.loadFile(path.join(__dirname, '..', 'pages', 'home', 'home.html')); // Carrega o arquivo HTML principal
 }
 
 app.whenReady().then(() => {
