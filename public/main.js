@@ -4,7 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const db = require('./database/db');
 const localAppDataPathConfig = process.env.LOCALAPPDATA || path.join(os.homedir(), '.local', 'share');
-const appFolderConfig = path.join(localAppDataPathConfig, 'controleFinanceiro');
+const appFolderConfig = path.join(localAppDataPathConfig, 'FinancEasy');
 const configPath = path.join(appFolderConfig, 'config.json');
 
 function createWindow() {
@@ -36,7 +36,7 @@ app.whenReady().then(() => {
             tema: 'escuro',
             notificacoes: 'ativadas',
             limiteGastos: 0,
-            dbPath: 'C:\Users\User\AppData\Local\controleFinanceiro',
+            dbPath: 'C:\Users\User\AppData\Local\FinancEasy',
             senha: 'admin'
         };
         fs.writeFileSync(configPath, JSON.stringify(defaultConfig));
@@ -57,7 +57,7 @@ function loadConfig() {
         const data = fs.readFileSync(configPath);
         return JSON.parse(data);
     } catch (error) {
-        return { tema: 'escuro', notificacoes: 'ativadas', limiteGastos: 0,"dbPath":"C:\Users\User\AppData\Local\controleFinanceiro" }; // Configurações padrão
+        return { tema: 'escuro', notificacoes: 'ativadas', limiteGastos: 0,"dbPath":"C:\Users\User\AppData\Local\FinancEasy" }; // Configurações padrão
     }
 }
 
