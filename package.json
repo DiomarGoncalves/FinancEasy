@@ -5,47 +5,10 @@
   "author": "Diomar Gonçalves",
   "main": "public/main.js",
   "scripts": {
-    "start": "electron .",
-    "pack": "electron-builder --dir",
-    "dist": "electron-builder"
-  },
-  "build": {
-    "appId": "com.sistemaFinanceiro.app",
-    "files": [
-      "main.js",
-      "preload.js",
-      "db.js",
-      "public/**/*",
-      "node_modules/**/*"
-    ],
-    "directories": {
-      "buildResources": "assets"
-    },
-    "win": {
-      "target": "nsis",
-      "icon": "assets/icon.ico"
-    },
-    "mac": {
-      "target": "dmg",
-      "icon": "assets/icon.icns"
-    },
-    "linux": {
-      "target": "AppImage",
-      "icon": "assets/icon.png"
-    },
-    "extraResources": [
-      {
-        "from": "node_modules/sqlite3",
-        "to": "node_modules/sqlite3",
-        "filter": [
-          "**/*"
-        ]
-      }
-    ]
+    "start": "electron ."
   },
   "devDependencies": {
-    "electron": "^13.6.9",
-    "electron-builder": "^22.14.13",
+    "electron": "^26.2.4",
     "electron-reload": "^2.0.0-alpha.1"
   },
   "dependencies": {
@@ -53,6 +16,6 @@
     "chart.js": "^3.5.1",
     "jspdf": "^2.4.0",
     "jspdf-autotable": "^3.5.13",
-    "sqlite3": "3.1.7"
+    "sqlite3": "^5.1.7"
   }
 }
