@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('tema').value = config.tema;
     document.getElementById('notificacoes').value = config.notificacoes;
     document.getElementById('limiteGastos').value = config.limiteGastos || 0;
-    document.getElementById('dbPath').value = config.dbPath || 'C:\\Users\\User\\AppData\\Local\\FinancEasy';
+    document.getElementById('dbPath').value = config.dbPath || 'C:\\Users\\User\\AppData\\Local\\DBcontroleFinanceiro';
 });
 
 document.getElementById('selectDbPath').addEventListener('click', async () => {
