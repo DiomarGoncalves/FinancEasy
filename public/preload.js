@@ -15,6 +15,8 @@ contextBridge.exposeInMainWorld('controle', {
     on: (channel, func) => ipcRenderer.on(channel, (event, ...args) => func(...args)),
     loadConfig: () => ipcRenderer.invoke('load-config'),
     saveConfig: (config) => ipcRenderer.invoke('save-config', config),
+    verificarSenha: (senha) => ipcRenderer.invoke('verificar-senha', senha),
+    selectDbPath: () => ipcRenderer.invoke('select-db-path'),
     inserirValoresTeste: () => ipcRenderer.invoke('inserir-valores-teste'),
     limparBanco: () => ipcRenderer.invoke('limpar-banco'),
     getDespesas: () => ipcRenderer.invoke('get-despesas'),

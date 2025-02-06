@@ -1,8 +1,11 @@
 require('electron-reload')(__dirname);
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const db = require('./database/db');
+const localAppDataPathConfig = process.env.LOCALAPPDATA || path.join(os.homedir(), '.local', 'share');
+const appFolderConfig = path.join(localAppDataPathConfig, 'controleFinanceiro');
+const configPath = path.join(appFolderConfig, 'config.json');
 
 function createWindow() {
     const mainWindow = new BrowserWindow({
@@ -14,12 +17,31 @@ function createWindow() {
             contextIsolation: true
         }
     });
-    mainWindow.maximize();
+    // mainWindow.maximize();
 
-    mainWindow.loadFile(path.join(__dirname, '..', 'pages', 'home', 'home.html')); // Carrega o arquivo HTML principal
+    mainWindow.loadFile(path.join(__dirname, '..', 'pages','home', 'home.html')); // Carrega o arquivo HTML principal
 }
 
+
+app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+        app.quit();
+    }
+});
+
 app.whenReady().then(() => {
+    // Verificar e criar o arquivo de configuração se não existir
+    if (!fs.existsSync(configPath)) {
+        const defaultConfig = {
+            tema: 'escuro',
+            notificacoes: 'ativadas',
+            limiteGastos: 0,
+            dbPath: 'C:\Users\User\AppData\Local\controleFinanceiro',
+            senha: 'admin'
+        };
+        fs.writeFileSync(configPath, JSON.stringify(defaultConfig));
+    }
+
     createWindow();
 
     app.on('activate', () => {
@@ -29,10 +51,41 @@ app.whenReady().then(() => {
     });
 });
 
-app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-        app.quit();
+// Função para carregar configurações
+function loadConfig() {
+    try {
+        const data = fs.readFileSync(configPath);
+        return JSON.parse(data);
+    } catch (error) {
+        return { tema: 'escuro', notificacoes: 'ativadas', limiteGastos: 0,"dbPath":"C:\Users\User\AppData\Local\controleFinanceiro" }; // Configurações padrão
     }
+}
+
+// Função para salvar configurações
+function saveConfig(config) {
+    const { novaSenha, ...restConfig } = config;
+    const currentConfig = loadConfig();
+    const updatedConfig = { ...currentConfig, ...restConfig };
+    if (novaSenha) {
+        updatedConfig.senha = novaSenha;
+    }
+    fs.writeFileSync(configPath, JSON.stringify(updatedConfig));
+}
+
+// IPC Handlers para configurações
+ipcMain.handle('load-config', async () => {
+    return loadConfig();
+});
+
+ipcMain.handle('save-config', async (event, config) => {
+    saveConfig(config);
+    return { status: 'success' };
+});
+
+// IPC Handler para verificar a senha
+ipcMain.handle('verificar-senha', async (event, senha) => {
+    const config = loadConfig();
+    return config.senha === senha;
 });
 
 // Atualizar o limite do cartão ao adicionar uma despesa
@@ -191,21 +244,6 @@ ipcMain.handle('get-historico-despesas', async () => {
     });
 });
 
-// Função para carregar configurações
-function loadConfig() {
-    try {
-        const data = fs.readFileSync(path.join(__dirname, 'config.json'));
-        return JSON.parse(data);
-    } catch (error) {
-        return { tema: 'escuro', notificacoes: 'ativadas', limiteGastos: 0 }; // Configurações padrão
-    }
-}
-
-// Função para salvar configurações
-function saveConfig(config) {
-    fs.writeFileSync(path.join(__dirname, 'config.json'), JSON.stringify(config));
-}
-
 // Função para inserir valores de teste
 function inserirValoresTeste() {
     return new Promise((resolve, reject) => {
@@ -289,17 +327,8 @@ function limparBanco() {
             resolve();
         });
     });
-}
+};
 
-// IPC Handlers para configurações
-ipcMain.handle('load-config', async () => {
-    return loadConfig();
-});
-
-ipcMain.handle('save-config', async (event, config) => {
-    saveConfig(config);
-    return { status: 'success' };
-});
 
 // IPC Handlers para teste e limpeza
 ipcMain.handle('inserir-valores-teste', async () => {
@@ -409,4 +438,18 @@ ipcMain.handle('calcular-saldo', async () => {
             }
         });
     });
+});
+
+ipcMain.handle('select-db-path', async () => {
+    const result = await dialog.showOpenDialog({
+        properties: ['openDirectory']
+    });
+    console.log('result', result);
+    if (result.canceled) {
+        return null;
+        console.log('Operação cancelada');
+    } else {
+        return result.filePaths[0];
+        console.log(result.filePaths[0]);
+    }
 });

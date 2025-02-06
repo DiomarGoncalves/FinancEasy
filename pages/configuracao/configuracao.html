@@ -30,6 +30,17 @@
                 <label for="limiteGastos" class="form-label">Limite de Gastos Mensais</label>
                 <input type="number" class="form-control" id="limiteGastos" name="limiteGastos" min="0" step="0.01">
             </div>
+            <div class="mb-3">
+                <label for="dbPath" class="form-label">Caminho do Banco de Dados</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="dbPath" name="dbPath" readonly>
+                    <button type="button" class="btn btn-secondary" id="selectDbPath">Selecionar Caminho</button>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="novaSenha" class="form-label">Nova Senha</label>
+                <input type="password" class="form-control" id="novaSenha" name="novaSenha">
+            </div>
             <button type="submit" class="btn btn-light">Salvar Configurações</button>
         </form>
         <button class="btn btn-warning mt-3" id="inserirTeste">Inserir Valores de Teste</button>
@@ -39,6 +50,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
-
-<!-- AINDA ESTA EM DESENVOLVIMENTO POR ISSO HÁ MUITOS ERRINHOS -->

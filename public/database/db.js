@@ -1,22 +1,35 @@
-const sqlite3 = require('sqlite3').verbose();
-const fs = require('fs');
 const path = require('path');
+const fs = require('fs');
 const os = require('os');
+const sqlite3 = require('sqlite3').verbose();
 
 // Obter o caminho do LocalAppData
 const localAppDataPath = process.env.LOCALAPPDATA || path.join(os.homedir(), '.local', 'share');
 
 // Definir a pasta do banco dentro do LocalAppData
-const appFolder = path.join(localAppDataPath, 'DBcontroleFinanceiro'); // Altere 'MeuApp' para o nome do seu aplicativo
-const dbPath = path.join(appFolder, 'database.db');
+const appFolder = path.join(localAppDataPath, 'controleFinanceiro');
+const defaultDbPath = path.join(appFolder, 'database.db');
 
 // Criar a pasta se não existir
 if (!fs.existsSync(appFolder)) {
     fs.mkdirSync(appFolder, { recursive: true });
 }
 
+// Modificar o caminho do banco de dados para usar o caminho configurado pelo usuário
+const configPath = path.join(appFolder, 'config.json');
+let dbPath = defaultDbPath;
+
+if (fs.existsSync(configPath)) {
+    const config = JSON.parse(fs.readFileSync(configPath));
+    if (config.dbPath) {
+        dbPath = path.join(config.dbPath, 'database.db');
+    }
+}
+
 // Criar ou abrir o banco de dados
 const db = new sqlite3.Database(dbPath);
+
+
 db.serialize(() => {
     // Criar tabela de despesas
     db.run(`CREATE TABLE IF NOT EXISTS despesas (

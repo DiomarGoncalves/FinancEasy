@@ -12,6 +12,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('tema').value = config.tema;
     document.getElementById('notificacoes').value = config.notificacoes;
     document.getElementById('limiteGastos').value = config.limiteGastos || 0;
+    document.getElementById('dbPath').value = config.dbPath || 'C:\\Users\\User\\AppData\\Local\\DBcontroleFinanceiro';
+});
+
+document.getElementById('selectDbPath').addEventListener('click', async () => {
+    const dbPath = await window.controle.selectDbPath();
+    if (dbPath) {
+        document.getElementById('dbPath').value = dbPath;
+    }
 });
 
 document.getElementById('configForm').addEventListener('submit', async (event) => {
@@ -19,9 +27,11 @@ document.getElementById('configForm').addEventListener('submit', async (event) =
     const tema = document.getElementById('tema').value;
     const notificacoes = document.getElementById('notificacoes').value;
     const limiteGastos = parseFloat(document.getElementById('limiteGastos').value);
+    const dbPath = document.getElementById('dbPath').value;
+    const novaSenha = document.getElementById('novaSenha').value;
 
     // Salvar as configurações usando IPC
-    await window.controle.saveConfig({ tema, notificacoes, limiteGastos });
+    await window.controle.saveConfig({ tema, notificacoes, limiteGastos, dbPath, novaSenha});
     alert('Configurações salvas com sucesso!');
 });
 
