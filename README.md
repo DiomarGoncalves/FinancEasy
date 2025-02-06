@@ -21,7 +21,7 @@ Sistema Financeiro é uma aplicação de gerenciamento financeiro pessoal que pe
 
 ## Instalação
 
-Para instalar o Sistema Financeiro, basta acessar a página de [versões](https://diomargoncalves.github.io/controle-financeiro/) e baixar o instalador correspondente ao seu sistema operacional.
+Para instalar o Sistema Financeiro, basta acessar a [página do sistema](https://diomargoncalves.github.io/controle-financeiro/) e baixar o instalador correspondente ao seu sistema operacional.
 
 ## Contribuição
 
