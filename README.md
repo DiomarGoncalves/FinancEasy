@@ -1,8 +1,8 @@
-# Sistema Financeiro
+# FinancEasy
 
-![Sistema Financeiro](assets/icon.png)
+![FinancEasy](public/assets/icon.png)
 
-Sistema Financeiro é uma aplicação de gerenciamento financeiro pessoal que permite aos usuários controlar suas despesas e receitas, gerar relatórios detalhados e calcular o saldo atual. Desenvolvido com Electron, a aplicação oferece uma interface amigável e intuitiva para facilitar o acompanhamento das finanças pessoais.
+FinancEasy é uma aplicação de gerenciamento financeiro pessoal que permite aos usuários controlar suas despesas e receitas, gerar relatórios detalhados e calcular o saldo atual. Desenvolvido com Electron, a aplicação oferece uma interface amigável e intuitiva para facilitar o acompanhamento das finanças pessoais.
 
 ## Funcionalidades
 
@@ -14,14 +14,14 @@ Sistema Financeiro é uma aplicação de gerenciamento financeiro pessoal que pe
 ## Capturas de Tela
 
 ### Tela Principal
-![Tela Principal](assets/tela-principal.png)
+![Tela Principal](public/assets/tela-principal.png)
 
 ### Relatórios
-![Relatórios](assets/relatorios.png)
+![Relatórios](public/assets/relatorios.png)
 
 ## Instalação
 
-Para instalar o Sistema Financeiro, basta acessar a [página do sistema](https://diomargoncalves.github.io/controle-financeiro/) e baixar o instalador correspondente ao seu sistema operacional.
+Para instalar o FinancEasy, basta acessar a [página do sistema](https://diomargoncalves.github.io/controle-financeiro/) e baixar o instalador correspondente ao seu sistema operacional.
 
 ## Contribuição
 

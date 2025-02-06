@@ -1,7 +1,7 @@
 {
-  "name": "Sistemafinanceiro",
-  "version": "0.0.1",
-  "description": "Sistema Financeiro é uma aplicação de gerenciamento financeiro pessoal que permite aos usuários controlar suas despesas e receitas, gerar relatórios detalhados e calcular o saldo atual. Desenvolvido com Electron, a aplicação oferece uma interface amigável e intuitiva para facilitar o acompanhamento das finanças pessoais.",
+  "name": "FinancEasy",
+  "version": "alpha-0.0.1",
+  "description": "FinancEasy é uma aplicação de gerenciamento financeiro pessoal que permite aos usuários controlar suas despesas e receitas, gerar relatórios detalhados e calcular o saldo atual. Desenvolvido com Electron, a aplicação oferece uma interface amigável e intuitiva para facilitar o acompanhamento das finanças pessoais.",
   "author": "Diomar Gonçalves",
   "main": "public/main.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "dist": "electron-builder"
   },
   "build": {
-    "appId": "com.sistemaFinanceiro.app",
+    "appId": "com.FinancEasy.app",
     "files": [
       "public/main.js",
       "public/preload.js",
@@ -23,15 +23,15 @@
     },
     "win": {
       "target": "nsis",
-      "icon": "assets/icon.ico"
+      "icon": "public/assets/icon.ico"
     },
     "mac": {
       "target": "dmg",
-      "icon": "assets/icon.icns"
+      "icon": "public/assets/icon.icns"
     },
     "linux": {
       "target": "AppImage",
-      "icon": "assets/icon.png"
+      "icon": "public/assets/icon.png"
     },
     "extraResources": [
       {
