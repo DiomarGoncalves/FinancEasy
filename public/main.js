@@ -2,9 +2,8 @@ const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 const path = require("path");
 const fs = require("fs");
 const db = require("./database/db");
-const localAppDataPathConfig =
-  process.env.LOCALAPPDATA || path.join(os.homedir(), ".local", "share");
-const appFolderConfig = path.join(localAppDataPathConfig, "controleFinanceiro");
+const localAppDataPathConfig = process.env.LOCALAPPDATA || path.join(os.homedir(), ".local", "share");
+const appFolderConfig = path.join(localAppDataPathConfig, "FinancEasy");
 const configPath = path.join(appFolderConfig, "config.json");
 
 if (process.env.NODE_ENV === "development") {
@@ -25,7 +24,7 @@ function createWindow() {
       contextIsolation: true,
     },
   });
-  // mainWindow.maximize();
+  mainWindow.maximize();
 
   mainWindow.loadFile(path.join(__dirname, "..", "pages", "home", "home.html")); // Carrega o arquivo HTML principal
 }
@@ -43,7 +42,7 @@ app.whenReady().then(() => {
       tema: "escuro",
       notificacoes: "ativadas",
       limiteGastos: 0,
-      dbPath: "C:UsersUserAppDataLocalcontroleFinanceiro",
+      dbPath: appFolderConfig,
       senha: "admin",
     };
     fs.writeFileSync(configPath, JSON.stringify(defaultConfig));
@@ -68,7 +67,7 @@ function loadConfig() {
       tema: "escuro",
       notificacoes: "ativadas",
       limiteGastos: 0,
-      dbPath: "C:UsersUserAppDataLocalcontroleFinanceiro",
+      dbPath: appFolderConfig,
     }; // Configurações padrão
   }
 }

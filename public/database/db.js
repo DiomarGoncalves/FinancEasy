@@ -7,7 +7,7 @@ const sqlite3 = require('sqlite3').verbose();
 const localAppDataPath = process.env.LOCALAPPDATA || path.join(os.homedir(), '.local', 'share');
 
 // Definir a pasta do banco dentro do LocalAppData
-const appFolder = path.join(localAppDataPath, 'controleFinanceiro');
+const appFolder = path.join(localAppDataPath, 'FinancEasy');
 const defaultDbPath = path.join(appFolder, 'database.db');
 
 // Criar a pasta se não existir
@@ -22,7 +22,7 @@ let dbPath = defaultDbPath;
 if (fs.existsSync(configPath)) {
     const config = JSON.parse(fs.readFileSync(configPath));
     if (config.dbPath) {
-        dbPath = path.join(config.dbPath, 'database.db');
+        dbPath = path.join(config.dbPath, 'FinancEasy.db');
     }
 }
 
