@@ -18,6 +18,7 @@ database.sqlite
 dist/
 out/
 build/
+versoes/
 *.asar
 *.dmg
 *.app

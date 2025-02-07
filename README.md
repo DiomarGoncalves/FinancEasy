@@ -1,6 +1,6 @@
 # FinancEasy
 
-![FinancEasy](public/assets/icon.png)
+![FinancEasy](assets/icon.png)
 
 FinancEasy é uma aplicação de gerenciamento financeiro pessoal que permite aos usuários controlar suas despesas e receitas, gerar relatórios detalhados e calcular o saldo atual. Desenvolvido com Electron, a aplicação oferece uma interface amigável e intuitiva para facilitar o acompanhamento das finanças pessoais.
 
@@ -14,10 +14,10 @@ FinancEasy é uma aplicação de gerenciamento financeiro pessoal que permite ao
 ## Capturas de Tela
 
 ### Tela Principal
-![Tela Principal](public/assets/tela-principal.png)
+![Tela Principal](assets/tela-principal.png)
 
 ### Relatórios
-![Relatórios](public/assets/relatorios.png)
+![Relatórios](assets/relatorios.png)
 
 ## Instalação
 
