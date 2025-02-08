@@ -99,403 +99,549 @@ ipcMain.handle("verificar-senha", async (event, senha) => {
   return config.senha === senha;
 });
 
+// Função para criar uma nova fatura
+function criarFatura(cartao_id, data_inicio, data_fim) {
+    return new Promise((resolve, reject) => {
+        const sql = `INSERT INTO faturas (cartao_id, data_inicio, data_fim, valor_total, paga) VALUES (?, ?, ?, 0, 0)`;
+        db.run(sql, [cartao_id, data_inicio, data_fim], function (err) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve({ id: this.lastID });
+            }
+        });
+    });
+}
+
+// Função para obter a fatura aberta ou criar uma nova se não houver
+async function obterOuCriarFatura(cartao_id) {
+    const faturas = await obterFaturas(cartao_id);
+    let faturaAtual = faturas.find(fatura => !fatura.paga);
+
+    if (!faturaAtual) {
+        const hoje = new Date();
+        const data_inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1).toISOString().split('T')[0];
+        const data_fim = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0).toISOString().split('T')[0];
+        faturaAtual = await criarFatura(cartao_id, data_inicio, data_fim);
+    }
+
+    return faturaAtual;
+}
+
+// Função para atualizar o valor total da fatura
+function atualizarFatura(fatura_id, valor) {
+    return new Promise((resolve, reject) => {
+        const sql = `UPDATE faturas SET valor_total = valor_total + ? WHERE id = ?`;
+        db.run(sql, [valor, fatura_id], function (err) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve({ changes: this.changes });
+            }
+        });
+    });
+}
+
+// Função para obter faturas de um cartão
+function obterFaturas(cartao_id) {
+    return new Promise((resolve, reject) => {
+        const sql = `SELECT * FROM faturas WHERE cartao_id = ?`;
+        db.all(sql, [cartao_id], (err, rows) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
+    });
+}
+
+// Função para obter despesas de uma fatura
+function obterDespesasFatura(fatura_id) {
+    return new Promise((resolve, reject) => {
+        const sql = `SELECT * FROM despesas WHERE fatura_id = ?`;
+        db.all(sql, [fatura_id], (err, rows) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
+    });
+}
+
+// Função para obter todos os cartões
+function obterCartoes() {
+    return new Promise((resolve, reject) => {
+        const sql = `SELECT * FROM cartoes`;
+        db.all(sql, [], (err, rows) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
+    });
+}
+
+// IPC Handlers para faturas
+ipcMain.handle("criar-fatura", async (event, cartao_id, data_inicio, data_fim) => {
+    return criarFatura(cartao_id, data_inicio, data_fim);
+});
+
+ipcMain.handle("atualizar-fatura", async (event, fatura_id, valor) => {
+    return atualizarFatura(fatura_id, valor);
+});
+
+ipcMain.handle("obter-faturas", async (event, cartao_id) => {
+    return obterFaturas(cartao_id);
+});
+
+ipcMain.handle("obter-despesas-fatura", async (event, fatura_id) => {
+    return obterDespesasFatura(fatura_id);
+});
+
+// Função para obter o limite disponível do cartão
+function obterLimiteDisponivel(cartao_id) {
+    return new Promise((resolve, reject) => {
+        const sql = `SELECT limite FROM cartoes WHERE id = ?`;
+        db.get(sql, [cartao_id], (err, row) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(row.limite);
+            }
+        });
+    });
+}
+
 // Atualizar o limite do cartão ao adicionar uma despesa
 ipcMain.handle("add-despesa", async (event, despesa) => {
-  const {
-    estabelecimento,
-    data,
-    valor,
-    forma_pagamento,
-    numero_parcelas,
-    cartao_id,
-  } = despesa;
-  const valorParcela = valor / numero_parcelas;
+    const {
+        estabelecimento,
+        data,
+        valor,
+        forma_pagamento,
+        numero_parcelas,
+        cartao_id,
+    } = despesa;
+    const valorParcela = valor / numero_parcelas;
 
-  return new Promise((resolve, reject) => {
-    db.serialize(() => {
-      for (let i = 0; i < numero_parcelas; i++) {
-        const parcelaData = new Date(data);
-        parcelaData.setMonth(parcelaData.getMonth() + i);
-        const parcelaDataStr = parcelaData.toISOString().split("T")[0];
-
-        const sql = `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) 
-                             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-        db.run(
-          sql,
-          [
-            estabelecimento,
-            parcelaDataStr,
-            valorParcela,
-            forma_pagamento,
-            numero_parcelas,
-            numero_parcelas - i,
-            valorParcela,
-            cartao_id,
-          ],
-          function (err) {
-            if (err) {
-              reject(err);
-            }
-          }
-        );
-      }
-
-      // Atualizar o limite do cartão
-      const updateSql = `UPDATE cartoes SET limite = limite - ? WHERE id = ?`;
-      db.run(updateSql, [valor, cartao_id], function (err) {
-        if (err) {
-          reject(err);
-        } else {
-          resolve({ status: "success" });
+    return new Promise(async (resolve, reject) => {
+        const limiteDisponivel = await obterLimiteDisponivel(cartao_id);
+        if (limiteDisponivel < valor) {
+            reject(new Error("Limite insuficiente para realizar a compra."));
+            return;
         }
-      });
-    });
-  });
-});
-ipcMain.handle("get-despesas", async () => {
-  return new Promise((resolve, reject) => {
-    db.all(`SELECT * FROM despesas`, [], (err, rows) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(rows);
-      }
-    });
-  });
-});
 
-ipcMain.handle("delete-despesa", async (event, id) => {
-  return new Promise((resolve, reject) => {
-    const sql = `DELETE FROM despesas WHERE id = ?`;
-    db.run(sql, [id], function (err) {
-      if (err) {
-        reject(err);
-      } else {
-        resolve({ changes: this.changes });
-      }
-    });
-  });
-});
+        db.serialize(async () => {
+            // Obter ou criar a fatura atual do cartão
+            const faturaAtual = await obterOuCriarFatura(cartao_id);
 
-ipcMain.handle("pay-despesa", async (event, id) => {
-  return new Promise((resolve, reject) => {
-    const sql = `SELECT * FROM despesas WHERE id = ?`;
-    console.log(sql);
-    db.get(sql, [id], (err, despesa) => {
-      if (err) {
-        reject(err);
-      } else {
-        const insertSql = `INSERT INTO historico_despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id, data_pagamento) 
-                                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-        const deleteSql = `DELETE FROM despesas WHERE id = ?`;
-        const data_pagamento = new Date().toISOString().split("T")[0];
+            for (let i = 0; i < numero_parcelas; i++) {
+                const parcelaData = new Date(data);
+                parcelaData.setMonth(parcelaData.getMonth() + i);
+                const parcelaDataStr = parcelaData.toISOString().split("T")[0];
 
-        db.run(
-          insertSql,
-          [
-            despesa.estabelecimento,
-            despesa.data,
-            despesa.valor,
-            despesa.forma_pagamento,
-            despesa.numero_parcelas,
-            despesa.parcelas_restantes,
-            despesa.valor_parcela,
-            despesa.cartao_id,
-            data_pagamento,
-          ],
-          function (err) {
-            if (err) {
-              reject(err);
-            } else {
-              db.run(deleteSql, [id], function (err) {
-                if (err) {
-                  reject(err);
-                } else {
-                  resolve({ changes: this.changes });
-                }
-              });
+                const sql = `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id, fatura_id) 
+                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                db.run(
+                    sql,
+                    [
+                        estabelecimento,
+                        parcelaDataStr,
+                        valorParcela,
+                        forma_pagamento,
+                        numero_parcelas,
+                        numero_parcelas - i,
+                        valorParcela,
+                        cartao_id,
+                        faturaAtual.id
+                    ],
+                    function (err) {
+                        if (err) {
+                            reject(err);
+                        }
+                    }
+                );
             }
-          }
-        );
-      }
+
+            // Atualizar o valor total da fatura
+            await atualizarFatura(faturaAtual.id, valor);
+
+            // Atualizar o limite do cartão
+            const updateSql = `UPDATE cartoes SET limite = limite - ? WHERE id = ?`;
+            db.run(updateSql, [valor, cartao_id], function (err) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve({ status: "success" });
+                }
+            });
+        });
     });
-  });
 });
 
+// Função para criar faturas mensais automaticamente
+async function criarFaturasMensais() {
+    const cartoes = await obterCartoes();
+    const hoje = new Date();
+    for (const cartao of cartoes) {
+        const vencimento = new Date(cartao.vencimento);
+        if (hoje.getDate() === vencimento.getDate()) {
+            const data_inicio = new Date(hoje.getFullYear(), hoje.getMonth(), 1).toISOString().split('T')[0];
+            const data_fim = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0).toISOString().split('T')[0];
+            await criarFatura(cartao.id, data_inicio, data_fim);
+        }
+    }
+}
+
+// IPC Handlers para cartões
 ipcMain.handle("get-cartoes", async () => {
-  return new Promise((resolve, reject) => {
-    db.all(`SELECT * FROM cartoes`, [], (err, rows) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(rows);
-      }
-    });
-  });
+    return obterCartoes();
 });
 
 ipcMain.handle("add-cartao", async (event, cartao) => {
-  const { nome, banco, limite } = cartao;
+    const { nome, banco, limite, vencimento } = cartao;
 
-  return new Promise((resolve, reject) => {
-    const sql = `INSERT INTO cartoes (nome, banco, limite) VALUES (?, ?, ?)`;
-    db.run(sql, [nome, banco, limite], function (err) {
-      if (err) {
-        reject(err);
-      } else {
-        resolve({ id: this.lastID });
-      }
+    return new Promise((resolve, reject) => {
+        const sql = `INSERT INTO cartoes (nome, banco, limite, vencimento) VALUES (?, ?, ?, ?)`;
+        db.run(sql, [nome, banco, limite, vencimento], function (err) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve({ id: this.lastID });
+            }
+        });
     });
-  });
 });
 
 ipcMain.handle("delete-cartao", async (event, id) => {
-  return new Promise((resolve, reject) => {
-    const sql = `DELETE FROM cartoes WHERE id = ?`;
-    db.run(sql, [id], function (err) {
-      if (err) {
-        reject(err);
-      } else {
-        resolve({ changes: this.changes });
-      }
+    return new Promise((resolve, reject) => {
+        const sql = `DELETE FROM cartoes WHERE id = ?`;
+        db.run(sql, [id], function (err) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve({ changes: this.changes });
+            }
+        });
     });
-  });
 });
 
 ipcMain.handle("update-cartao", async (event, cartao) => {
-  const { id, nome, banco, limite } = cartao;
+    const { id, nome, banco, limite } = cartao;
 
-  return new Promise((resolve, reject) => {
-    const sql = `UPDATE cartoes SET nome = ?, banco = ?, limite = ? WHERE id = ?`;
-    db.run(sql, [nome, banco, limite, id], function (err) {
-      if (err) {
-        reject(err);
-      } else {
-        resolve({ changes: this.changes });
-      }
+    return new Promise((resolve, reject) => {
+        const sql = `UPDATE cartoes SET nome = ?, banco = ?, limite = ? WHERE id = ?`;
+        db.run(sql, [nome, banco, limite, id], function (err) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve({ changes: this.changes });
+            }
+        });
     });
-  });
 });
 
-ipcMain.handle("get-historico-despesas", async () => {
-  return new Promise((resolve, reject) => {
-    db.all(`SELECT * FROM historico_despesas`, [], (err, rows) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(rows);
-      }
+// IPC Handlers para despesas
+ipcMain.handle("get-despesas", async () => {
+    return new Promise((resolve, reject) => {
+        const sql = `SELECT * FROM despesas`;
+        db.all(sql, [], (err, rows) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
     });
-  });
+});
+
+ipcMain.handle("delete-despesa", async (event, id) => {
+    return new Promise((resolve, reject) => {
+        const sql = `DELETE FROM despesas WHERE id = ?`;
+        db.run(sql, [id], function (err) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve({ changes: this.changes });
+            }
+        });
+    });
+});
+
+ipcMain.handle("pay-despesa", async (event, id) => {
+    return new Promise((resolve, reject) => {
+        const sql = `SELECT * FROM despesas WHERE id = ?`;
+        db.get(sql, [id], (err, despesa) => {
+            if (err) {
+                reject(err);
+            } else {
+                const insertSql = `INSERT INTO historico_despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id, data_pagamento) 
+                                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                const deleteSql = `DELETE FROM despesas WHERE id = ?`;
+                const data_pagamento = new Date().toISOString().split("T")[0];
+
+                db.run(
+                    insertSql,
+                    [
+                        despesa.estabelecimento,
+                        despesa.data,
+                        despesa.valor,
+                        despesa.forma_pagamento,
+                        despesa.numero_parcelas,
+                        despesa.parcelas_restantes,
+                        despesa.valor_parcela,
+                        despesa.cartao_id,
+                        data_pagamento,
+                    ],
+                    function (err) {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            db.run(deleteSql, [id], function (err) {
+                                if (err) {
+                                    reject(err);
+                                } else {
+                                    resolve({ changes: this.changes });
+                                }
+                            });
+                        }
+                    }
+                );
+            }
+        });
+    });
 });
 
 // Função para inserir valores de teste
 function inserirValoresTeste() {
-  return new Promise((resolve, reject) => {
-    const sqls = [
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Loja A', '2025-01-01', 100.00, 'Crédito', 1, 0, 100.00, 1)`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Loja B', '2025-02-01', 200.00, 'Débito', 2, 1, 100.00, 2)`,
-      `INSERT INTO cartoes (nome, banco, limite) VALUES ('Cartão A', 'Banco A', 1000.00)`,
-      `INSERT INTO cartoes (nome, banco, limite) VALUES ('Cartão B', 'Banco B', 2000.00)`,
-      `INSERT INTO historico_despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id, data_pagamento) VALUES ('Loja A', '2025-01-01', 100.00, 'Crédito', 1, 0, 100.00, 1, '2025-01-02')`,
-      `INSERT INTO historico_despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id, data_pagamento) VALUES ('Loja B', '2025-02-01', 200.00, 'Débito', 2, 1, 100.00, 2, '2025-02-02')`,
-      `INSERT INTO receitas (descricao, data, valor, forma_recebimento) VALUES ('Salário', '2025-01-15', 3000.00, 'Transferência')`,
-      `INSERT INTO receitas (descricao, data, valor, forma_recebimento) VALUES ('Freelance', '2025-02-10', 1500.00, 'Dinheiro')`,
-    ];
-    db.serialize(() => {
-      sqls.forEach((sql) => {
-        db.run(sql, (err) => {
-          if (err) {
-            console.error("Erro ao executar SQL:", sql, err); // Log de erro
-            reject(err);
-          }
+    return new Promise((resolve, reject) => {
+        const sqls = [
+            `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Loja A', '2025-01-01', 100.00, 'Crédito', 1, 0, 100.00, 1)`,
+            `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Loja B', '2025-02-01', 200.00, 'Débito', 2, 1, 100.00, 2)`,
+            `INSERT INTO cartoes (nome, banco, limite) VALUES ('Cartão A', 'Banco A', 1000.00)`,
+            `INSERT INTO cartoes (nome, banco, limite) VALUES ('Cartão B', 'Banco B', 2000.00)`,
+            `INSERT INTO historico_despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id, data_pagamento) VALUES ('Loja A', '2025-01-01', 100.00, 'Crédito', 1, 0, 100.00, 1, '2025-01-02')`,
+            `INSERT INTO historico_despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id, data_pagamento) VALUES ('Loja B', '2025-02-01', 200.00, 'Débito', 2, 1, 100.00, 2, '2025-02-02')`,
+            `INSERT INTO receitas (descricao, data, valor, forma_recebimento) VALUES ('Salário', '2025-01-15', 3000.00, 'Transferência')`,
+            `INSERT INTO receitas (descricao, data, valor, forma_recebimento) VALUES ('Freelance', '2025-02-10', 1500.00, 'Dinheiro')`,
+        ];
+        db.serialize(() => {
+            sqls.forEach((sql) => {
+                db.run(sql, (err) => {
+                    if (err) {
+                        console.error("Erro ao executar SQL:", sql, err); // Log de erro
+                        reject(err);
+                    }
+                });
+            });
+            resolve();
         });
-      });
-      resolve();
     });
-  });
 }
 
 function inserirDespesasAnoCompleto() {
-  return new Promise((resolve, reject) => {
-    const sqls = [
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Supermercado', '2025-01-15', 150.00, 'Crédito', 1, 0, 150.00, 1)`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Padaria', '2025-02-10', 50.00, 'Débito', 1, 0, 50.00, 2)`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Farmácia', '2025-03-05', 75.00, 'Dinheiro', 1, 0, 75.00, NULL)`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Restaurante', '2025-04-20', 200.00, 'Crédito', 2, 1, 100.00, 1)`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Posto de Gasolina', '2025-05-18', 120.00, 'Débito', 1, 0, 120.00, 2)`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Cinema', '2025-06-25', 60.00, 'Dinheiro', 1, 0, 60.00, NULL)`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Loja de Roupas', '2025-07-12', 300.00, 'Crédito', 3, 2, 100.00, 1)`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Supermercado', '2025-08-08', 180.00, 'Débito', 1, 0, 180.00, 2)`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Padaria', '2025-09-14', 40.00, 'Dinheiro', 1, 0, 40.00, NULL)`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Farmácia', '2025-10-22', 90.00, 'Crédito', 1, 0, 90.00, 1)`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Restaurante', '2025-11-30', 250.00, 'Débito', 1, 0, 250.00, 2)`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Posto de Gasolina', '2025-12-05', 100.00, 'Dinheiro', 1, 0, 100.00, NULL)`,
-    ];
-    db.serialize(() => {
-      sqls.forEach((sql) => {
-        db.run(sql, (err) => {
-          if (err) {
-            console.error("Erro ao executar SQL:", sql, err); // Log de erro
-            reject(err);
-          }
+    return new Promise((resolve, reject) => {
+        const sqls = [
+            `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Supermercado', '2025-01-15', 150.00, 'Crédito', 1, 0, 150.00, 1)`,
+            `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Padaria', '2025-02-10', 50.00, 'Débito', 1, 0, 50.00, 2)`,
+            `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Farmácia', '2025-03-05', 75.00, 'Dinheiro', 1, 0, 75.00, NULL)`,
+            `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Restaurante', '2025-04-20', 200.00, 'Crédito', 2, 1, 100.00, 1)`,
+            `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Posto de Gasolina', '2025-05-18', 120.00, 'Débito', 1, 0, 120.00, 2)`,
+            `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Cinema', '2025-06-25', 60.00, 'Dinheiro', 1, 0, 60.00, NULL)`,
+            `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Loja de Roupas', '2025-07-12', 300.00, 'Crédito', 3, 2, 100.00, 1)`,
+            `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Supermercado', '2025-08-08', 180.00, 'Débito', 1, 0, 180.00, 2)`,
+            `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Padaria', '2025-09-14', 40.00, 'Dinheiro', 1, 0, 40.00, NULL)`,
+            `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Farmácia', '2025-10-22', 90.00, 'Crédito', 1, 0, 90.00, 1)`,
+            `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Restaurante', '2025-11-30', 250.00, 'Débito', 1, 0, 250.00, 2)`,
+            `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Posto de Gasolina', '2025-12-05', 100.00, 'Dinheiro', 1, 0, 100.00, NULL)`,
+        ];
+        db.serialize(() => {
+            sqls.forEach((sql) => {
+                db.run(sql, (err) => {
+                    if (err) {
+                        console.error("Erro ao executar SQL:", sql, err); // Log de erro
+                        reject(err);
+                    }
+                });
+            });
+            resolve();
         });
-      });
-      resolve();
     });
-  });
 }
 
 // Adicione um manipulador IPC para chamar essa função
 ipcMain.handle("inserir-despesas-ano-completo", async () => {
-  await inserirDespesasAnoCompleto();
-  return "Despesas inseridas para todos os meses do ano de 2025";
+    await inserirDespesasAnoCompleto();
+    return "Despesas inseridas para todos os meses do ano de 2025";
 });
 // Função para limpar o banco de dados
 function limparBanco() {
-  return new Promise((resolve, reject) => {
-    const sqls = [
-      `DELETE FROM despesas`,
-      `DELETE FROM cartoes`,
-      `DELETE FROM historico_despesas`,
-      `DELETE FROM receitas`,
-    ];
-    db.serialize(() => {
-      sqls.forEach((sql) => {
-        db.run(sql, (err) => {
-          if (err) {
-            console.error("Erro ao executar SQL:", sql, err); // Log de erro
-            reject(err);
-          }
+    return new Promise((resolve, reject) => {
+        const sqls = [
+            `DELETE FROM despesas`,
+            `DELETE FROM cartoes`,
+            `DELETE FROM historico_despesas`,
+            `DELETE FROM receitas`,
+            `DELETE FROM faturas`
+        ];
+        db.serialize(() => {
+            sqls.forEach((sql) => {
+                db.run(sql, (err) => {
+                    if (err) {
+                        console.error("Erro ao executar SQL:", sql, err); // Log de erro
+                        reject(err);
+                    }
+                });
+            });
+            resolve();
         });
-      });
-      resolve();
     });
-  });
 }
 
 // IPC Handlers para teste e limpeza
 ipcMain.handle("inserir-valores-teste", async () => {
-  await inserirValoresTeste();
-  return { status: "success" };
+    await inserirValoresTeste();
+    return { status: "success" };
 });
 
 ipcMain.handle("limpar-banco", async () => {
-  await limparBanco();
-  return { status: "success" };
+    await limparBanco();
+    return { status: "success" };
 });
 
 // IPC Handlers para receitas
 ipcMain.handle("add-receita", async (event, receita) => {
-  const { descricao, data, valor, forma_recebimento } = receita;
+    const { descricao, data, valor, forma_recebimento } = receita;
 
-  return new Promise((resolve, reject) => {
-    const sql = `INSERT INTO receitas (descricao, data, valor, forma_recebimento) VALUES (?, ?, ?, ?)`;
-    db.run(sql, [descricao, data, valor, forma_recebimento], function (err) {
-      if (err) {
-        reject(err);
-      } else {
-        resolve({ id: this.lastID });
-      }
+    return new Promise((resolve, reject) => {
+        const sql = `INSERT INTO receitas (descricao, data, valor, forma_recebimento) VALUES (?, ?, ?, ?)`;
+        db.run(sql, [descricao, data, valor, forma_recebimento], function (err) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve({ id: this.lastID });
+            }
+        });
     });
-  });
 });
 
 ipcMain.handle("get-receitas", async () => {
-  return new Promise((resolve, reject) => {
-    db.all(`SELECT * FROM receitas`, [], (err, rows) => {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(rows);
-      }
+    return new Promise((resolve, reject) => {
+        db.all(`SELECT * FROM receitas`, [], (err, rows) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
     });
-  });
 });
 
 ipcMain.handle("delete-receita", async (event, id) => {
-  return new Promise((resolve, reject) => {
-    const sql = `DELETE FROM receitas WHERE id = ?`;
-    db.run(sql, [id], function (err) {
-      if (err) {
-        reject(err);
-      } else {
-        resolve({ changes: this.changes });
-      }
+    return new Promise((resolve, reject) => {
+        const sql = `DELETE FROM receitas WHERE id = ?`;
+        db.run(sql, [id], function (err) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve({ changes: this.changes });
+            }
+        });
     });
-  });
 });
 
 // IPC Handlers para filtrar despesas e receitas
 ipcMain.handle("get-despesas-filtradas", async (event, filtros) => {
-  const { dataInicio, dataFim } = filtros;
-  console.log("Filtros recebidos:", filtros); // Log para depuração
-  return new Promise((resolve, reject) => {
-    const sql = `SELECT * FROM despesas WHERE data BETWEEN ? AND ?`;
-    console.log("Executando SQL:", sql, [dataInicio, dataFim]); // Log para depuração
-    db.all(sql, [dataInicio, dataFim], (err, rows) => {
-      if (err) {
-        console.error("Erro ao buscar despesas:", err); // Log de erro
-        reject(err);
-      } else {
-        console.log("Despesas filtradas no banco de dados:", rows); // Log para depuração
-        resolve(rows);
-      }
+    const { dataInicio, dataFim } = filtros;
+    console.log("Filtros recebidos:", filtros); // Log para depuração
+    return new Promise((resolve, reject) => {
+        const sql = `SELECT * FROM despesas WHERE data BETWEEN ? AND ?`;
+        console.log("Executando SQL:", sql, [dataInicio, dataFim]); // Log para depuração
+        db.all(sql, [dataInicio, dataFim], (err, rows) => {
+            if (err) {
+                console.error("Erro ao buscar despesas:", err); // Log de erro
+                reject(err);
+            } else {
+                console.log("Despesas filtradas no banco de dados:", rows); // Log para depuração
+                resolve(rows);
+            }
+        });
     });
-  });
 });
 
 ipcMain.handle("get-receitas-filtradas", async (event, filtros) => {
-  const { dataInicio, dataFim } = filtros;
-  console.log("Filtros recebidos:", filtros); // Log para depuração
-  return new Promise((resolve, reject) => {
-    const sql = `SELECT * FROM receitas WHERE data BETWEEN ? AND ?`;
-    db.all(sql, [dataInicio, dataFim], (err, rows) => {
-      if (err) {
-        console.error("Erro ao buscar receitas:", err); // Log de erro
-        reject(err);
-      } else {
-        console.log("Receitas filtradas no banco de dados:", rows); // Log para depuração
-        resolve(rows);
-      }
+    const { dataInicio, dataFim } = filtros;
+    console.log("Filtros recebidos:", filtros); // Log para depuração
+    return new Promise((resolve, reject) => {
+        const sql = `SELECT * FROM receitas WHERE data BETWEEN ? AND ?`;
+        db.all(sql, [dataInicio, dataFim], (err, rows) => {
+            if (err) {
+                console.error("Erro ao buscar receitas:", err); // Log de erro
+                reject(err);
+            } else {
+                console.log("Receitas filtradas no banco de dados:", rows); // Log para depuração
+                resolve(rows);
+            }
+        });
     });
-  });
 });
 // IPC Handler para calcular saldo
 ipcMain.handle("calcular-saldo", async () => {
-  return new Promise((resolve, reject) => {
-    const sqlDespesas = `SELECT SUM(valor) as totalDespesas FROM despesas`;
-    const sqlReceitas = `SELECT SUM(valor) as totalReceitas FROM receitas`;
+    return new Promise((resolve, reject) => {
+        const sqlDespesas = `SELECT SUM(valor) as totalDespesas FROM despesas`;
+        const sqlReceitas = `SELECT SUM(valor) as totalReceitas FROM receitas`;
 
-    db.get(sqlDespesas, [], (err, resultDespesas) => {
-      if (err) {
-        reject(err);
-      } else {
-        db.get(sqlReceitas, [], (err, resultReceitas) => {
-          if (err) {
-            reject(err);
-          } else {
-            const saldo =
-              (resultReceitas.totalReceitas || 0) -
-              (resultDespesas.totalDespesas || 0);
-            resolve({ saldo });
-          }
+        db.get(sqlDespesas, [], (err, resultDespesas) => {
+            if (err) {
+                reject(err);
+            } else {
+                db.get(sqlReceitas, [], (err, resultReceitas) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        const saldo =
+                            (resultReceitas.totalReceitas || 0) -
+                            (resultDespesas.totalDespesas || 0);
+                        resolve({ saldo });
+                    }
+                });
+            }
         });
-      }
     });
-  });
 });
 
 ipcMain.handle("select-db-path", async () => {
-  const result = await dialog.showOpenDialog({
-    properties: ["openDirectory"],
-  });
-  console.log("result", result);
-  if (result.canceled) {
-    return null;
-    console.log("Operação cancelada");
-  } else {
-    return result.filePaths[0];
-    console.log(result.filePaths[0]);
-  }
+    const result = await dialog.showOpenDialog({
+        properties: ["openDirectory"],
+    });
+    console.log("result", result);
+    if (result.canceled) {
+        return null;
+        console.log("Operação cancelada");
+    } else {
+        return result.filePaths[0];
+        console.log(result.filePaths[0]);
+    }
+});
+
+// Função para pagar uma fatura
+function pagarFatura(cartao_id) {
+    return new Promise((resolve, reject) => {
+        const sql = `UPDATE faturas SET paga = 1 WHERE cartao_id = ? AND paga = 0`;
+        db.run(sql, [cartao_id], function (err) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve({ changes: this.changes });
+            }
+        });
+    });
+}
+
+// IPC Handler para pagar fatura
+ipcMain.handle("pagar-fatura", async (event, cartao_id) => {
+    return pagarFatura(cartao_id);
 });

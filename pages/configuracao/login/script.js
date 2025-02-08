@@ -1,3 +1,8 @@
+function resetFormAndUnlockInputs(form) {
+    form.reset(); // Resetar o formulário
+    form.querySelectorAll('input').forEach(input => input.disabled = false); // Desbloquear inputs
+}
+
 document.getElementById('loginForm').addEventListener('submit', async (event) => {
     event.preventDefault();
     const senha = document.getElementById('senha').value;
@@ -5,6 +10,8 @@ document.getElementById('loginForm').addEventListener('submit', async (event) =>
     if (senhaCorreta) {
         window.location.href = '../configuracao.html';
     } else {
-        alert('Senha incorreta!');
+        const msg = document.getElementById('msgErro');
+        msg.textContent = 'Senha incorreta';
+        resetFormAndUnlockInputs(event.target); // Resetar e desbloquear inputs
     }
 });

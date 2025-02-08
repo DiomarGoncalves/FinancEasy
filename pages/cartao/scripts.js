@@ -1,7 +1,29 @@
+function showFatura(cartaoId) {
+    window.location.href = `faturas/faturas.html?cartaoId=${cartaoId}`;
+}
+
+async function registrarCompra(cartaoId, valor, descricao, parcelas = 1) {
+    const despesa = {
+        estabelecimento: descricao,
+        data: new Date().toISOString().split('T')[0],
+        valor: parseFloat(valor),
+        forma_pagamento: 'Crédito',
+        numero_parcelas: parseInt(parcelas),
+        cartao_id: cartaoId
+    };
+    await window.controle.invoke('add-despesa', despesa);
+    loadCartoes(); // Atualizar a lista de cartões
+}
+
+async function pagarFatura(cartaoId) {
+    await window.controle.invoke('pagar-fatura', cartaoId);
+    loadCartoes(); // Atualizar a lista de cartões
+}
+
 async function loadCartoes() {
     const cartoes = await window.controle.invoke('get-cartoes');
     const tableBody = document.querySelector("#cartoesTable tbody");
-    tableBody.innerHTML = ""; // Limpar tabela
+    tableBody.innerHTML = ''; // Limpar tabela
 
     cartoes.forEach((cartao) => {
         const row = document.createElement("tr");
@@ -12,6 +34,8 @@ async function loadCartoes() {
             <td>
                 <button class="btn btn-warning btn-sm" onclick="showEditModal(${cartao.id}, '${cartao.nome}', '${cartao.banco}', ${cartao.limite})">Editar</button>
                 <button class="btn btn-danger btn-sm" onclick="deleteCartao(${cartao.id})">Excluir</button>
+                <button class="btn btn-info btn-sm" onclick="showFatura(${cartao.id})">Fatura</button>
+                <button class="btn btn-success btn-sm" onclick="pagarFatura(${cartao.id})">Pagar Fatura</button>
             </td>
         `;
         tableBody.appendChild(row); // Adicionar linha à tabela
@@ -45,6 +69,8 @@ document.getElementById('editCartaoForm').addEventListener('submit', async (even
     const editModal = bootstrap.Modal.getInstance(document.getElementById('editCartaoModal'));
     editModal.hide();
     loadCartoes(); // Atualizar a lista de cartões
+    event.target.reset(); // Resetar o formulário
+    document.getElementById('editCartaoForm').querySelectorAll('input').forEach(input => input.disabled = false); // Desbloquear inputs
 });
 
 loadCartoes();

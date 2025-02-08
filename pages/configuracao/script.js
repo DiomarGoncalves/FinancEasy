@@ -1,3 +1,8 @@
+function resetFormAndUnlockInputs(form) {
+    form.reset(); // Resetar o formulário
+    form.querySelectorAll('input').forEach(input => input.disabled = false); // Desbloquear inputs
+}
+
 async function inserirDespesasAnoCompleto() {
     try {
         const resultado = await window.controle.inserirDespesasAnoCompleto();
@@ -7,32 +12,37 @@ async function inserirDespesasAnoCompleto() {
         alert('Erro ao inserir despesas. Verifique o console para mais detalhes.');
     }
 }
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', async (event) => {
+    event.preventDefault();
     const config = await window.controle.loadConfig();
     document.getElementById('tema').value = config.tema;
     document.getElementById('notificacoes').value = config.notificacoes;
     document.getElementById('limiteGastos').value = config.limiteGastos || 0;
     document.getElementById('dbPath').value = config.dbPath || 'C:\\Users\\User\\AppData\\Local\\FinancEasy';
+    resetFormAndUnlockInputs(event.target);
 });
 
-document.getElementById('selectDbPath').addEventListener('click', async () => {
+document.getElementById('selectDbPath').addEventListener('click', async (event) => {
+    event.preventDefault();
     const dbPath = await window.controle.selectDbPath();
     if (dbPath) {
         document.getElementById('dbPath').value = dbPath;
     }
+    resetFormAndUnlockInputs(event.target);
 });
 
 document.getElementById('configForm').addEventListener('submit', async (event) => {
     event.preventDefault();
-    const tema = document.getElementById('tema').value;
-    const notificacoes = document.getElementById('notificacoes').value;
-    const limiteGastos = parseFloat(document.getElementById('limiteGastos').value);
-    const dbPath = document.getElementById('dbPath').value;
-    const novaSenha = document.getElementById('novaSenha').value;
+    const config = {
+        limiteGastos: document.getElementById('limiteGastos').value,
+        dbPath: document.getElementById('dbPath').value,
+        novaSenha: document.getElementById('novaSenha').value
+    };
 
-    // Salvar as configurações usando IPC
-    await window.controle.saveConfig({ tema, notificacoes, limiteGastos, dbPath, novaSenha});
+    await window.controle.invoke('save-config', config);
     alert('Configurações salvas com sucesso!');
+    event.target.reset(); // Resetar o formulário
+    document.getElementById('configForm').querySelectorAll('input').forEach(input => input.disabled = false); // Desbloquear inputs
 });
 
 document.getElementById('inserirTeste').addEventListener('click', async () => {

@@ -1,3 +1,7 @@
+function resetFormAndUnlockInputs(form) {
+    form.reset(); // Resetar o formulário
+    form.querySelectorAll('input').forEach(input => input.disabled = false); // Desbloquear inputs
+};
 document.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('receitaForm').addEventListener('submit', async (event) => {
         event.preventDefault();
@@ -12,6 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             valor,
             forma_recebimento: formaRecebimento
         };
+        resetFormAndUnlockInputs(event.target); // Resetar e desbloquear inputs
 
         await window.controle.invoke('add-receita', receita);
         alert('Receita adicionada com sucesso!');
