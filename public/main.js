@@ -2,10 +2,33 @@ const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 const path = require("path");
 const fs = require("fs");
 const db = require("./database/db");
+const os = require("os");
+
 const localAppDataPathConfig =
-  process.env.LOCALAPPDATA || path.join(os.homedir(), ".local", "share");
-const appFolderConfig = path.join(localAppDataPathConfig, "FinancEasy");
+process.env.LOCALAPPDATA || path.join(os.homedir(), ".local", "share");
+const appFolderConfig = path.join(localAppDataPathConfig, "FinancEasyV3");
 const configPath = path.join(appFolderConfig, "config.json");
+
+let config = {};
+
+try {
+    if (fs.existsSync(configPath)) {
+        config = JSON.parse(fs.readFileSync(configPath));
+    } else {
+        fs.writeFileSync(configPath, JSON.stringify(config));
+    }
+} catch (error) {
+    if (error.code === 'ENOENT') {
+        console.error('Arquivo config.json não encontrado, criando um novo.');
+        fs.mkdirSync(appFolderConfig, { recursive: true });
+        fs.writeFileSync(configPath, JSON.stringify(config));
+    } else {
+        console.error(`Erro ao ler ou criar config.json: ${error.message}`);
+    }
+}
+
+const dbPath = config.dbPath || appFolderConfig;
+process.env.DB_PATH = dbPath;
 
 if (process.env.NODE_ENV === "development") {
   try {

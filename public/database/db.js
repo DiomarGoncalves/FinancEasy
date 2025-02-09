@@ -1,14 +1,13 @@
 const path = require('path');
 const fs = require('fs');
-const os = require('os');
 const sqlite3 = require('sqlite3').verbose();
 
 // Obter o caminho do LocalAppData
 const localAppDataPath = process.env.LOCALAPPDATA || path.join(os.homedir(), '.local', 'share');
 
 // Definir a pasta do banco dentro do LocalAppData
-const appFolder = path.join(localAppDataPath, 'FinancEasy');
-const defaultDbPath = path.join(appFolder, 'database.db');
+const appFolder = path.join(localAppDataPath, 'FinancEasyV3');
+const defaultDbPath = path.join(appFolder, 'FinancEasy.db');
 
 // Criar a pasta se não existir
 if (!fs.existsSync(appFolder)) {
