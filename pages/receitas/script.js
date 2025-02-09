@@ -28,6 +28,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     });
 
+    document.getElementById('salarioForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const descricao = "Salário";
+        const data = document.getElementById('dataSalario').value;
+        const valor = parseFloat(document.getElementById('valorSalario').value);
+        const formaRecebimento = document.getElementById('forma_recebimento_salario').value;
+
+        const receita = {
+            descricao,
+            data,
+            valor,
+            forma_recebimento: formaRecebimento
+        };
+        resetFormAndUnlockInputs(event.target); // Resetar e desbloquear inputs
+
+        try {
+            await window.controle.invoke('add-receita', receita);
+            console.log('Salário adicionado com sucesso!');
+            loadReceitas();
+        } catch (error) {
+            console.error(`Erro ao adicionar salário: ${error.message}`);
+        }
+    });
+
     loadReceitas();
 });
 

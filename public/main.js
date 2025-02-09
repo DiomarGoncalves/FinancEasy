@@ -208,6 +208,8 @@ function obterLimiteDisponivel(cartao_id) {
         db.get(sql, [cartao_id], (err, row) => {
             if (err) {
                 reject(err);
+            } else if (!row) {
+                reject(new Error("Cartão não encontrado."));
             } else {
                 resolve(row.limite);
             }
@@ -228,57 +230,74 @@ ipcMain.handle("add-despesa", async (event, despesa) => {
     const valorParcela = valor / numero_parcelas;
 
     return new Promise(async (resolve, reject) => {
-        const limiteDisponivel = await obterLimiteDisponivel(cartao_id);
-        if (limiteDisponivel < valor) {
-            reject(new Error("Limite insuficiente para realizar a compra."));
-            return;
-        }
-
-        db.serialize(async () => {
-            // Obter ou criar a fatura atual do cartão
-            const faturaAtual = await obterOuCriarFatura(cartao_id);
-
-            for (let i = 0; i < numero_parcelas; i++) {
-                const parcelaData = new Date(data);
-                parcelaData.setMonth(parcelaData.getMonth() + i);
-                const parcelaDataStr = parcelaData.toISOString().split("T")[0];
-
-                const sql = `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id, fatura_id) 
-                             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-                db.run(
-                    sql,
-                    [
-                        estabelecimento,
-                        parcelaDataStr,
-                        valorParcela,
-                        forma_pagamento === "Cartão de Crédito" ? "Crédito" : forma_pagamento,
-                        numero_parcelas,
-                        numero_parcelas - i,
-                        valorParcela,
-                        cartao_id,
-                        faturaAtual.id
-                    ],
-                    function (err) {
-                        if (err) {
-                            reject(err);
-                        }
-                    }
-                );
+        try {
+            if (forma_pagamento === "Crédito" || forma_pagamento === "Cartão de Crédito") {
+                const limiteDisponivel = await obterLimiteDisponivel(cartao_id);
+                if (limiteDisponivel === undefined) {
+                    reject(new Error("Cartão não encontrado."));
+                    return;
+                }
+                if (limiteDisponivel < valor) {
+                    reject(new Error("Limite insuficiente para realizar a compra."));
+                    return;
+                }
             }
 
-            // Atualizar o valor total da fatura
-            await atualizarFatura(faturaAtual.id, valor);
+            db.serialize(async () => {
+                // Obter ou criar a fatura atual do cartão, se for pagamento com cartão de crédito
+                let faturaAtual;
+                if (forma_pagamento === "Crédito" || forma_pagamento === "Cartão de Crédito") {
+                    faturaAtual = await obterOuCriarFatura(cartao_id);
+                }
 
-            // Atualizar o limite do cartão
-            const updateSql = `UPDATE cartoes SET limite = limite - ? WHERE id = ?`;
-            db.run(updateSql, [valor, cartao_id], function (err) {
-                if (err) {
-                    reject(err);
+                for (let i = 0; i < numero_parcelas; i++) {
+                    const parcelaData = new Date(data);
+                    parcelaData.setMonth(parcelaData.getMonth() + i);
+                    const parcelaDataStr = parcelaData.toISOString().split("T")[0];
+
+                    const sql = `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id, fatura_id) 
+                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+                    db.run(
+                        sql,
+                        [
+                            estabelecimento,
+                            parcelaDataStr,
+                            valorParcela,
+                            forma_pagamento === "Cartão de Crédito" ? "Crédito" : forma_pagamento,
+                            numero_parcelas,
+                            numero_parcelas - i,
+                            valorParcela,
+                            cartao_id,
+                            faturaAtual ? faturaAtual.id : null
+                        ],
+                        function (err) {
+                            if (err) {
+                                reject(err);
+                            }
+                        }
+                    );
+                }
+
+                // Atualizar o valor total da fatura, se for pagamento com cartão de crédito
+                if (faturaAtual) {
+                    await atualizarFatura(faturaAtual.id, valor);
+
+                    // Atualizar o limite do cartão
+                    const updateSql = `UPDATE cartoes SET limite = limite - ? WHERE id = ?`;
+                    db.run(updateSql, [valor, cartao_id], function (err) {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve({ status: "success" });
+                        }
+                    });
                 } else {
                     resolve({ status: "success" });
                 }
             });
-        });
+        } catch (error) {
+            reject(error);
+        }
     });
 });
 
@@ -733,4 +752,23 @@ function atualizarLimiteCartao(cartao_id, valor) {
 // IPC Handler para atualizar o limite do cartão
 ipcMain.handle("update-limite-cartao", async (event, { id, valor }) => {
     return atualizarLimiteCartao(id, valor);
+});
+
+// Função para obter o histórico de despesas pagas
+function obterHistoricoDespesas() {
+    return new Promise((resolve, reject) => {
+        const sql = `SELECT * FROM historico_despesas`;
+        db.all(sql, [], (err, rows) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
+    });
+}
+
+// IPC Handler para obter o histórico de despesas pagas
+ipcMain.handle("get-historico-despesas", async () => {
+    return obterHistoricoDespesas();
 });

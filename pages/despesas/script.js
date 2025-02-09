@@ -139,32 +139,49 @@ async function loadCartoes() {
 }
 
 async function payDespesa(id) {
-  if (confirm("Tem certeza que deseja pagar esta despesa?")) {
-    try {
-      const despesa = await window.controle.invoke("get-despesa", id);
-      await window.controle.invoke("pay-despesa", id);
-      if (despesa.forma_pagamento === "Crédito") {
-        await window.controle.invoke("update-limite-cartao", {
-          id: despesa.cartao_id,
-          valor: despesa.valor_parcela,
-        });
-      }
-      loadDespesas(); // Atualizar a lista de despesas
-    } catch (error) {
-      console.error(`Erro ao pagar despesa: ${error.message}`);
+  try {
+    const despesa = await window.controle.invoke("get-despesa", id);
+    await window.controle.invoke("pay-despesa", id);
+    if (despesa.forma_pagamento === "Crédito") {
+      await window.controle.invoke("update-limite-cartao", {
+        id: despesa.cartao_id,
+        valor: despesa.valor_parcela,
+      });
     }
+    loadDespesas(); // Atualizar a lista de despesas
+    showMessage("Despesa paga com sucesso!", "success");
+  } catch (error) {
+    console.error(`Erro ao pagar despesa: ${error.message}`);
+    showMessage(`Erro ao pagar despesa: ${error.message}`, "danger");
   }
 }
 
 async function deleteDespesa(id) {
-  if (confirm("Tem certeza que deseja excluir esta despesa?")) {
-    try {
-      await window.controle.invoke("delete-despesa", id);
-      loadDespesas(); // Atualizar a lista de despesas
-    } catch (error) {
-      console.error(`Erro ao excluir despesa: ${error.message}`);
+  try {
+    const despesa = await window.controle.invoke("get-despesa", id);
+    await window.controle.invoke("delete-despesa", id);
+    if (despesa.forma_pagamento === "Crédito") {
+      await window.controle.invoke("update-limite-cartao", {
+        id: despesa.cartao_id,
+        valor: despesa.valor_parcela * despesa.parcelas_restantes,
+      });
     }
+    loadDespesas(); // Atualizar a lista de despesas
+    showMessage("Despesa excluída com sucesso!", "success");
+  } catch (error) {
+    console.error(`Erro ao excluir despesa: ${error.message}`);
+    showMessage(`Erro ao excluir despesa: ${error.message}`, "danger");
   }
+}
+
+function showMessage(message, type) {
+  const messageContainer = document.createElement("div");
+  messageContainer.className = `alert alert-${type}`;
+  messageContainer.textContent = message;
+  document.body.prepend(messageContainer);
+  setTimeout(() => {
+    messageContainer.remove();
+  }, 3000);
 }
 
 function exportarPDF() {
