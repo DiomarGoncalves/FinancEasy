@@ -101,7 +101,19 @@ db.serialize(() => {
         descricao TEXT NOT NULL,
         data TEXT NOT NULL,
         valor REAL NOT NULL,
-        forma_recebimento TEXT NOT NULL CHECK (forma_recebimento IN ('Transferência', 'Pix', 'Dinheiro', 'Cheque'))
+        categoria TEXT NOT NULL,
+        fonte TEXT NOT NULL,
+        forma_recebimento TEXT NOT NULL CHECK (forma_recebimento IN ('Transferência', 'Pix', 'Dinheiro', 'Cheque')),
+        conta_bancaria TEXT NOT NULL,
+        recorrente BOOLEAN DEFAULT 0,
+        intervalo_recorrencia TEXT
+    )`);
+
+    // **Tabela de Contas Bancárias**
+    db.run(`CREATE TABLE IF NOT EXISTS contas_bancarias (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nome TEXT NOT NULL,
+        tipo TEXT NOT NULL CHECK (tipo IN ('Conta Corrente', 'Poupança', 'Carteira Digital'))
     )`);
 });
 
