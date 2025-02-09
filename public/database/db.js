@@ -84,6 +84,17 @@ db.serialize(() => {
         FOREIGN KEY(cartao_id) REFERENCES cartoes(id) ON DELETE SET NULL
     )`);
 
+    // **Tabela de Histórico de Faturas**
+    db.run(`CREATE TABLE IF NOT EXISTS historico_faturas (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        cartao_id INTEGER NOT NULL,
+        data_inicio TEXT NOT NULL,
+        data_fim TEXT NOT NULL,
+        valor_total REAL NOT NULL,
+        data_pagamento TEXT NOT NULL,
+        FOREIGN KEY(cartao_id) REFERENCES cartoes(id) ON DELETE CASCADE
+    )`);
+
     // **Tabela de Receitas**
     db.run(`CREATE TABLE IF NOT EXISTS receitas (
         id INTEGER PRIMARY KEY AUTOINCREMENT,

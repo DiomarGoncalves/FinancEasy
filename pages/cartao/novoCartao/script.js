@@ -13,7 +13,12 @@ document.getElementById('cartaoForm').addEventListener('submit', async (event) =
         vencimento: document.getElementById('vencimento').value
     };
 
-    await window.controle.invoke('add-cartao', cartao);
+    try {
+        await window.controle.invoke('add-cartao', cartao);
+        console.log('Cartão adicionado com sucesso!');
+    } catch (error) {
+        console.error(`Erro ao adicionar cartão: ${error.message}`);
+    }
     resetFormAndUnlockInputs(event.target); // Resetar e desbloquear inputs
     event.target.reset(); // Resetar o formulário
 });

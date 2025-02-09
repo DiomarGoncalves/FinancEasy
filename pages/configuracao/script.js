@@ -6,29 +6,35 @@ function resetFormAndUnlockInputs(form) {
 async function inserirDespesasAnoCompleto() {
     try {
         const resultado = await window.controle.inserirDespesasAnoCompleto();
-        alert(resultado);
     } catch (error) {
         console.error('Erro ao inserir despesas:', error);
-        alert('Erro ao inserir despesas. Verifique o console para mais detalhes.');
     }
 }
+
 document.addEventListener('DOMContentLoaded', async (event) => {
-    event.preventDefault();
-    const config = await window.controle.loadConfig();
-    document.getElementById('tema').value = config.tema;
-    document.getElementById('notificacoes').value = config.notificacoes;
-    document.getElementById('limiteGastos').value = config.limiteGastos || 0;
-    document.getElementById('dbPath').value = config.dbPath || 'C:\\Users\\User\\AppData\\Local\\FinancEasy';
-    resetFormAndUnlockInputs(event.target);
+    try {
+        const config = await window.controle.loadConfig();
+        document.getElementById('tema').value = config.tema;
+        document.getElementById('notificacoes').value = config.notificacoes;
+        document.getElementById('limiteGastos').value = config.limiteGastos || 0;
+        document.getElementById('dbPath').value = config.dbPath || 'C:\\Users\\User\\AppData\\Local\\FinancEasy';
+        resetFormAndUnlockInputs(event.target);
+    } catch (error) {
+        console.error(`Erro ao carregar configurações: ${error.message}`);
+    }
 });
 
 document.getElementById('selectDbPath').addEventListener('click', async (event) => {
     event.preventDefault();
-    const dbPath = await window.controle.selectDbPath();
-    if (dbPath) {
-        document.getElementById('dbPath').value = dbPath;
+    try {
+        const dbPath = await window.controle.selectDbPath();
+        if (dbPath) {
+            document.getElementById('dbPath').value = dbPath;
+        }
+        resetFormAndUnlockInputs(event.target);
+    } catch (error) {
+        console.error(`Erro ao selecionar caminho do banco de dados: ${error.message}`);
     }
-    resetFormAndUnlockInputs(event.target);
 });
 
 document.getElementById('configForm').addEventListener('submit', async (event) => {
@@ -39,18 +45,29 @@ document.getElementById('configForm').addEventListener('submit', async (event) =
         novaSenha: document.getElementById('novaSenha').value
     };
 
-    await window.controle.invoke('save-config', config);
-    alert('Configurações salvas com sucesso!');
-    event.target.reset(); // Resetar o formulário
-    document.getElementById('configForm').querySelectorAll('input').forEach(input => input.disabled = false); // Desbloquear inputs
+    try {
+        await window.controle.invoke('save-config', config);
+        console.log('Configurações salvas com sucesso!');
+        event.target.reset(); // Resetar o formulário
+        document.getElementById('configForm').querySelectorAll('input').forEach(input => input.disabled = false); // Desbloquear inputs
+    } catch (error) {
+        console.error(`Erro ao salvar configurações: ${error.message}`);
+    }
 });
 
 document.getElementById('inserirTeste').addEventListener('click', async () => {
-    await window.controle.inserirValoresTeste();
-    alert('Valores de teste inseridos com sucesso!');
+    try {
+        await window.controle.inserirValoresTeste();
+    } catch (error) {
+        console.error(`Erro ao inserir valores de teste: ${error.message}`);
+    }
 });
 
 document.getElementById('limparBanco').addEventListener('click', async () => {
-    await window.controle.limparBanco();
-    alert('Banco de dados limpo com sucesso!');
+    try {
+        await window.controle.limparBanco();
+        console.log('Banco de dados limpo com sucesso!');
+    } catch (error) {
+        console.error(`Erro ao limpar banco de dados: ${error.message}`);
+    }
 });

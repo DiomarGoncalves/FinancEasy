@@ -6,14 +6,19 @@ function resetFormAndUnlockInputs(form) {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
-  const cartoes = await window.controle.getCartoes();
-  const cartaoSelect = document.getElementById("cartao");
-  cartoes.forEach((cartao) => {
-    const option = document.createElement("option");
-    option.value = cartao.id;
-    option.textContent = `${cartao.nome} - ${cartao.banco}`;
-    cartaoSelect.appendChild(option);
-  });
+  try {
+    const cartoes = await window.controle.getCartoes();
+    const cartaoSelect = document.getElementById("cartao");
+    cartoes.forEach((cartao) => {
+      const option = document.createElement("option");
+      option.value = cartao.id;
+      option.textContent = `${cartao.nome} - ${cartao.banco}`;
+      cartaoSelect.appendChild(option);
+    });
+  } catch (error) {
+    console.error(`Erro ao carregar cartões: ${error.message}`);
+  }
+
   document.getElementById("exportar").addEventListener("click", () => {
     exportarPDF();
   });
@@ -47,13 +52,16 @@ document.addEventListener("DOMContentLoaded", async () => {
       const estabelecimento = document.getElementById("estabelecimento").value;
       const data = document.getElementById("data").value;
       const valor = parseFloat(document.getElementById("valor").value);
-      const formaPagamento = document.getElementById("forma_pagamento").value;
+      let formaPagamento = document.getElementById("forma_pagamento").value;
+      if (formaPagamento === "Cartão de Crédito") {
+        formaPagamento = "Crédito";
+      }
       const numeroParcelas =
-        formaPagamento === "Cartão de Crédito"
+        formaPagamento === "Crédito"
           ? parseInt(document.getElementById("numero_parcelas").value)
           : 1;
       const cartaoId =
-        formaPagamento === "Cartão de Crédito"
+        formaPagamento === "Crédito"
           ? parseInt(document.getElementById("cartao").value)
           : null;
 
@@ -65,68 +73,100 @@ document.addEventListener("DOMContentLoaded", async () => {
         numero_parcelas: numeroParcelas,
         cartao_id: cartaoId,
       };
+
+      try {
+        await window.controle.invoke("add-despesa", despesa);
+        document.getElementById("errorMessage").classList.add("d-none");
+        loadDespesas();
+      } catch (error) {
+        const errorMessage = document.getElementById("errorMessage");
+        errorMessage.textContent = error.message;
+        errorMessage.classList.remove("d-none");
+      }
+
       resetFormAndUnlockInputs(event.target); // Resetar e desbloquear inputs
-      await window.controle.invoke("add-despesa", despesa);
-      alert("Despesa adicionada com sucesso!");
-      loadDespesas();
     });
 
   loadDespesas();
 });
 
 async function loadDespesas() {
-  const despesas = await window.controle.invoke("get-despesas");
-  const tableBody = document.querySelector("#despesasTable tbody");
-  tableBody.innerHTML = ""; // Limpar tabela
-  totalGasto = 0;
+  try {
+    const despesas = await window.controle.invoke("get-despesas");
+    const tableBody = document.querySelector("#despesasTable tbody");
+    tableBody.innerHTML = ""; // Limpar tabela
+    totalGasto = 0;
 
-  despesas.forEach((despesa) => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-                  <td>${despesa.estabelecimento}</td>
-                  <td>${despesa.data}</td>
-                  <td>R$ ${despesa.valor}</td>
-                  <td>${despesa.forma_pagamento}</td>
-                  <td>${despesa.numero_parcelas}</td>
-                  <td>${despesa.parcelas_restantes}</td>
-                  <td>R$ ${despesa.valor_parcela}</td>
-                  <td>${despesa.cartao_id}</td>
-                  <td>
-                      <button class="btn btn-success btn-sm" onclick="payDespesa(${despesa.id})">Pagar</button>
-                      <button class="btn btn-danger btn-sm" onclick="deleteDespesa(${despesa.id})">Excluir</button>
-                  </td>
-              `;
-    tableBody.appendChild(row); // Adicionar linha à tabela
-    totalGasto += despesa.valor;
-  });
+    despesas.forEach((despesa) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+                    <td>${despesa.estabelecimento}</td>
+                    <td>${despesa.data}</td>
+                    <td>R$ ${despesa.valor}</td>
+                    <td>${despesa.forma_pagamento}</td>
+                    <td>${despesa.numero_parcelas}</td>
+                    <td>${despesa.parcelas_restantes}</td>
+                    <td>R$ ${despesa.valor_parcela}</td>
+                    <td>${despesa.cartao_id}</td>
+                    <td>
+                        <button class="btn btn-success btn-sm" onclick="payDespesa(${despesa.id})">Pagar</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteDespesa(${despesa.id})">Excluir</button>
+                    </td>
+                `;
+      tableBody.appendChild(row); // Adicionar linha à tabela
+      totalGasto += despesa.valor;
+    });
+  } catch (error) {
+    console.error(`Erro ao carregar despesas: ${error.message}`);
+  }
 }
 
 async function loadCartoes() {
-  const cartoes = await window.controle.invoke("get-cartoes");
-  const cartaoSelect = document.getElementById("cartao");
-  cartaoSelect.innerHTML = ""; // Limpar opções
+  try {
+    const cartoes = await window.controle.invoke("get-cartoes");
+    const cartaoSelect = document.getElementById("cartao");
+    cartaoSelect.innerHTML = ""; // Limpar opções
 
-  cartoes.forEach((cartao) => {
-    const option = document.createElement("option");
-    option.value = cartao.id;
-    option.textContent = `${cartao.nome} - Limite: R$${cartao.limite}`;
-    cartaoSelect.appendChild(option); // Adicionar opção ao select
-  });
+    cartoes.forEach((cartao) => {
+      const option = document.createElement("option");
+      option.value = cartao.id;
+      option.textContent = `${cartao.nome} - Limite: R$${cartao.limite}`;
+      cartaoSelect.appendChild(option); // Adicionar opção ao select
+    });
+  } catch (error) {
+    console.error(`Erro ao carregar cartões: ${error.message}`);
+  }
 }
 
 async function payDespesa(id) {
   if (confirm("Tem certeza que deseja pagar esta despesa?")) {
-    await window.controle.invoke("pay-despesa", id);
-    loadDespesas(); // Atualizar a lista de despesas
+    try {
+      const despesa = await window.controle.invoke("get-despesa", id);
+      await window.controle.invoke("pay-despesa", id);
+      if (despesa.forma_pagamento === "Crédito") {
+        await window.controle.invoke("update-limite-cartao", {
+          id: despesa.cartao_id,
+          valor: despesa.valor_parcela,
+        });
+      }
+      loadDespesas(); // Atualizar a lista de despesas
+    } catch (error) {
+      console.error(`Erro ao pagar despesa: ${error.message}`);
+    }
   }
 }
 
 async function deleteDespesa(id) {
   if (confirm("Tem certeza que deseja excluir esta despesa?")) {
-    await window.controle.invoke("delete-despesa", id);
-    loadDespesas(); // Atualizar a lista de despesas
+    try {
+      await window.controle.invoke("delete-despesa", id);
+      loadDespesas(); // Atualizar a lista de despesas
+    } catch (error) {
+      console.error(`Erro ao excluir despesa: ${error.message}`);
+    }
   }
 }
+
 function exportarPDF() {
   console.log(totalGasto);
   const { jsPDF } = window.jspdf;
