@@ -6,7 +6,7 @@ const os = require("os");
 
 const localAppDataPathConfig =
 process.env.LOCALAPPDATA || path.join(os.homedir(), ".local", "share");
-const appFolderConfig = path.join(localAppDataPathConfig, "FinancEasyV3");
+const appFolderConfig = path.join(localAppDataPathConfig, "FinancEasyV2");
 const configPath = path.join(appFolderConfig, "config.json");
 
 let config = {};
