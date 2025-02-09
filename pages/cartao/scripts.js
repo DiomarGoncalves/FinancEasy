@@ -44,7 +44,6 @@ async function loadCartoes() {
                     <button class="btn btn-warning btn-sm" onclick="showEditModal(${cartao.id}, '${cartao.nome}', '${cartao.banco}', ${cartao.limite})">Editar</button>
                     <button class="btn btn-danger btn-sm" onclick="deleteCartao(${cartao.id})">Excluir</button>
                     <button class="btn btn-info btn-sm" onclick="showFatura(${cartao.id})">Fatura</button>
-                    <button class="btn btn-success btn-sm" onclick="pagarFatura(${cartao.id})">Pagar Fatura</button>
                 </td>
             `;
             tableBody.appendChild(row); // Adicionar linha à tabela
@@ -55,13 +54,13 @@ async function loadCartoes() {
 }
 
 async function deleteCartao(id) {
-    if (confirm('Tem certeza que deseja excluir este cartão?')) {
-        try {
-            await window.controle.invoke('delete-cartao', id);
-            loadCartoes(); // Atualizar a lista de cartões
-        } catch (error) {
-            console.error(`Erro ao excluir cartão: ${error.message}`);
-        }
+    try {
+        await window.controle.invoke('delete-cartao', id);
+        loadCartoes(); // Atualizar a lista de cartões
+        showMessage('Cartão excluído com sucesso!', 'success');
+    } catch (error) {
+        console.error(`Erro ao excluir cartão: ${error.message}`);
+        showMessage(`Erro ao excluir cartão: ${error.message}`, 'danger');
     }
 }
 
@@ -93,4 +92,17 @@ document.getElementById('editCartaoForm').addEventListener('submit', async (even
     }
 });
 
-loadCartoes();
+function showMessage(message, type) {
+    const messageContainer = document.getElementById('messageContainer');
+    messageContainer.innerHTML = `<div class="alert alert-${type}" role="alert">${message}</div>`;
+    setTimeout(() => {
+        messageContainer.innerHTML = '';
+    }, 3000);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const messageContainer = document.createElement('div');
+    messageContainer.id = 'messageContainer';
+    document.body.prepend(messageContainer);
+    loadCartoes();
+});

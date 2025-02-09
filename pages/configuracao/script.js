@@ -1,8 +1,3 @@
-function resetFormAndUnlockInputs(form) {
-    form.reset(); // Resetar o formulário
-    form.querySelectorAll('input').forEach(input => input.disabled = false); // Desbloquear inputs
-}
-
 function showMessage(message, type) {
     const messageContainer = document.createElement("div");
     messageContainer.className = `alert alert-${type}`;
@@ -29,7 +24,6 @@ document.addEventListener('DOMContentLoaded', async (event) => {
         document.getElementById('notificacoes').value = config.notificacoes;
         document.getElementById('limiteGastos').value = config.limiteGastos || 0;
         document.getElementById('dbPath').value = config.dbPath || 'C:\\Users\\User\\AppData\\Local\\FinancEasy';
-        resetFormAndUnlockInputs(event.target);
     } catch (error) {
         showMessage(`Erro ao carregar configurações: ${error.message}`, 'danger');
     }
@@ -42,7 +36,6 @@ document.getElementById('selectDbPath').addEventListener('click', async (event) 
         if (dbPath) {
             document.getElementById('dbPath').value = dbPath;
         }
-        resetFormAndUnlockInputs(event.target);
     } catch (error) {
         showMessage(`Erro ao selecionar caminho do banco de dados: ${error.message}`, 'danger');
     }
