@@ -1,6 +1,6 @@
 {
   "name": "FinancEasy",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "FinancEasy é uma aplicação de gerenciamento financeiro pessoal que permite aos usuários controlar suas despesas e receitas, gerar relatórios detalhados e calcular o saldo atual. Desenvolvido com Electron, a aplicação oferece uma interface amigável e intuitiva para facilitar o acompanhamento das finanças pessoais.",
   "author": "Diomar Gonçalves",
   "main": "public/main.js",
