@@ -1,14 +1,13 @@
 const path = require('path');
 const fs = require('fs');
-const os = require('os');
 const sqlite3 = require('sqlite3').verbose();
 
 // Obter o caminho do LocalAppData
 const localAppDataPath = process.env.LOCALAPPDATA || path.join(os.homedir(), '.local', 'share');
 
 // Definir a pasta do banco dentro do LocalAppData
-const appFolder = path.join(localAppDataPath, 'FinancEasy');
-const defaultDbPath = path.join(appFolder, 'database.db');
+const appFolder = path.join(localAppDataPath, 'FinancEasyV2');
+const defaultDbPath = path.join(appFolder, 'FinancEasy.db');
 
 // Criar a pasta se não existir
 if (!fs.existsSync(appFolder)) {
@@ -29,50 +28,91 @@ if (fs.existsSync(configPath)) {
 // Criar ou abrir o banco de dados
 const db = new sqlite3.Database(dbPath);
 
-
 db.serialize(() => {
-    // Criar tabela de despesas
-    db.run(`CREATE TABLE IF NOT EXISTS despesas (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        estabelecimento TEXT,
-        data TEXT,
-        valor REAL,
-        forma_pagamento TEXT,
-        numero_parcelas INTEGER,
-        parcelas_restantes INTEGER,
-        valor_parcela REAL,
-        cartao_id INTEGER
-    )`);
+    // **Ativar suporte a chaves estrangeiras**
+    db.run("PRAGMA foreign_keys = ON");
 
-    // Criar tabela de cartões
+    // **Tabela de Cartões**
     db.run(`CREATE TABLE IF NOT EXISTS cartoes (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome TEXT,
-        banco TEXT,
-        limite REAL
+        nome TEXT NOT NULL,
+        banco TEXT NOT NULL,
+        limite REAL NOT NULL,
+        vencimento TEXT NOT NULL
     )`);
 
-    // Criar tabela de histórico de despesas
+    // **Tabela de Faturas**
+    db.run(`CREATE TABLE IF NOT EXISTS faturas (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        cartao_id INTEGER NOT NULL,
+        data_inicio TEXT NOT NULL,
+        data_fim TEXT NOT NULL,
+        valor_total REAL DEFAULT 0.0,
+        paga BOOLEAN DEFAULT 0,
+        FOREIGN KEY(cartao_id) REFERENCES cartoes(id) ON DELETE CASCADE
+    )`);
+
+    // **Tabela de Despesas**
+    db.run(`CREATE TABLE IF NOT EXISTS despesas (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        estabelecimento TEXT NOT NULL,
+        data TEXT NOT NULL,
+        valor REAL NOT NULL,
+        forma_pagamento TEXT NOT NULL CHECK (forma_pagamento IN ('Crédito', 'Débito', 'Dinheiro', 'Pix')),
+        numero_parcelas INTEGER DEFAULT 1,
+        parcelas_restantes INTEGER DEFAULT 1,
+        valor_parcela REAL NOT NULL,
+        cartao_id INTEGER,
+        fatura_id INTEGER,
+        FOREIGN KEY(cartao_id) REFERENCES cartoes(id) ON DELETE SET NULL,
+        FOREIGN KEY(fatura_id) REFERENCES faturas(id) ON DELETE SET NULL
+    )`);
+
+    // **Tabela de Histórico de Despesas**
     db.run(`CREATE TABLE IF NOT EXISTS historico_despesas (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        estabelecimento TEXT,
-        data TEXT,
-        valor REAL,
-        forma_pagamento TEXT,
-        numero_parcelas INTEGER,
-        parcelas_restantes INTEGER,
-        valor_parcela REAL,
+        estabelecimento TEXT NOT NULL,
+        data TEXT NOT NULL,
+        valor REAL NOT NULL,
+        forma_pagamento TEXT NOT NULL,
+        numero_parcelas INTEGER DEFAULT 1,
+        parcelas_restantes INTEGER DEFAULT 1,
+        valor_parcela REAL NOT NULL,
         cartao_id INTEGER,
-        data_pagamento TEXT
+        data_pagamento TEXT NOT NULL,
+        FOREIGN KEY(cartao_id) REFERENCES cartoes(id) ON DELETE SET NULL
     )`);
 
-    // Criar tabela de receitas
+    // **Tabela de Histórico de Faturas**
+    db.run(`CREATE TABLE IF NOT EXISTS historico_faturas (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        cartao_id INTEGER NOT NULL,
+        data_inicio TEXT NOT NULL,
+        data_fim TEXT NOT NULL,
+        valor_total REAL NOT NULL,
+        data_pagamento TEXT NOT NULL,
+        FOREIGN KEY(cartao_id) REFERENCES cartoes(id) ON DELETE CASCADE
+    )`);
+
+    // **Tabela de Receitas**
     db.run(`CREATE TABLE IF NOT EXISTS receitas (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        descricao TEXT,
-        data TEXT,
-        valor REAL,
-        forma_recebimento TEXT
+        descricao TEXT NOT NULL,
+        data TEXT NOT NULL,
+        valor REAL NOT NULL,
+        categoria TEXT NOT NULL,
+        fonte TEXT NOT NULL,
+        forma_recebimento TEXT NOT NULL CHECK (forma_recebimento IN ('Transferência', 'Pix', 'Dinheiro', 'Cheque')),
+        conta_bancaria TEXT NOT NULL,
+        recorrente BOOLEAN DEFAULT 0,
+        intervalo_recorrencia TEXT
+    )`);
+
+    // **Tabela de Contas Bancárias**
+    db.run(`CREATE TABLE IF NOT EXISTS contas_bancarias (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nome TEXT NOT NULL,
+        tipo TEXT NOT NULL CHECK (tipo IN ('Conta Corrente', 'Poupança', 'Carteira Digital'))
     )`);
 });
 

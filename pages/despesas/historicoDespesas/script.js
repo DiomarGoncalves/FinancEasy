@@ -1,19 +1,23 @@
 let totalGasto = 0;
 document.addEventListener("DOMContentLoaded", async () => {
-  const historico = await window.controle.invoke("get-historico-despesas");
-  renderHistorico(historico);
+  try {
+    const historico = await window.controle.invoke("get-historico-despesas");
+    renderHistorico(historico);
 
-  document.getElementById("filtrar").addEventListener("click", () => {
-    const mes = document.getElementById("mes").value;
-    const historicoFiltrado = historico.filter((despesa) =>
-      despesa.data_pagamento.startsWith(mes)
-    );
-    renderHistorico(historicoFiltrado);
-  });
+    document.getElementById("filtrar").addEventListener("click", () => {
+      const mes = document.getElementById("mes").value;
+      const historicoFiltrado = historico.filter((despesa) =>
+        despesa.data_pagamento.startsWith(mes)
+      );
+      renderHistorico(historicoFiltrado);
+    });
 
-  document.getElementById("exportar").addEventListener("click", () => {
-    exportarPDF();
-  });
+    document.getElementById("exportar").addEventListener("click", () => {
+      exportarPDF();
+    });
+  } catch (error) {
+    console.error(`Erro ao carregar histórico de despesas: ${error.message}`);
+  }
 });
 
 function renderHistorico(historico) {
