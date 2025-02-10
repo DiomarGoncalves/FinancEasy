@@ -1,34 +1,12 @@
 const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 const path = require("path");
 const fs = require("fs");
+const os = require("os"); // Adicionar importação do módulo 'os'
 const db = require("./database/db");
-const os = require("os");
-
 const localAppDataPathConfig =
-process.env.LOCALAPPDATA || path.join(os.homedir(), ".local", "share");
-const appFolderConfig = path.join(localAppDataPathConfig, "FinancEasyV2");
+  process.env.LOCALAPPDATA || path.join(os.homedir(), ".local", "share");
+const appFolderConfig = path.join(localAppDataPathConfig, "FinancEasy");
 const configPath = path.join(appFolderConfig, "config.json");
-
-let config = {};
-
-try {
-    if (fs.existsSync(configPath)) {
-        config = JSON.parse(fs.readFileSync(configPath));
-    } else {
-        fs.writeFileSync(configPath, JSON.stringify(config));
-    }
-} catch (error) {
-    if (error.code === 'ENOENT') {
-        console.error('Arquivo config.json não encontrado, criando um novo.');
-        fs.mkdirSync(appFolderConfig, { recursive: true });
-        fs.writeFileSync(configPath, JSON.stringify(config));
-    } else {
-        console.error(`Erro ao ler ou criar config.json: ${error.message}`);
-    }
-}
-
-const dbPath = config.dbPath || appFolderConfig;
-process.env.DB_PATH = dbPath;
 
 if (process.env.NODE_ENV === "development") {
   try {
@@ -60,6 +38,11 @@ app.on("window-all-closed", () => {
 });
 
 app.whenReady().then(() => {
+  // Verificar e criar o diretório de configuração se não existir
+  if (!fs.existsSync(appFolderConfig)) {
+    fs.mkdirSync(appFolderConfig, { recursive: true });
+  }
+
   // Verificar e criar o arquivo de configuração se não existir
   if (!fs.existsSync(configPath)) {
     const defaultConfig = {
@@ -1031,88 +1014,88 @@ function exportarDadosSQL() {
 
 // Função para exportar todo o banco de dados em JSON
 function exportarBancoDadosJSON() {
-    return new Promise((resolve, reject) => {
-        const sql = `SELECT name FROM sqlite_master WHERE type='table'`;
-        db.all(sql, [], (err, tables) => {
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT name FROM sqlite_master WHERE type='table'`;
+    db.all(sql, [], (err, tables) => {
+      if (err) {
+        reject(err);
+      } else {
+        const data = {};
+        let count = tables.length;
+        tables.forEach(table => {
+          db.all(`SELECT * FROM ${table.name}`, [], (err, rows) => {
             if (err) {
-                reject(err);
+              reject(err);
             } else {
-                const data = {};
-                let count = tables.length;
-                tables.forEach(table => {
-                    db.all(`SELECT * FROM ${table.name}`, [], (err, rows) => {
-                        if (err) {
-                            reject(err);
-                        } else {
-                            data[table.name] = rows;
-                            count--;
-                            if (count === 0) {
-                                resolve(JSON.stringify(data, null, 2));
-                            }
-                        }
-                    });
-                });
+              data[table.name] = rows;
+              count--;
+              if (count === 0) {
+                resolve(JSON.stringify(data, null, 2));
+              }
             }
+          });
         });
+      }
     });
+  });
 }
 
 // Função para exportar todo o banco de dados em CSV
 function exportarBancoDadosCSV() {
-    return new Promise((resolve, reject) => {
-        const sql = `SELECT name FROM sqlite_master WHERE type='table'`;
-        db.all(sql, [], (err, tables) => {
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT name FROM sqlite_master WHERE type='table'`;
+    db.all(sql, [], (err, tables) => {
+      if (err) {
+        reject(err);
+      } else {
+        let csv = '';
+        let count = tables.length;
+        tables.forEach(table => {
+          db.all(`SELECT * FROM ${table.name}`, [], (err, rows) => {
             if (err) {
-                reject(err);
+              reject(err);
             } else {
-                let csv = '';
-                let count = tables.length;
-                tables.forEach(table => {
-                    db.all(`SELECT * FROM ${table.name}`, [], (err, rows) => {
-                        if (err) {
-                            reject(err);
-                        } else {
-                            csv += `\n\nTable: ${table.name}\n`;
-                            csv += rows.map(row => Object.values(row).join(",")).join("\n");
-                            count--;
-                            if (count === 0) {
-                                resolve(csv);
-                            }
-                        }
-                    });
-                });
+              csv += `\n\nTable: ${table.name}\n`;
+              csv += rows.map(row => Object.values(row).join(",")).join("\n");
+              count--;
+              if (count === 0) {
+                resolve(csv);
+              }
             }
+          });
         });
+      }
     });
+  });
 }
 
 // Função para exportar todo o banco de dados em SQL
 function exportarBancoDadosSQL() {
-    return new Promise((resolve, reject) => {
-        const sql = `SELECT name FROM sqlite_master WHERE type='table'`;
-        db.all(sql, [], (err, tables) => {
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT name FROM sqlite_master WHERE type='table'`;
+    db.all(sql, [], (err, tables) => {
+      if (err) {
+        reject(err);
+      } else {
+        let sqlDump = '';
+        let count = tables.length;
+        tables.forEach(table => {
+          db.all(`SELECT * FROM ${table.name}`, [], (err, rows) => {
             if (err) {
-                reject(err);
+              reject(err);
             } else {
-                let sqlDump = '';
-                let count = tables.length;
-                tables.forEach(table => {
-                    db.all(`SELECT * FROM ${table.name}`, [], (err, rows) => {
-                        if (err) {
-                            reject(err);
-                        } else {
-                            sqlDump += `\n\n-- Table: ${table.name}\n`;
-                            sqlDump += rows.map(row => `INSERT INTO ${table.name} VALUES (${Object.values(row).map(value => `'${value}'`).join(",")});`).join("\n");
-                            count--;
-                            if (count === 0) {
-                                resolve(sqlDump);
-                            }
-                        }
-                    });
-                });
+              sqlDump += `\n\n-- Table: ${table.name}\n`;
+              sqlDump += rows.map(row => `INSERT INTO ${table.name} VALUES (${Object.values(row).map(value => `'${value}'`).join(",")});`).join("\n");
+              count--;
+              if (count === 0) {
+                resolve(sqlDump);
+              }
             }
+          });
         });
+      }
     });
+  });
 }
 
 // IPC Handlers para exportação de dados
@@ -1152,54 +1135,81 @@ ipcMain.handle("exportar-dados", async (event, formato) => {
 // Função para importar dados em JSON
 function importarDadosJSON(filePath) {
   return new Promise((resolve, reject) => {
-      const json = fs.readFileSync(filePath, 'utf8');
-      const dados = JSON.parse(json);
-      const sqls = dados.map(row => `INSERT INTO despesas VALUES (${Object.values(row).map(value => `'${value}'`).join(",")});`);
-      db.serialize(() => {
-          sqls.forEach(sql => {
-              db.run(sql, (err) => {
-                  if (err) {
-                      reject(err);
-                  }
-              });
-          });
-          resolve();
+    const json = fs.readFileSync(filePath, 'utf8');
+    const dados = JSON.parse(json);
+    const sqls = [];
+
+    // Verificar a estrutura dos dados e criar as instruções SQL apropriadas
+    for (const tabela in dados) {
+      if (dados.hasOwnProperty(tabela)) {
+        dados[tabela].forEach(row => {
+          const colunas = Object.keys(row).join(", ");
+          const valores = Object.values(row).map(value => `'${value}'`).join(", ");
+          sqls.push(`INSERT INTO ${tabela} (${colunas}) VALUES (${valores});`);
+        });
+      }
+    }
+
+    db.serialize(() => {
+      sqls.forEach(sql => {
+        db.run(sql, (err) => {
+          if (err) {
+            reject(err);
+          }
+        });
       });
+      resolve();
+    });
   });
 }
 
 // Função para importar dados em CSV
 function importarDadosCSV(filePath) {
   return new Promise((resolve, reject) => {
-      const csv = fs.readFileSync(filePath, 'utf8');
-      const rows = csv.split("\n").map(row => row.split(","));
-      const sqls = rows.map(row => `INSERT INTO despesas VALUES (${row.map(value => `'${value}'`).join(",")});`);
-      db.serialize(() => {
-          sqls.forEach(sql => {
-              db.run(sql, (err) => {
-                  if (err) {
-                      reject(err);
-                  }
-              });
-          });
-          resolve();
+    const csv = fs.readFileSync(filePath, 'utf8');
+    const linhas = csv.split("\n");
+    const sqls = [];
+
+    // Verificar a estrutura dos dados e criar as instruções SQL apropriadas
+    let tabelaAtual = null;
+    linhas.forEach(linha => {
+      if (linha.startsWith("Table:")) {
+        tabelaAtual = linha.split(":")[1].trim();
+      } else if (tabelaAtual && linha.trim()) {
+        const valores = linha.split(",").map(value => `'${value.trim()}'`).join(", ");
+        sqls.push(`INSERT INTO ${tabelaAtual} VALUES (${valores});`);
+      }
+    });
+
+    db.serialize(() => {
+      sqls.forEach(sql => {
+        db.run(sql, (err) => {
+          if (err) {
+            reject(err);
+          }
+        });
       });
+      resolve();
+    });
   });
 }
 
 // Função para importar dados em SQL
 function importarDadosSQL(filePath) {
   return new Promise((resolve, reject) => {
-      const sql = fs.readFileSync(filePath, 'utf8');
-      db.serialize(() => {
-          db.exec(sql, (err) => {
-              if (err) {
-                  reject(err);
-              } else {
-                  resolve();
-              }
-          });
+    const sql = fs.readFileSync(filePath, 'utf8');
+    const sqls = sql.split(";").filter(stmt => stmt.trim());
+
+    db.serialize(() => {
+      sqls.forEach(stmt => {
+        db.run(stmt, (err) => {
+          if (err) {
+            reject(err);
+          }
+        });
       });
+      resolve();
+    });
   });
 }
 
