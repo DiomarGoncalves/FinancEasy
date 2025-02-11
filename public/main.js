@@ -477,11 +477,15 @@ ipcMain.handle("pay-despesa", async (event, id) => {
 function inserirValoresTeste() {
   return new Promise((resolve, reject) => {
     const sqls = [
+      // Cartões
+      `INSERT INTO cartoes (nome, banco, limite, vencimento) VALUES ('Cartão A', 'Banco A', 1000.00, '2025-01-10')`,
+      `INSERT INTO cartoes (nome, banco, limite, vencimento) VALUES ('Cartão B', 'Banco B', 2000.00, '2025-02-15')`,
+
       // Despesas
       `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Loja A', '2025-01-01', 100.00, 'Crédito', 1, 0, 100.00, 1)`,
       `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Loja B', '2025-02-01', 200.00, 'Débito', 2, 1, 100.00, 2)`,
-      `INSERT INTO cartoes (nome, banco, limite, vencimento) VALUES ('Cartão A', 'Banco A', 1000.00, '2025-01-10')`,
-      `INSERT INTO cartoes (nome, banco, limite, vencimento) VALUES ('Cartão B', 'Banco B', 2000.00, '2025-02-15')`,
+
+      // Histórico de Despesas
       `INSERT INTO historico_despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id, data_pagamento) VALUES ('Loja A', '2025-01-01', 100.00, 'Crédito', 1, 0, 100.00, 1, '2025-01-02')`,
       `INSERT INTO historico_despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id, data_pagamento) VALUES ('Loja B', '2025-02-01', 200.00, 'Débito', 2, 1, 100.00, 2, '2025-02-02')`,
 
@@ -805,19 +809,29 @@ async function pagarFatura(cartao_id) {
               if (err) {
                 reject(err);
               } else {
-                // Devolver o valor ao limite do cartão
-                const updateSql = `UPDATE cartoes SET limite = limite + (SELECT valor_total FROM historico_faturas WHERE cartao_id = ? AND data_pagamento = ?) WHERE id = ?`;
-                db.run(
-                  updateSql,
-                  [cartao_id, data_pagamento, cartao_id],
-                  function (err) {
-                    if (err) {
-                      reject(err);
-                    } else {
-                      resolve({ changes: this.changes });
-                    }
-                  }
-                );
+                // Mover despesas pagas para o histórico
+                moveDespesasParaHistorico(cartao_id)
+                  .then(() => {
+                    // Remover despesas pagas
+                    removeDespesasPagas(cartao_id)
+                      .then(() => {
+                        // Devolver o valor ao limite do cartão
+                        const updateSql = `UPDATE cartoes SET limite = limite + (SELECT valor_total FROM historico_faturas WHERE cartao_id = ? AND data_pagamento = ?) WHERE id = ?`;
+                        db.run(
+                          updateSql,
+                          [cartao_id, data_pagamento, cartao_id],
+                          function (err) {
+                            if (err) {
+                              reject(err);
+                            } else {
+                              resolve({ changes: this.changes });
+                            }
+                          }
+                        );
+                      })
+                      .catch((err) => reject(err));
+                  })
+                  .catch((err) => reject(err));
               }
             });
           }
@@ -1268,5 +1282,76 @@ async function selecionarFormato() {
 // IPC Handler para selecionar formato
 ipcMain.handle("selecionar-formato", async () => {
   return selecionarFormato();
+});
+
+// Função para remover despesas pagas
+function removeDespesasPagas(cartaoId) {
+  return new Promise((resolve, reject) => {
+    const sql = `DELETE FROM despesas WHERE cartao_id = ? AND paga = 1`;
+    db.run(sql, [cartaoId], function (err) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve({ changes: this.changes });
+      }
+    });
+  });
+}
+
+// IPC Handler para remover despesas pagas
+ipcMain.handle("remove-despesas-pagas", async (event, cartaoId) => {
+  return removeDespesasPagas(cartaoId);
+});
+
+// Função para mover despesas pagas para o histórico
+function moveDespesasParaHistorico(cartaoId) {
+  return new Promise((resolve, reject) => {
+    const selectSql = `SELECT * FROM despesas WHERE cartao_id = ? AND paga = 1`;
+    db.all(selectSql, [cartaoId], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        const insertSql = `INSERT INTO historico_despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id, data_pagamento) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        const deleteSql = `DELETE FROM despesas WHERE id = ?`;
+        const data_pagamento = new Date().toISOString().split("T")[0];
+
+        db.serialize(() => {
+          rows.forEach((despesa) => {
+            db.run(
+              insertSql,
+              [
+                despesa.estabelecimento,
+                despesa.data,
+                despesa.valor,
+                despesa.forma_pagamento,
+                despesa.numero_parcelas,
+                despesa.parcelas_restantes,
+                despesa.valor_parcela,
+                despesa.cartao_id,
+                data_pagamento,
+              ],
+              function (err) {
+                if (err) {
+                  reject(err);
+                } else {
+                  db.run(deleteSql, [despesa.id], function (err) {
+                    if (err) {
+                      reject(err);
+                    }
+                  });
+                }
+              }
+            );
+          });
+          resolve({ status: "success" });
+        });
+      }
+    });
+  });
+}
+
+// IPC Handler para mover despesas pagas para o histórico
+ipcMain.handle("move-despesas-para-historico", async (event, cartaoId) => {
+  return moveDespesasParaHistorico(cartaoId);
 });
 

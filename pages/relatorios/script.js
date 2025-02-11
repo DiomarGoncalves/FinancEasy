@@ -1,4 +1,3 @@
-let totalDespesas = 0;
 let totalReceitas = 0;
 
 async function gerarGraficos() {
@@ -286,19 +285,19 @@ function gerarRelatorioDespesas() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     doc.text("Relatório de Despesas", 10, 10);
+    let totalDespesas = 0;
     doc.autoTable({
       html: "#previewDespesasTable",
-      didDrawPage: (data) => {
-        // Adicionar o total gasto no final da página
-        const pageHeight = doc.internal.pageSize.height;
-        const totalGasto = Array.from(data.table.body).reduce((acc, row) => {
-          const valorText = row.cells[2]?.textContent || "0";
-          const valor = parseFloat(valorText.replace("R$ ", ""));
-          return acc + (isNaN(valor) ? 0 : valor);
-        }, 0);
-        doc.text(`Total Gasto: R$ ${totalGasto.toFixed(2)}`, 10, pageHeight - 10);
+      didDrawCell: (data) => {
+        if (data.column.index === 2) {
+          const valorText = data.cell.raw || "0";
+          const valor = parseFloat(String(valorText).replace("R$ ", ""));
+          totalDespesas += isNaN(valor) ? 0 : valor;
+        }
       },
     });
+    const finalY = doc.lastAutoTable.finalY || 10;
+    doc.text(`Total Gasto: R$ ${totalDespesas.toFixed(2)}`, 10, finalY + 10);
     doc.save("relatorio_despesas.pdf");
   } catch (error) {
     console.error(`Erro ao gerar relatório de despesas: ${error.message}`);
@@ -310,23 +309,19 @@ function gerarRelatorioReceitas() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     doc.text("Relatório de Receitas", 10, 10);
+    let totalReceitas = 0;
     doc.autoTable({
       html: "#previewReceitasTable",
-      didDrawPage: (data) => {
-        // Adicionar o total recebido no final da página
-        const pageHeight = doc.internal.pageSize.height;
-        const totalRecebido = Array.from(data.table.body).reduce((acc, row) => {
-          const valorText = row.cells[2]?.textContent || "0";
-          const valor = parseFloat(valorText.replace("R$ ", ""));
-          return acc + (isNaN(valor) ? 0 : valor);
-        }, 0);
-        doc.text(
-          `Total Recebido: R$ ${totalRecebido.toFixed(2)}`,
-          10,
-          pageHeight - 10
-        );
+      didDrawCell: (data) => {
+        if (data.column.index === 2) {
+          const valorText = data.cell.raw || "0";
+          const valor = parseFloat(String(valorText).replace("R$ ", ""));
+          totalReceitas += isNaN(valor) ? 0 : valor;
+        }
       },
     });
+    const finalY = doc.lastAutoTable.finalY || 10;
+    doc.text(`Total Recebido: R$ ${totalReceitas.toFixed(2)}`, 10, finalY + 10);
     doc.save("relatorio_receitas.pdf");
   } catch (error) {
     console.error(`Erro ao gerar relatório de receitas: ${error.message}`);

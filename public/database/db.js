@@ -64,6 +64,7 @@ db.serialize(() => {
         valor_parcela REAL NOT NULL,
         cartao_id INTEGER,
         fatura_id INTEGER,
+        paga INTEGER DEFAULT 0,
         FOREIGN KEY(cartao_id) REFERENCES cartoes(id) ON DELETE SET NULL,
         FOREIGN KEY(fatura_id) REFERENCES faturas(id) ON DELETE SET NULL
     )`);
