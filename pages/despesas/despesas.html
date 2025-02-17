@@ -86,19 +86,6 @@
                 />
               </div>
               <div class="col-md-6">
-                <label for="parcelas_restantes" class="form-label">Parcelas Restantes</label>
-                <input
-                  type="number"
-                  id="parcelas_restantes"
-                  name="parcelas_restantes"
-                  class="form-control bg-dark text-white"
-                  placeholder="Parcelas restantes"
-                  required
-                />
-              </div>
-            </div>
-            <div class="row mb-3">
-              <div class="col-md-6">
                 <label for="valor_parcela" class="form-label">Valor da Parcela</label>
                 <input
                   type="number"
@@ -127,7 +114,45 @@
       </div>
       <div class="container-fluid mt-5">
         <h2 class="text-white mb-4">Lista de Despesas</h2>
-        <div class="table-responsive">
+        <div class="container mt-5 bg-dark text-white p-4 rounded">
+          <h2 class="mb-4">Filtrar Despesas</h2>
+          <form id="filtroForm" class="needs-validation" novalidate>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="filtroDataInicio" class="form-label">Data Início</label>
+                <input
+                  type="date"
+                  id="filtroDataInicio"
+                  name="filtroDataInicio"
+                  class="form-control bg-dark text-white"
+                />
+              </div>
+              <div class="col-md-6">
+                <label for="filtroDataFim" class="form-label">Data Fim</label>
+                <input
+                  type="date"
+                  id="filtroDataFim"
+                  name="filtroDataFim"
+                  class="form-control bg-dark text-white"
+                />
+              </div>
+            </div>
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="filtroNome" class="form-label">Nome do Estabelecimento</label>
+                <input
+                  type="text"
+                  id="filtroNome"
+                  name="filtroNome"
+                  class="form-control bg-dark text-white"
+                  placeholder="Nome do estabelecimento"
+                />
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+          </form>
+        </div>
+        <div class="table-responsive mt-4">
           <table
             class="table table-dark table-striped table-bordered w-100"
             id="despesasTable"

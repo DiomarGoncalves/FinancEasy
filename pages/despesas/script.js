@@ -87,38 +87,62 @@ document.addEventListener("DOMContentLoaded", async () => {
       resetFormAndUnlockInputs(event.target); // Resetar e desbloquear inputs
     });
 
+  document.getElementById("filtroForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const dataInicio = document.getElementById("filtroDataInicio").value;
+    const dataFim = document.getElementById("filtroDataFim").value;
+    const nome = document.getElementById("filtroNome").value;
+
+    const filtros = {
+      dataInicio: dataInicio || null,
+      dataFim: dataFim || null,
+      nome: nome || null,
+    };
+
+    try {
+      const despesasFiltradas = await window.controle.invoke("get-despesas-filtradas", filtros);
+      renderDespesas(despesasFiltradas);
+    } catch (error) {
+      console.error(`Erro ao filtrar despesas: ${error.message}`);
+    }
+  });
+
   loadDespesas();
 });
 
 async function loadDespesas() {
   try {
     const despesas = await window.controle.invoke("get-despesas");
-    const tableBody = document.querySelector("#despesasTable tbody");
-    tableBody.innerHTML = ""; // Limpar tabela
-    totalGasto = 0;
-
-    despesas.forEach((despesa) => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-                    <td>${despesa.estabelecimento}</td>
-                    <td>${despesa.data}</td>
-                    <td>R$ ${despesa.valor}</td>
-                    <td>${despesa.forma_pagamento}</td>
-                    <td>${despesa.numero_parcelas}</td>
-                    <td>${despesa.parcelas_restantes}</td>
-                    <td>R$ ${despesa.valor_parcela}</td>
-                    <td>${despesa.cartao_id}</td>
-                    <td>
-                        <button class="btn btn-success btn-sm" onclick="payDespesa(${despesa.id})">Pagar</button>
-                        <button class="btn btn-danger btn-sm" onclick="deleteDespesa(${despesa.id})">Excluir</button>
-                    </td>
-                `;
-      tableBody.appendChild(row); // Adicionar linha à tabela
-      totalGasto += despesa.valor;
-    });
+    renderDespesas(despesas);
   } catch (error) {
     console.error(`Erro ao carregar despesas: ${error.message}`);
   }
+}
+
+function renderDespesas(despesas) {
+  const tableBody = document.querySelector("#despesasTable tbody");
+  tableBody.innerHTML = ""; // Limpar tabela
+  totalGasto = 0;
+
+  despesas.forEach((despesa) => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${despesa.estabelecimento}</td>
+      <td>${despesa.data}</td>
+      <td>R$ ${despesa.valor}</td>
+      <td>${despesa.forma_pagamento}</td>
+      <td>${despesa.numero_parcelas}</td>
+      <td>${despesa.parcelas_restantes}</td>
+      <td>R$ ${despesa.valor_parcela}</td>
+      <td>${despesa.cartao_id}</td>
+      <td>
+        <button class="btn btn-success btn-sm" onclick="payDespesa(${despesa.id})">Pagar</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteDespesa(${despesa.id})">Excluir</button>
+      </td>
+    `;
+    tableBody.appendChild(row); // Adicionar linha à tabela
+    totalGasto += despesa.valor;
+  });
 }
 
 async function loadCartoes() {

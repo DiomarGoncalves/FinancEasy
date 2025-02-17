@@ -41,17 +41,6 @@ db.serialize(() => {
         vencimento TEXT NOT NULL
     )`);
 
-    // **Tabela de Faturas**
-    db.run(`CREATE TABLE IF NOT EXISTS faturas (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        cartao_id INTEGER NOT NULL,
-        data_inicio TEXT NOT NULL,
-        data_fim TEXT NOT NULL,
-        valor_total REAL DEFAULT 0.0,
-        paga BOOLEAN DEFAULT 0,
-        FOREIGN KEY(cartao_id) REFERENCES cartoes(id) ON DELETE CASCADE
-    )`);
-
     // **Tabela de Despesas**
     db.run(`CREATE TABLE IF NOT EXISTS despesas (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -63,10 +52,8 @@ db.serialize(() => {
         parcelas_restantes INTEGER DEFAULT 1,
         valor_parcela REAL NOT NULL,
         cartao_id INTEGER,
-        fatura_id INTEGER,
         paga INTEGER DEFAULT 0,
-        FOREIGN KEY(cartao_id) REFERENCES cartoes(id) ON DELETE SET NULL,
-        FOREIGN KEY(fatura_id) REFERENCES faturas(id) ON DELETE SET NULL
+        FOREIGN KEY(cartao_id) REFERENCES cartoes(id) ON DELETE SET NULL
     )`);
 
     // **Tabela de Histórico de Despesas**
@@ -82,17 +69,6 @@ db.serialize(() => {
         cartao_id INTEGER,
         data_pagamento TEXT NOT NULL,
         FOREIGN KEY(cartao_id) REFERENCES cartoes(id) ON DELETE SET NULL
-    )`);
-
-    // **Tabela de Histórico de Faturas**
-    db.run(`CREATE TABLE IF NOT EXISTS historico_faturas (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        cartao_id INTEGER NOT NULL,
-        data_inicio TEXT NOT NULL,
-        data_fim TEXT NOT NULL,
-        valor_total REAL NOT NULL,
-        data_pagamento TEXT NOT NULL,
-        FOREIGN KEY(cartao_id) REFERENCES cartoes(id) ON DELETE CASCADE
     )`);
 
     // **Tabela de Receitas**

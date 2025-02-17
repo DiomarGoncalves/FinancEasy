@@ -27,8 +27,8 @@ contextBridge.exposeInMainWorld('controle', {
     getDespesasFiltradas: (filtros) => ipcRenderer.invoke('get-despesas-filtradas', filtros).catch(error => { console.error(error.message); }),
     getReceitasFiltradas: (filtros) => ipcRenderer.invoke('get-receitas-filtradas', filtros).catch(error => { console.error(error.message); }),
     calcularSaldo: () => ipcRenderer.invoke('calcular-saldo').catch(error => { console.error(error.message); }),
-    inserirDespesasAnoCompleto: () => ipcRenderer.invoke('inserir-despesas-ano-completo').catch(error => { console.error(error.message); }),
     exportarDados: (formato) => ipcRenderer.invoke('exportar-dados', formato).catch(error => { console.error(error.message); }),
     importarDados: (formato) => ipcRenderer.invoke('importar-dados', formato).catch(error => { console.error(error.message); }),
     selecionarFormato: () => ipcRenderer.invoke('selecionar-formato').catch(error => { console.error(error.message); }),
+    inserirDespesasAnoCompleto: () => ipcRenderer.invoke('inserir-despesas-ano-completo').catch(error => { console.error(error.message); }),
 });

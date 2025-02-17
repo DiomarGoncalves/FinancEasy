@@ -1,7 +1,3 @@
-function showFatura(cartaoId) {
-    window.location.href = `faturas/faturas.html?cartaoId=${cartaoId}`;
-}
-
 async function registrarCompra(cartaoId, valor, descricao, parcelas = 1) {
     const despesa = {
         estabelecimento: descricao,
@@ -15,16 +11,7 @@ async function registrarCompra(cartaoId, valor, descricao, parcelas = 1) {
         await window.controle.invoke('add-despesa', despesa);
         loadCartoes(); // Atualizar a lista de cartões
     } catch (error) {
-        console.error(`Erro ao registrar compra: ${error.message}`);
-    }
-}
-
-async function pagarFatura(cartaoId) {
-    try {
-        await window.controle.invoke('pagar-fatura', cartaoId);
-        loadCartoes(); // Atualizar a lista de cartões
-    } catch (error) {
-        console.error(`Erro ao pagar fatura: ${error.message}`);
+        showMessage(`Erro ao registrar compra: ${error.message}`, 'danger');
     }
 }
 
@@ -43,7 +30,6 @@ async function loadCartoes() {
                 <td>
                     <button class="btn btn-warning btn-sm" onclick="showEditModal(${cartao.id}, '${cartao.nome}', '${cartao.banco}', ${cartao.limite})">Editar</button>
                     <button class="btn btn-danger btn-sm" onclick="deleteCartao(${cartao.id})">Excluir</button>
-                    <button class="btn btn-info btn-sm" onclick="showFatura(${cartao.id})">Fatura</button>
                 </td>
             `;
             tableBody.appendChild(row); // Adicionar linha à tabela
