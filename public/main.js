@@ -74,6 +74,7 @@ function loadConfig() {
       tema: "escuro",
       notificacoes: "ativadas",
       limiteGastos: 0,
+      senha: "admin",
       dbPath: appFolderConfig,
     }; // Configurações padrão
   }
