@@ -1,8 +1,8 @@
 let totalGasto = 0;
 
 function resetFormAndUnlockInputs(form) {
-    form.reset(); // Resetar o formulário
-    form.querySelectorAll('input').forEach(input => input.disabled = false); // Desbloquear inputs
+  form.reset(); // Resetar o formulário
+  form.querySelectorAll("input").forEach((input) => (input.disabled = false)); // Desbloquear inputs
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -87,25 +87,30 @@ document.addEventListener("DOMContentLoaded", async () => {
       resetFormAndUnlockInputs(event.target); // Resetar e desbloquear inputs
     });
 
-  document.getElementById("filtroForm").addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const dataInicio = document.getElementById("filtroDataInicio").value;
-    const dataFim = document.getElementById("filtroDataFim").value;
-    const nome = document.getElementById("filtroNome").value;
+  document
+    .getElementById("filtroForm")
+    .addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const dataInicio = document.getElementById("filtroDataInicio").value;
+      const dataFim = document.getElementById("filtroDataFim").value;
+      const nome = document.getElementById("filtroNome").value;
 
-    const filtros = {
-      dataInicio: dataInicio || null,
-      dataFim: dataFim || null,
-      nome: nome || null,
-    };
+      const filtros = {
+        dataInicio: dataInicio || null,
+        dataFim: dataFim || null,
+        nome: nome || null,
+      };
 
-    try {
-      const despesasFiltradas = await window.controle.invoke("get-despesas-filtradas", filtros);
-      renderDespesas(despesasFiltradas);
-    } catch (error) {
-      console.error(`Erro ao filtrar despesas: ${error.message}`);
-    }
-  });
+      try {
+        const despesasFiltradas = await window.controle.invoke(
+          "get-despesas-filtradas",
+          filtros
+        );
+        renderDespesas(despesasFiltradas);
+      } catch (error) {
+        console.error(`Erro ao filtrar despesas: ${error.message}`);
+      }
+    });
 
   loadDespesas();
 });
