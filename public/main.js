@@ -1106,3 +1106,53 @@ ipcMain.handle("selecionar-formato", async () => {
 });
 
 
+// sessão de inovestimentos
+
+ipcMain.handle('delete-investment', (event, id) => {
+  const stmt = db.prepare("DELETE FROM investimentos WHERE id = ?");
+  stmt.run(id, function (err) {
+      if (err) {
+          console.error(err);
+          return;
+      }
+      console.log(`Investimento com ID ${id} excluído`);
+  });
+  stmt.finalize();
+});
+
+
+// Manipulador para adicionar um investimento
+ipcMain.handle("add-investment", async (event, investment) => {
+  const { nome_ativo, quantidade, valor_investido, data_aquisicao, tipo_investimento, conta_origem, observacoes } = investment;
+
+  return new Promise((resolve, reject) => {
+    const sql = `INSERT INTO investimentos (nome_ativo, quantidade, valor_investido, data_aquisicao, tipo_investimento, conta_origem, observacoes)
+                 VALUES (?, ?, ?, ?, ?, ?, ?)`;
+
+    db.run(sql, [nome_ativo, quantidade, valor_investido, data_aquisicao, tipo_investimento, conta_origem, observacoes], function (err) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve({ id: this.lastID });
+      }
+    });
+  });
+});
+
+// Manipulador para obter os investimentos
+ipcMain.handle("get-investments", async () => {
+  return new Promise((resolve, reject) => {
+    const sql = "SELECT * FROM investimentos";
+    db.all(sql, [], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows); // Retorna o array de investimentos
+      }
+    });
+  });
+});
+
+
+
+// sessão de inovestimentos

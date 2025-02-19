@@ -31,4 +31,7 @@ contextBridge.exposeInMainWorld('controle', {
     importarDados: (formato) => ipcRenderer.invoke('importar-dados', formato).catch(error => { console.error(error.message); }),
     selecionarFormato: () => ipcRenderer.invoke('selecionar-formato').catch(error => { console.error(error.message); }),
     inserirDespesasAnoCompleto: () => ipcRenderer.invoke('inserir-despesas-ano-completo').catch(error => { console.error(error.message); }),
+    addInvestment: (investment) => ipcRenderer.invoke('add-investment', investment),
+    deleteInvestment: (id) => ipcRenderer.invoke('delete-investment', id),
+    getInvestments: () => ipcRenderer.invoke('get-investments'),
 });

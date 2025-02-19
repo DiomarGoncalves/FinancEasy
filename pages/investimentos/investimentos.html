@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <title>Controle de Investimentos</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <a href="../home/home.html" class="btn btn-light">Voltar para a Home</a>
+    <h1>Controle de Investimentos</h1>
+    <div class="form-container">
+      <h2>Adicionar Investimento</h2>
+      <form id="investmentForm">
+        <div class="form-group">
+          <label for="assetName">Nome do Ativo</label>
+          <select id="assetName" required>
+            <option value="Ação">Ação</option>
+            <option value="FII">FII</option>
+            <option value="Cripto">Criptomoeda</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="quantity">Quantidade Adquirida</label>
+          <input type="number" id="quantity" required>
+        </div>
+        <div class="form-group">
+          <label for="investmentValue">Valor Investido</label>
+          <input type="number" id="investmentValue" required>
+        </div>
+        <div class="form-group">
+          <label for="acquisitionDate">Data de Aquisição</label>
+          <input type="date" id="acquisitionDate" required>
+        </div>
+        <div class="form-group">
+          <label for="account">Conta de Origem</label>
+          <input type="text" id="account" required>
+        </div>
+        <div class="form-group">
+          <label for="observations">Observações (opcional)</label>
+          <textarea id="observations" rows="3"></textarea>
+        </div>
+        <button type="submit">Adicionar Investimento</button>
+      </form>
+    </div>
+
+    <div class="investment-list">
+      <h2>Lista de Investimentos</h2>
+      <table id="investmentTable">
+        <thead>
+          <tr>
+            <th>Ativo</th>
+            <th>Quantidade</th>
+            <th>Valor Investido</th>
+            <th>Data de Aquisição</th>
+            <th>Conta de Origem</th>
+            <th>Observações</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Dados de investimentos serão exibidos aqui -->
+        </tbody>
+      </table>
+      <div id="alertMessage" class="alert" style="display: none;">
+        Nenhum investimento cadastrado.
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

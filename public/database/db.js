@@ -91,6 +91,17 @@ db.serialize(() => {
         nome TEXT NOT NULL,
         tipo TEXT NOT NULL CHECK (tipo IN ('Conta Corrente', 'Poupança', 'Carteira Digital'))
     )`);
+
+    db.run(`CREATE TABLE IF NOT EXISTS investimentos (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nome_ativo TEXT NOT NULL,
+        quantidade REAL NOT NULL,
+        valor_investido REAL NOT NULL,
+        data_aquisicao TEXT NOT NULL,
+        tipo_investimento TEXT NOT NULL CHECK (tipo_investimento IN ('Ação', 'FII', 'Cripto')),
+        conta_origem TEXT NOT NULL,
+        observacoes TEXT
+    )`);
 });
 
 module.exports = db;
