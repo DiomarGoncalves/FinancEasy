@@ -1,4 +1,5 @@
 let totalReceitas = 0;
+let totalDespesas = 0;
 
 async function gerarGraficos() {
   try {
@@ -285,7 +286,6 @@ function gerarRelatorioDespesas() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     doc.text("Relatório de Despesas", 10, 10);
-    let totalDespesas = 0;
     doc.autoTable({
       html: "#previewDespesasTable",
       didDrawCell: (data) => {
@@ -309,7 +309,6 @@ function gerarRelatorioReceitas() {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
     doc.text("Relatório de Receitas", 10, 10);
-    let totalReceitas = 0;
     doc.autoTable({
       html: "#previewReceitasTable",
       didDrawCell: (data) => {
