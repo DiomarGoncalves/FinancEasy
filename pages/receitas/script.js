@@ -112,7 +112,7 @@ async function renderReceitas(receitas) {
                 <td>${receita.recorrente ? "Sim" : "Não"}</td>
                 <td>${receita.intervalo_recorrencia || "-"}</td>
                 <td>
-                    <button class="btn btn-danger btn-sm" onclick="deleteReceita(${
+                    <button class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md"  onclick="deleteReceita(${
                       receita.id
                     })">Excluir</button>
                 </td>

@@ -47,7 +47,7 @@ function displayInvestments() {
     alertMessage.style.display = "block";
   } else {
     alertMessage.style.display = "none";
-    investments.forEach((investment, index) => {
+    investments.forEach((investment,) => {
       const row = investmentTable.insertRow();
       row.innerHTML = `
           <td>${investment.nome_ativo}</td>
@@ -56,7 +56,7 @@ function displayInvestments() {
           <td>${investment.data_aquisicao}</td>
           <td>${investment.conta_origem}</td>
           <td>${investment.observacoes || "-"}</td>
-          <td><button onclick="deleteInvestment(${index})">Excluir</button></td>
+          <td><button class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md"  onclick="deleteInvest(${investment.id})">Excluir</button></td>
         `;
     });
   }
@@ -76,16 +76,22 @@ function loadInvestments() {
 }
 
 // Função para excluir investimento
-function deleteInvestment(id) {
+function deleteInvest(id) {
   window.controle
     .deleteInvestment(id)
-    .then(() => {
-      loadInvestments(); // Carrega novamente os investimentos após a exclusão
+    .then((result) => {
+      if (result) {
+        console.log(`Investimento com ID ${id} excluído com sucesso.`);
+        loadInvestments(); // Recarrega a lista
+      } else {
+        console.warn(`Nenhum investimento encontrado com o ID ${id}.`);
+      }
     })
     .catch((err) => {
       console.error("Erro ao excluir investimento:", err);
     });
 }
+
 
 // Carrega os investimentos quando a página é carregada
 loadInvestments();

@@ -4,211 +4,165 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Relatórios</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="styles.css">
   </head>
-  <body>
-    <div class="container">
-      <a href="../home/home.html" class="btn btn-light mb-3">Voltar para o início</a>
-      <div class="dashboards">
-        <div>
-          <h2>Despesas Mensais</h2>
+  <body class="bg-gray-900 text-white">
+    <div class="container mx-auto p-6">
+      <a href="../home/home.html" class="btn bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg mb-4 inline-block">
+        <i class="fas fa-home"></i> Voltar para o início
+      </a>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg">
+          <h2 class="text-2xl font-bold mb-4">💰 Despesas Mensais</h2>
           <canvas id="despesasMensaisChart"></canvas>
         </div>
-        <div>
-          <h2>Receitas Mensais</h2>
+        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg">
+          <h2 class="text-2xl font-bold mb-4">💵 Receitas Mensais</h2>
           <canvas id="receitasMensaisChart"></canvas>
         </div>
-        <div>
-          <h2>Saldo Mensal</h2>
+        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg">
+          <h2 class="text-2xl font-bold mb-4">📊 Saldo Mensal</h2>
           <canvas id="saldoMensalChart"></canvas>
         </div>
-        <div>
-          <h2>Formas de Pagamento</h2>
+        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg">
+          <h2 class="text-2xl font-bold mb-4">💳 Formas de Pagamento</h2>
           <canvas id="formasPagamentoChart"></canvas>
         </div>
-        <div>
-          <h2>Tipos de Receitas</h2>
+        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg">
+          <h2 class="text-2xl font-bold mb-4">💸 Tipos de Receitas</h2>
           <canvas id="tiposReceitasChart"></canvas>
         </div>
       </div>
-      <div class="menu">
-        <button class="btn btn-primary" onclick="showForm('despesasForm')">
-          Filtrar Despesas
+      
+      <div class="flex gap-4 mb-6">
+        <button class="btn bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg" onclick="showForm('despesasForm')">
+          <i class="fas fa-filter"></i> Filtrar Despesas
         </button>
-        <button class="btn btn-primary" onclick="showForm('receitasForm')">
-          Filtrar Receitas
+        <button class="btn bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg" onclick="showForm('receitasForm')">
+          <i class="fas fa-filter"></i> Filtrar Receitas
         </button>
-        <button class="btn btn-primary" onclick="abrirMesModal()">
-          Gerar Relatório Mensal
+        <button class="btn bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg" onclick="abrirMesModal()">
+          <i class="fas fa-calendar-alt"></i> Gerar Relatório Mensal
         </button>
       </div>
-      <div id="despesasForm" class="hidden">
-        <h2>Filtrar Despesas</h2>
+      
+      <!-- Formulário de Despesas -->
+      <div id="despesasForm" class="hidden bg-gray-800 p-6 rounded-2xl shadow-lg">
+        <h2 class="text-2xl font-bold mb-4">📅 Filtrar Despesas</h2>
         <form id="formDespesas">
-          <div class="mb-3">
-            <label for="dataInicioDespesas" class="form-label"
-              >Data Início</label
-            >
-            <input
-              type="date"
-              class="form-control"
-              id="dataInicioDespesas"
-              name="dataInicioDespesas"
-            />
+          <div class="mb-4">
+            <label for="dataInicioDespesas" class="text-lg">Início</label>
+            <input type="date" class="form-input bg-gray-700 text-white w-full p-3 rounded-lg" id="dataInicioDespesas" name="dataInicioDespesas" />
           </div>
-          <div class="mb-3">
-            <label for="dataFimDespesas" class="form-label">Data Fim</label>
-            <input
-              type="date"
-              class="form-control"
-              id="dataFimDespesas"
-              name="dataFimDespesas"
-            />
+          <div class="mb-4">
+            <label for="dataFimDespesas" class="text-lg">Fim</label>
+            <input type="date" class="form-input bg-gray-700 text-white w-full p-3 rounded-lg" id="dataFimDespesas" name="dataFimDespesas" />
           </div>
-          <button
-            type="button"
-            class="btn btn-light"
-            onclick="filtrarDespesas()"
-          >
-            Filtrar
-          </button>
-          <button
-            type="button"
-            class="btn btn-secondary"
-            onclick="hideForm('despesasForm')"
-          >
-            Cancelar
-          </button>
+          <div class="flex gap-4">
+            <button type="button" class="btn bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg" onclick="filtrarDespesas()">
+              <i class="fas fa-search"></i> Filtrar
+            </button>
+            <button type="button" class="btn bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg" onclick="hideForm('despesasForm')">
+              <i class="fas fa-times"></i> Cancelar
+            </button>
+          </div>
         </form>
-        <h3>Pré-visualização</h3>
+        <h3 class="mt-4">Pré-visualização</h3>
         <table class="table table-dark table-striped" id="previewDespesasTable">
           <thead>
             <tr>
-              <th>Estabelecimento</th>
-              <th>Data</th>
-              <th>Valor</th>
-              <th>Forma de Pagamento</th>
+              <th>🏪 Estabelecimento</th>
+              <th>📅 Data</th>
+              <th>💸 Valor</th>
+              <th>💳 Forma de Pagamento</th>
             </tr>
           </thead>
           <tbody>
             <!-- Linhas serão adicionadas dinamicamente -->
           </tbody>
-          <h3 id="totalDespesas">Total Despesas: R$ 0,00</h3>
         </table>
-        <button class="btn btn-success" onclick="gerarRelatorioDespesas()">
-          Gerar Relatório
+        <h3 id="totalDespesas" class="mt-4">Total Despesas: R$ 0,00</h3>
+        <button class="btn bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg mt-4" onclick="gerarRelatorioDespesas()">
+          <i class="fas fa-download"></i> Gerar Relatório
         </button>
       </div>
 
-      <div id="receitasForm" class="hidden">
-        <h2>Filtrar Receitas</h2>
+      <!-- Formulário de Receitas -->
+      <div id="receitasForm" class="hidden bg-gray-800 p-6 rounded-2xl shadow-lg">
+        <h2 class="text-2xl font-bold mb-4">💰 Filtrar Receitas</h2>
         <form id="formReceitas">
-          <div class="mb-3">
-            <label for="dataInicioReceitas" class="form-label"
-              >Data Início</label
-            >
-            <input
-              type="date"
-              class="form-control"
-              id="dataInicioReceitas"
-              name="dataInicioReceitas"
-            />
+          <div class="mb-4">
+            <label for="dataInicioReceitas" class="text-lg">Início</label>
+            <input type="date" class="form-input bg-gray-700 text-white w-full p-3 rounded-lg" id="dataInicioReceitas" name="dataInicioReceitas" />
           </div>
-          <div class="mb-3">
-            <label for="dataFimReceitas" class="form-label">Data Fim</label>
-            <input
-              type="date"
-              class="form-control"
-              id="dataFimReceitas"
-              name="dataFimReceitas"
-            />
+          <div class="mb-4">
+            <label for="dataFimReceitas" class="text-lg">Fim</label>
+            <input type="date" class="form-input bg-gray-700 text-white w-full p-3 rounded-lg" id="dataFimReceitas" name="dataFimReceitas" />
           </div>
-          <button
-            type="button"
-            class="btn btn-light"
-            onclick="filtrarReceitas()"
-          >
-            Filtrar
-          </button>
-          <button
-            type="button"
-            class="btn btn-secondary"
-            onclick="hideForm('receitasForm')"
-          >
-            Cancelar
-          </button>
+          <div class="flex gap-4">
+            <button type="button" class="btn bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg" onclick="filtrarReceitas()">
+              <i class="fas fa-search"></i> Filtrar
+            </button>
+            <button type="button" class="btn bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg" onclick="hideForm('receitasForm')">
+              <i class="fas fa-times"></i> Cancelar
+            </button>
+          </div>
         </form>
-        <h3>Pré-visualização</h3>
+        <h3 class="mt-4">Pré-visualização</h3>
         <table class="table table-dark table-striped" id="previewReceitasTable">
           <thead>
             <tr>
-              <th>Descrição</th>
-              <th>Data</th>
-              <th>Valor</th>
-              <th>Forma de Recebimento</th>
+              <th>📝 Descrição</th>
+              <th>📅 Data</th>
+              <th>💸 Valor</th>
+              <th>💳 Forma de Recebimento</th>
             </tr>
           </thead>
           <tbody>
             <!-- Linhas serão adicionadas dinamicamente -->
           </tbody>
-          <h3 id="totalReceitas">Total Receitas: R$ 0,00</h3>
         </table>
-        <button class="btn btn-success" onclick="gerarRelatorioReceitas()">
-          Gerar Relatório
+        <h3 id="totalReceitas" class="mt-4">Total Receitas: R$ 0,00</h3>
+        <button class="btn bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg mt-4" onclick="gerarRelatorioReceitas()">
+          <i class="fas fa-download"></i> Gerar Relatório
         </button>
       </div>
 
       <!-- Modal para selecionar o mês -->
       <div class="modal" id="mesModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
-          <div class="modal-content">
+          <div class="modal-content bg-gray-800 text-white">
             <div class="modal-header">
-              <h5 class="modal-title">Selecionar Mês</h5>
+              <h5 class="modal-title">📅 Selecionar Mês</h5>
             </div>
             <div class="modal-body">
               <form id="mesForm">
                 <div class="form-group">
                   <label for="mesInput">Mês (1-12)</label>
-                  <input
-                    type="number"
-                    class="form-control"
-                    id="mesInput"
-                    min="1"
-                    max="12"
-                    required
-                  />
+                  <input type="number" class="form-control bg-gray-700 text-white" id="mesInput" min="1" max="12" required />
                 </div>
               </form>
             </div>
             <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-primary"
-                onclick="submitMesForm()"
-              >
-                Gerar Relatório
+              <button type="button" class="btn bg-purple-600 hover:bg-purple-500 text-white" onclick="submitMesForm()">
+                <i class="fas fa-check"></i> Gerar Relatório
               </button>
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-dismiss="modal"
-              >
-                Cancelar
+              <button type="button" class="btn bg-gray-600 hover:bg-gray-500 text-white" data-dismiss="modal">
+                <i class="fas fa-times"></i> Cancelar
               </button>
             </div>
           </div>
         </div>
       </div>
     </div>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="script.js"></script>
   </body>
 </html>

@@ -140,15 +140,21 @@ function renderDespesas(despesas) {
       <td>${despesa.parcelas_restantes}</td>
       <td>R$ ${despesa.valor_parcela}</td>
       <td>${despesa.cartao_id}</td>
-      <td>
-        <button class="btn btn-success btn-sm" onclick="payDespesa(${despesa.id})">Pagar</button>
-        <button class="btn btn-danger btn-sm" onclick="deleteDespesa(${despesa.id})">Excluir</button>
+      <td colspan="1" class="text-center">
+          <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md mr-2" onclick="payDespesa(${despesa.id})">
+              <i class="fas fa-dollar-sign icon"></i> Pagar
+          </button>
+          <button class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md" onclick="deleteDespesa(${despesa.id})">
+              <i class="fas fa-trash-alt icon"></i> Excluir
+          </button>
       </td>
+
     `;
     tableBody.appendChild(row); // Adicionar linha à tabela
     totalGasto += despesa.valor;
   });
 }
+
 
 async function loadCartoes() {
   try {

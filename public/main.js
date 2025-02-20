@@ -1109,15 +1109,19 @@ ipcMain.handle("selecionar-formato", async () => {
 // sessão de inovestimentos
 
 ipcMain.handle('delete-investment', (event, id) => {
-  const stmt = db.prepare("DELETE FROM investimentos WHERE id = ?");
-  stmt.run(id, function (err) {
+  return new Promise((resolve, reject) => {
+    const stmt = db.prepare("DELETE FROM investimentos WHERE id = ?");
+    stmt.run(id, function (err) {
       if (err) {
-          console.error(err);
-          return;
+        console.error("Erro ao excluir investimento:", err);
+        reject(err);
+      } else {
+        console.log(`Investimento com ID ${id} excluído`);
+        resolve(true); // Confirma que o investimento foi excluído
       }
-      console.log(`Investimento com ID ${id} excluído`);
+    });
+    stmt.finalize();
   });
-  stmt.finalize();
 });
 
 

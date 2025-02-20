@@ -1,7 +1,15 @@
 body {
     background-color: #121212;
     color: #fff;
+    display: flex;
+    flex-direction: row-reverse;
 }
+#editCartaoModal {
+    display: none;
+  }
+/* Estilo para o backdrop do modal */
+
+
 .form-control,
 .form-select {
     background-color: #444;
