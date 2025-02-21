@@ -24,6 +24,7 @@ contextBridge.exposeInMainWorld('controle', {
     addReceita: (receita) => ipcRenderer.invoke('add-receita', receita).catch(error => { console.error(error.message); }),
     getReceitas: () => ipcRenderer.invoke('get-receitas').catch(error => { console.error(error.message); }),
     deleteReceita: (id) => ipcRenderer.invoke('delete-receita', id).catch(error => { console.error(error.message); }),
+    getHistoricoDespesasFiltradas: (filtros) => ipcRenderer.invoke('get-historicoDespesas-filtradas', filtros).catch(error => { console.error(error.message); }),
     getDespesasFiltradas: (filtros) => ipcRenderer.invoke('get-despesas-filtradas', filtros).catch(error => { console.error(error.message); }),
     getReceitasFiltradas: (filtros) => ipcRenderer.invoke('get-receitas-filtradas', filtros).catch(error => { console.error(error.message); }),
     calcularSaldo: () => ipcRenderer.invoke('calcular-saldo').catch(error => { console.error(error.message); }),

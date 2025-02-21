@@ -602,6 +602,35 @@ ipcMain.handle("delete-receita", async (event, id) => {
 });
 
 // IPC Handlers para filtrar despesas e receitas
+ipcMain.handle("get-historicoDespesas-filtradas", async (event, filtros) => {
+  const { dataInicio, dataFim, nome } = filtros;
+  let sql = `SELECT * FROM historico_despesas WHERE 1=1`;
+  const params = [];
+
+  if (dataInicio) {
+    sql += ` AND data >= ?`;
+    params.push(dataInicio);
+  }
+  if (dataFim) {
+    sql += ` AND data <= ?`;
+    params.push(dataFim);
+  }
+  if (nome) {
+    sql += ` AND estabelecimento LIKE ?`;
+    params.push(`%${nome}%`);
+  }
+
+  return new Promise((resolve, reject) => {
+    db.all(sql, params, (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+});
+
 ipcMain.handle("get-despesas-filtradas", async (event, filtros) => {
   const { dataInicio, dataFim, nome } = filtros;
   let sql = `SELECT * FROM despesas WHERE 1=1`;

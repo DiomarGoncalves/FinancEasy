@@ -16,14 +16,30 @@ async function gerarGraficos() {
       dataInicio,
       dataFim,
     });
+    const historicoDespesas = await window.controle.getHistoricoDespesasFiltradas({
+      dataInicio,
+      dataFim,
+    });
 
     console.log("Despesas:", despesas); // Log para depuração
     console.log("Receitas:", receitas); // Log para depuração
 
     const despesasMensais = Array(12).fill(0);
+    const historicoDespesasMensais = Array(12).fill(0);
     const receitasMensais = Array(12).fill(0);
     const formasPagamento = {};
     const tiposReceitas = {};
+
+    historicoDespesas.forEach((historicoDespesas) => {
+      const mes = new Date(historicoDespesas.data).getMonth();
+      historicoDespesasMensais[mes] += historicoDespesas.valor;
+
+      if (formasPagamento[historicoDespesas.forma_pagamento]) {
+        formasPagamento[historicoDespesas.forma_pagamento] += historicoDespesas.valor;
+      } else {
+        formasPagamento[historicoDespesas.forma_pagamento] = historicoDespesas.valor;
+      }
+    });
 
     despesas.forEach((despesa) => {
       const mes = new Date(despesa.data).getMonth();
@@ -50,6 +66,35 @@ async function gerarGraficos() {
     const saldoMensal = receitasMensais.map(
       (receita, index) => receita - despesasMensais[index]
     );
+
+    new Chart(document.getElementById("historicoDespesasMensaisChart"), {
+      type: "bar",
+      data: {
+        labels: [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
+        ],
+        datasets: [
+          {
+            label: "Despesas Mensais",
+            data: historicoDespesasMensais,
+            backgroundColor: "rgba(255, 99, 132, 0.2)",
+            borderColor: "rgba(255, 99, 132, 1)",
+            borderWidth: 1,
+          },
+        ],
+      },
+    });
 
     new Chart(document.getElementById("despesasMensaisChart"), {
       type: "bar",
