@@ -38,7 +38,9 @@ db.serialize(() => {
         nome TEXT NOT NULL,
         banco TEXT NOT NULL,
         limite REAL NOT NULL,
-        vencimento TEXT NOT NULL
+        vencimento TEXT NOT NULL,
+        limite_gasto REAL DEFAULT 0,
+        limite_disponivel REAL GENERATED ALWAYS AS (limite - limite_gasto) VIRTUAL
     )`);
 
     // **Tabela de Despesas**

@@ -137,31 +137,16 @@ function showMessage(message, type) {
   `);
 }
 
-// Atualizar o limite do cartão ao adicionar uma despesa
+// Função para adicionar despesa com validação de limite
 ipcMain.handle("add-despesa", async (event, despesa) => {
-  const {
-    estabelecimento,
-    data,
-    valor,
-    forma_pagamento,
-    numero_parcelas,
-    cartao_id,
-  } = despesa;
+  const { estabelecimento, data, valor, forma_pagamento, numero_parcelas, cartao_id } = despesa;
   const valorParcela = valor / numero_parcelas;
 
   return new Promise(async (resolve, reject) => {
     try {
-      if (
-        forma_pagamento === "Crédito" ||
-        forma_pagamento === "Cartão de Crédito"
-      ) {
-        const limiteDisponivel = await obterLimiteDisponivel(cartao_id);
-        if (limiteDisponivel === undefined) {
-          reject(new Error("Cartão não encontrado."));
-          return;
-        }
-        if (limiteDisponivel < valor) {
-          showMessage("Limite insuficiente para realizar a compra.", "danger");
+      if (forma_pagamento === "Crédito") {
+        const cartao = await obterCartao(cartao_id);
+        if (cartao.limite_gasto + valor > cartao.limite) {
           reject(new Error("Limite insuficiente para realizar a compra."));
           return;
         }
@@ -174,44 +159,120 @@ ipcMain.handle("add-despesa", async (event, despesa) => {
           const parcelaDataStr = parcelaData.toISOString().split("T")[0];
 
           const sql = `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) 
-                                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
-          db.run(
-            sql,
-            [
-              estabelecimento,
-              parcelaDataStr,
-              valorParcela,
-              forma_pagamento === "Cartão de Crédito"
-                ? "Crédito"
-                : forma_pagamento,
-              numero_parcelas,
-              numero_parcelas - i,
-              valorParcela,
-              cartao_id,
-            ],
-            function (err) {
-              if (err) {
-                reject(err);
-              }
+                       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+          db.run(sql, [estabelecimento, parcelaDataStr, valorParcela, forma_pagamento, numero_parcelas, numero_parcelas - i, valorParcela, cartao_id], function (err) {
+            if (err) {
+              reject(err);
             }
-          );
+          });
         }
 
-        // Atualizar o limite do cartão
-        const updateSql = `UPDATE cartoes SET limite = limite - ? WHERE id = ?`;
-        db.run(updateSql, [valor, cartao_id], function (err) {
-          if (err) {
-            reject(err);
-          } else {
-            resolve({ status: "success" });
-          }
-        });
+        if (forma_pagamento === "Crédito") {
+          const updateSql = `UPDATE cartoes SET limite_gasto = limite_gasto + ? WHERE id = ?`;
+          db.run(updateSql, [valor, cartao_id], function (err) {
+            if (err) {
+              reject(err);
+            } else {
+              resolve({ status: "success" });
+            }
+          });
+        } else {
+          resolve({ status: "success" });
+        }
       });
     } catch (error) {
       reject(error);
     }
   });
 });
+
+// Função para pagar uma despesa e mover para o histórico
+ipcMain.handle("pay-despesa", async (event, id) => {
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT * FROM despesas WHERE id = ?`;
+    db.get(sql, [id], (err, despesa) => {
+      if (err) {
+        reject(err);
+      } else {
+        const insertSql = `INSERT INTO historico_despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id, data_pagamento) 
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        const deleteSql = `DELETE FROM despesas WHERE id = ?`;
+        const data_pagamento = new Date().toISOString().split("T")[0];
+
+        db.run(insertSql, [despesa.estabelecimento, despesa.data, despesa.valor, despesa.forma_pagamento, despesa.numero_parcelas, despesa.parcelas_restantes, despesa.valor_parcela, despesa.cartao_id, data_pagamento], function (err) {
+          if (err) {
+            reject(err);
+          } else {
+            db.run(deleteSql, [id], function (err) {
+              if (err) {
+                reject(err);
+              } else {
+                if (despesa.forma_pagamento === "Crédito") {
+                  const updateSql = `UPDATE cartoes SET limite_gasto = limite_gasto - ? WHERE id = ?`;
+                  db.run(updateSql, [despesa.valor, despesa.cartao_id], function (err) {
+                    if (err) {
+                      reject(err);
+                    } else {
+                      resolve({ changes: this.changes });
+                    }
+                  });
+                } else {
+                  resolve({ changes: this.changes });
+                }
+              }
+            });
+          }
+        });
+      }
+    });
+  });
+});
+
+// Função para excluir uma despesa e atualizar os limites do cartão
+ipcMain.handle("delete-despesa", async (event, id) => {
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT * FROM despesas WHERE id = ?`;
+    db.get(sql, [id], (err, despesa) => {
+      if (err) {
+        reject(err);
+      } else {
+        const deleteSql = `DELETE FROM despesas WHERE id = ?`;
+        db.run(deleteSql, [id], function (err) {
+          if (err) {
+            reject(err);
+          } else {
+            if (despesa.forma_pagamento === "Crédito") {
+              const updateSql = `UPDATE cartoes SET limite_gasto = limite_gasto - ? WHERE id = ?`;
+              db.run(updateSql, [despesa.valor, despesa.cartao_id], function (err) {
+                if (err) {
+                  reject(err);
+                } else {
+                  resolve({ changes: this.changes });
+                }
+              });
+            } else {
+              resolve({ changes: this.changes });
+            }
+          }
+        });
+      }
+    });
+  });
+});
+
+// Função para obter um cartão específico
+function obterCartao(id) {
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT * FROM cartoes WHERE id = ?`;
+    db.get(sql, [id], (err, row) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(row);
+      }
+    });
+  });
+}
 
 // Função para obter todos os cartões
 function obterCartoes() {
@@ -228,9 +289,6 @@ function obterCartoes() {
 }
 
 // IPC Handlers para cartões
-ipcMain.handle("get-cartoes", async () => {
-  return obterCartoes();
-});
 
 ipcMain.handle("add-cartao", async (event, cartao) => {
   const { nome, banco, limite, vencimento } = cartao;
@@ -247,18 +305,6 @@ ipcMain.handle("add-cartao", async (event, cartao) => {
   });
 });
 
-ipcMain.handle("delete-cartao", async (event, id) => {
-  return new Promise((resolve, reject) => {
-    const sql = `DELETE FROM cartoes WHERE id = ?`;
-    db.run(sql, [id], function (err) {
-      if (err) {
-        reject(err);
-      } else {
-        resolve({ changes: this.changes });
-      }
-    });
-  });
-});
 
 ipcMain.handle("update-cartao", async (event, cartao) => {
   const { id, nome, banco, limite } = cartao;
@@ -289,9 +335,28 @@ ipcMain.handle("get-despesas", async () => {
   });
 });
 
-ipcMain.handle("delete-despesa", async (event, id) => {
+// Função para obter todos os cartões
+function obterCartoes() {
   return new Promise((resolve, reject) => {
-    const sql = `DELETE FROM despesas WHERE id = ?`;
+    const sql = `SELECT * FROM cartoes`;
+    db.all(sql, [], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+}
+
+// IPC Handlers para cartões
+ipcMain.handle("get-cartoes", async () => {
+  return obterCartoes();
+});
+
+ipcMain.handle("delete-cartao", async (event, id) => {
+  return new Promise((resolve, reject) => {
+    const sql = `DELETE FROM cartoes WHERE id = ?`;
     db.run(sql, [id], function (err) {
       if (err) {
         reject(err);
@@ -302,62 +367,7 @@ ipcMain.handle("delete-despesa", async (event, id) => {
   });
 });
 
-// Função para pagar uma despesa e mover para o histórico
-ipcMain.handle("pay-despesa", async (event, id) => {
-  return new Promise((resolve, reject) => {
-    const sql = `SELECT * FROM despesas WHERE id = ?`;
-    db.get(sql, [id], (err, despesa) => {
-      if (err) {
-        reject(err);
-      } else {
-        const insertSql = `INSERT INTO historico_despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id, data_pagamento) 
-                                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-        const deleteSql = `DELETE FROM despesas WHERE id = ?`;
-        const data_pagamento = new Date().toISOString().split("T")[0];
 
-        db.run(
-          insertSql,
-          [
-            despesa.estabelecimento,
-            despesa.data,
-            despesa.valor,
-            despesa.forma_pagamento,
-            despesa.numero_parcelas,
-            despesa.parcelas_restantes,
-            despesa.valor_parcela,
-            despesa.cartao_id,
-            data_pagamento,
-          ],
-          function (err) {
-            if (err) {
-              reject(err);
-            } else {
-              db.run(deleteSql, [id], function (err) {
-                if (err) {
-                  reject(err);
-                } else {
-                  // Devolver o valor ao limite do cartão
-                  const updateSql = `UPDATE cartoes SET limite = limite + ? WHERE id = ?`;
-                  db.run(
-                    updateSql,
-                    [despesa.valor, despesa.cartao_id],
-                    function (err) {
-                      if (err) {
-                        reject(err);
-                      } else {
-                        resolve({ changes: this.changes });
-                      }
-                    }
-                  );
-                }
-              });
-            }
-          }
-        );
-      }
-    });
-  });
-});
 
 // Função para inserir valores de teste
 function inserirValoresTeste() {

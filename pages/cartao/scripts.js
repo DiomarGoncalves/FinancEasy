@@ -78,6 +78,8 @@ function showMessage(message, type) {
           <td class="px-4 py-2">${cartao.nome}</td>
           <td class="px-4 py-2">${cartao.banco}</td>
           <td class="px-4 py-2">${cartao.limite}</td>
+          <td class="px-4 py-2">${cartao.limite_gasto}</td>
+          <td class="px-4 py-2">${cartao.limite_disponivel}</td>
           <td class="px-4 py-2">
             <button class="btn btn-warning btn-sm bg-yellow-500 hover:bg-yellow-400 text-white py-1 px-2 rounded" onclick="showEditModal(${cartao.id}, '${cartao.nome}', '${cartao.banco}', ${cartao.limite})">Editar</button>
             <button class="btn btn-danger btn-sm bg-red-500 hover:bg-red-400 text-white py-1 px-2 rounded" onclick="deleteCartao(${cartao.id})">Excluir</button>

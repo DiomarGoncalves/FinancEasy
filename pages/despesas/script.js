@@ -1,5 +1,57 @@
 let totalGasto = 0;
 
+// Função para exibir notificações estilo toast
+function showMessage(message, type) {
+  let toastContainer = document.getElementById("toast-container");
+  if (!toastContainer) {
+    toastContainer = document.createElement("div");
+    toastContainer.id = "toast-container";
+    toastContainer.style.position = "fixed";
+    toastContainer.style.top = "20px";
+    toastContainer.style.right = "20px";
+    toastContainer.style.zIndex = "9999";
+    toastContainer.style.display = "flex";
+    toastContainer.style.flexDirection = "column";
+    toastContainer.style.gap = "10px";
+    document.body.appendChild(toastContainer);
+  }
+  
+  const toast = document.createElement("div");
+  toast.className = `toast-message alert alert-${type}`;
+  toast.textContent = message;
+  toast.style.padding = "15px 20px";
+  toast.style.borderRadius = "8px";
+  toast.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.2)";
+  toast.style.color = "#fff";
+  toast.style.fontWeight = "bold";
+  toast.style.opacity = "0";
+  toast.style.transform = "translateY(-20px)";
+  toast.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+
+  const colors = {
+    success: "#4CAF50",
+    error: "#F44336",
+    warning: "#FFC107",
+    info: "#2196F3"
+  };
+  toast.style.backgroundColor = colors[type] || "#333";
+  
+  toastContainer.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = "1";
+    toast.style.transform = "translateY(0)";
+  }, 100);
+  
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(-20px)";
+    setTimeout(() => toast.remove(), 300);
+  }, 5000);
+}
+
+
+
 function resetFormAndUnlockInputs(form) {
   form.reset(); // Resetar o formulário
   form.querySelectorAll("input").forEach((input) => (input.disabled = false)); // Desbloquear inputs
@@ -76,12 +128,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       try {
         await window.controle.invoke("add-despesa", despesa);
-        document.getElementById("errorMessage").classList.add("d-none");
+        showMessage("Despesa registrada com sucesso!", "success");
         loadDespesas();
       } catch (error) {
-        const errorMessage = document.getElementById("errorMessage");
-        errorMessage.textContent = error.message;
-        errorMessage.classList.remove("d-none");
+        showMessage(`Erro ao registrar despesa: ${error.message}`, "danger");
       }
 
       resetFormAndUnlockInputs(event.target); // Resetar e desbloquear inputs
@@ -108,7 +158,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         );
         renderDespesas(despesasFiltradas);
       } catch (error) {
-        console.error(`Erro ao filtrar despesas: ${error.message}`);
+        showMessage(`Erro ao filtrar despesas: ${error.message}`, "danger");
       }
     });
 
@@ -120,7 +170,7 @@ async function loadDespesas() {
     const despesas = await window.controle.invoke("get-despesas");
     renderDespesas(despesas);
   } catch (error) {
-    console.error(`Erro ao carregar despesas: ${error.message}`);
+    showMessage(`Erro ao carregar despesas: ${error.message}`, "danger");
   }
 }
 
@@ -155,7 +205,6 @@ function renderDespesas(despesas) {
   });
 }
 
-
 async function loadCartoes() {
   try {
     const cartoes = await window.controle.invoke("get-cartoes");
@@ -169,20 +218,13 @@ async function loadCartoes() {
       cartaoSelect.appendChild(option); // Adicionar opção ao select
     });
   } catch (error) {
-    console.error(`Erro ao carregar cartões: ${error.message}`);
+    showMessage (`Erro ao carregar cartões: ${error.message}`, "danger");
   }
 }
 
 async function payDespesa(id) {
   try {
-    const despesa = await window.controle.invoke("get-despesa", id);
     await window.controle.invoke("pay-despesa", id);
-    if (despesa.forma_pagamento === "Crédito") {
-      await window.controle.invoke("update-limite-cartao", {
-        id: despesa.cartao_id,
-        valor: despesa.valor_parcela,
-      });
-    }
     loadDespesas(); // Atualizar a lista de despesas
     showMessage("Despesa paga com sucesso!", "success");
   } catch (error) {
@@ -193,30 +235,13 @@ async function payDespesa(id) {
 
 async function deleteDespesa(id) {
   try {
-    const despesa = await window.controle.invoke("get-despesa", id);
     await window.controle.invoke("delete-despesa", id);
-    if (despesa.forma_pagamento === "Crédito") {
-      await window.controle.invoke("update-limite-cartao", {
-        id: despesa.cartao_id,
-        valor: despesa.valor_parcela * despesa.parcelas_restantes,
-      });
-    }
     loadDespesas(); // Atualizar a lista de despesas
     showMessage("Despesa excluída com sucesso!", "success");
   } catch (error) {
     console.error(`Erro ao excluir despesa: ${error.message}`);
     showMessage(`Erro ao excluir despesa: ${error.message}`, "danger");
   }
-}
-
-function showMessage(message, type) {
-  const messageContainer = document.createElement("div");
-  messageContainer.className = `alert alert-${type}`;
-  messageContainer.textContent = message;
-  document.body.prepend(messageContainer);
-  setTimeout(() => {
-    messageContainer.remove();
-  }, 3000);
 }
 
 function exportarPDF() {
