@@ -42,5 +42,6 @@ contextBridge.exposeInMainWorld('controle', {
     deleteReserva: (id) => ipcRenderer.invoke('delete-reserva', id).catch(error => { console.error(error.message); }),
     updateReserva: (reserva) => ipcRenderer.invoke('update-reserva', reserva).catch(error => { console.error(error.message); }),
     getObjetivo: () => ipcRenderer.invoke('get-objetivo').catch(error => { console.error(error.message); }),
-    setObjetivo: (objetivo) => ipcRenderer.invoke('set-objetivo', objetivo).catch(error => { console.error(error.message); })
+    setObjetivo: (objetivo) => ipcRenderer.invoke('set-objetivo', objetivo).catch(error => { console.error(error.message); }),
+    executarAtualizacaoSql: () => ipcRenderer.invoke('executar-atualizacao-sql').catch(error => { console.error(error.message); })
 });

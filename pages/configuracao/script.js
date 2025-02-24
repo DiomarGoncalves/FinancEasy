@@ -154,6 +154,15 @@ document.getElementById('importarDados').addEventListener('click', async () => {
     }
 });
 
+document.getElementById('executarSql').addEventListener('click', async () => {
+    try {
+        await window.controle.executarAtualizacaoSql();
+        showMessage('Atualização SQL executada com sucesso!', 'success');
+    } catch (error) {
+        showMessage(`Erro ao executar atualização SQL: ${error.message}`, 'danger');
+    }
+});
+
 async function loadReceitas() {
     try {
         const receitas = await window.controle.getReceitas();

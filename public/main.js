@@ -7,6 +7,7 @@ const localAppDataPathConfig =
   process.env.LOCALAPPDATA || path.join(os.homedir(), ".local", "share");
 const appFolderConfig = path.join(localAppDataPathConfig, "FinancEasyV2");
 const configPath = path.join(appFolderConfig, "config.json");
+const { exec } = require('child_process');
 
 if (process.env.NODE_ENV === "development") {
   try {
@@ -1367,4 +1368,18 @@ ipcMain.handle("get-objetivo", async () => {
 
 ipcMain.handle("set-objetivo", async (event, objetivo) => {
   return definirObjetivo(objetivo);
+});
+
+ipcMain.handle('executar-atualizacao-sql', async () => {
+    return new Promise((resolve, reject) => {
+        exec('node ./public/database/db.js', (error, stdout, stderr) => {
+            if (error) {
+                console.error(`Erro ao executar atualização SQL: ${error.message}`);
+                reject(error);
+            } else {
+                console.log(`Atualização SQL executada com sucesso: ${stdout}`);
+                resolve({ status: 'success' });
+            }
+        });
+    });
 });
