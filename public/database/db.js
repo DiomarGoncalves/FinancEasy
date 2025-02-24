@@ -85,6 +85,21 @@ db.serialize(() => {
         intervalo_recorrencia TEXT
     )`);
 
+    // **Tabela de Histórico de Receitas**
+    db.run(`CREATE TABLE IF NOT EXISTS historico_receitas (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        descricao TEXT NOT NULL,
+        data TEXT NOT NULL,
+        valor REAL NOT NULL,
+        categoria TEXT NOT NULL,
+        fonte TEXT NOT NULL,
+        forma_recebimento TEXT NOT NULL,
+        conta_bancaria TEXT NOT NULL,
+        recorrente BOOLEAN DEFAULT 0,
+        intervalo_recorrencia TEXT,
+        data_recebimento TEXT NOT NULL
+    )`);
+
     // **Tabela de Contas Bancárias**
     db.run(`CREATE TABLE IF NOT EXISTS contas_bancarias (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -101,6 +116,20 @@ db.serialize(() => {
         tipo_investimento TEXT NOT NULL CHECK (tipo_investimento IN ('Ação', 'FII', 'Cripto')),
         conta_origem TEXT NOT NULL,
         observacoes TEXT
+    )`);
+
+    // **Tabela de Reservas de Emergência**
+    db.run(`CREATE TABLE IF NOT EXISTS reservas (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        descricao TEXT NOT NULL,
+        valor REAL NOT NULL,
+        data TEXT NOT NULL
+    )`);
+
+    // **Tabela de Objetivo de Poupança**
+    db.run(`CREATE TABLE IF NOT EXISTS objetivo (
+        id INTEGER PRIMARY KEY CHECK (id = 1),
+        valor REAL NOT NULL
     )`);
 });
 

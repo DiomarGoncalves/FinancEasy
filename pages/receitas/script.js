@@ -115,6 +115,9 @@ async function renderReceitas(receitas) {
                     <button class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md"  onclick="deleteReceita(${
                       receita.id
                     })">Excluir</button>
+                    <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md" onclick="markReceitaAsReceived(${
+                      receita.id
+                    })">Recebida</button>
                 </td>
             `;
       tableBody.appendChild(row); // Adicionar linha à tabela
@@ -129,6 +132,16 @@ async function deleteReceita(id) {
     showMessage("Receita excluída com sucesso!", "success");
   } catch (error) {
     showMessage(`Erro ao excluir receita: ${error.message}`, "danger");
+  }
+}
+
+async function markReceitaAsReceived(id) {
+  try {
+    await window.controle.invoke("mark-receita-as-received", id);
+    loadReceitas(); // Atualizar a lista de receitas
+    showMessage("Receita marcada como recebida com sucesso!", "success");
+  } catch (error) {
+    showMessage(`Erro ao marcar receita como recebida: ${error.message}`, "danger");
   }
 }
 

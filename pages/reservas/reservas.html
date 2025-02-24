@@ -1,135 +1,126 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Reservas</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-    <style>
-        body {
-            background-color: #1a1a2e;
-            color: #fff;
-        }
-        .btn-primary {
-            background-color: #6c5ce7;
-            border-color: #6c5ce7;
-        }
-        .btn-primary:hover {
-            background-color: #5a4ccf;
-            border-color: #5a4ccf;
-        }
-        .modal-content {
-            background-color: #2e2e4d;
-            border-radius: 1rem;
-        }
-        input, select {
-            background-color: #3a3a5d;
-            color: #fff;
-            border: none;
-        }
-        input:focus, select:focus {
-            box-shadow: 0 0 0 0.2rem rgba(108, 92, 231, 0.5);
-        }
-        .table-dark th, .table-dark td {
-            background-color: #2e2e4d;
-            color: #fff;
-        }
-    </style>
-</head>
-<body>
-    <div class="container py-5">
-        <h1 class="text-center mb-4">Painel de Reservas</h1>
-        <div class="d-flex justify-content-between mb-3">
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalReserva">Nova Reserva</button>
-            <input id="searchReserva" type="text" class="form-control w-50" placeholder="Pesquisar reservas...">
-        </div>
-        <table class="table table-dark table-striped">
-            <thead>
-                <tr>
-                    <th>Descrição</th>
-                    <th>Valor</th>
-                    <th>Data</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
-            <tbody id="tabelaReservas"></tbody>
-        </table>
-    </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reserva de Emergência - FinancEasy</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+  </head>
+  <body class="bg-gray-900 text-white min-h-screen flex flex-col">
+    <nav class="bg-gray-800 p-4 shadow-lg">
+      <div class="container mx-auto flex justify-between items-center">
+        <a href="../home/home.html" class="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors mb-6">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            <span>Voltar para o início</span>
+          </a>
+      </div>
+    </nav>
 
-    <!-- Modal -->
-    <div class="modal fade" id="modalReserva" tabindex="-1" aria-labelledby="modalReservaLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="modalReservaLabel">Adicionar Reserva</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="formReserva">
-                        <div class="mb-3">
-                            <label for="descricao" class="form-label">Descrição</label>
-                            <input type="text" id="descricao" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="valor" class="form-label">Valor</label>
-                            <input type="number" id="valor" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="data" class="form-label">Data</label>
-                            <input type="date" id="data" class="form-control" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary w-100">Salvar</button>
-                    </form>
-                </div>
+    <main class="container mx-auto px-4 py-10 space-y-10">
+      <header class="bg-gray-800 p-8 rounded-2xl shadow-lg text-center">
+        <h1 class="text-4xl font-bold text-purple-500 mb-4 flex items-center justify-center gap-2">
+          <i class="ph ph-piggy-bank"></i> Reserva de Emergência
+        </h1>
+      </header>
+
+      <section class="bg-gray-800 p-6 rounded-2xl shadow-lg space-y-6">
+        <form id="add-reserva-form" class="space-y-4">
+          <h2 class="text-2xl font-semibold text-purple-400 flex items-center gap-2">
+            <i class="ph ph-plus-circle"></i> Adicionar Reserva
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label for="descricao" class="block text-sm mb-1">Descrição:</label>
+              <input type="text" id="descricao" name="descricao" required class="w-full p-2 rounded-lg bg-gray-700 text-white border border-gray-600" />
             </div>
+            <div>
+              <label for="valor" class="block text-sm mb-1">Valor:</label>
+              <input type="number" id="valor" name="valor" required class="w-full p-2 rounded-lg bg-gray-700 text-white border border-gray-600" />
+            </div>
+            <div>
+              <label for="data" class="block text-sm mb-1">Data:</label>
+              <input type="date" id="data" name="data" required class="w-full p-2 rounded-lg bg-gray-700 text-white border border-gray-600" />
+            </div>
+          </div>
+          <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 transition rounded-lg py-2 text-white font-semibold flex items-center justify-center gap-2">
+            <i class="ph ph-check"></i> Adicionar Reserva
+          </button>
+        </form>
+
+        <form id="set-objetivo-form" class="space-y-4">
+          <h2 class="text-2xl font-semibold text-purple-400 flex items-center gap-2">
+            <i class="ph ph-flag"></i> Definir Objetivo de Poupança
+          </h2>
+          <div>
+            <input type="number" id="objetivo" name="objetivo" required class="w-full p-2 rounded-lg bg-gray-700 text-white border border-gray-600" placeholder="Digite o valor do objetivo" />
+          </div>
+          <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 transition rounded-lg py-2 text-white font-semibold flex items-center justify-center gap-2">
+            <i class="ph ph-target"></i> Definir Objetivo
+          </button>
+        </form>
+
+        <div class="space-y-4">
+          <h2 class="text-2xl font-semibold text-purple-400 flex items-center gap-2">
+            <i class="ph ph-chart-line"></i> Progresso
+          </h2>
+          <div class="w-full bg-gray-700 rounded-full h-6 overflow-hidden">
+            <div id="progresso-bar" class="bg-purple-500 h-full text-center text-sm font-medium text-white leading-6" style="width: 0%;">0%</div>
+          </div>
+          <div class="text-center text-lg font-semibold text-purple-400">
+            <p id="resumo-total">Total Reservado: R$ 0.00</p>
+            <p id="resumo-objetivo">Objetivo: R$ 0.00</p>
+          </div>
         </div>
-    </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const formReserva = document.getElementById("formReserva");
-            const tabelaReservas = document.getElementById("tabelaReservas");
-            const searchReserva = document.getElementById("searchReserva");
-            let reservas = [];
+        <form id="simulacao-form" class="space-y-4">
+          <h2 class="text-2xl font-semibold text-purple-400 flex items-center gap-2">
+            <i class="ph ph-calculator"></i> Simulação de Crescimento
+          </h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label for="taxa" class="block text-sm mb-1">Taxa de Juros Anual (%):</label>
+              <input type="number" id="taxa" name="taxa" required class="w-full p-2 rounded-lg bg-gray-700 text-white border border-gray-600" />
+            </div>
+            <div>
+              <label for="periodo" class="block text-sm mb-1">Período (meses):</label>
+              <input type="number" id="periodo" name="periodo" required class="w-full p-2 rounded-lg bg-gray-700 text-white border border-gray-600" />
+            </div>
+          </div>
+          <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 transition rounded-lg py-2 text-white font-semibold flex items-center justify-center gap-2">
+            <i class="ph ph-trend-up"></i> Simular Crescimento
+          </button>
+        </form>
 
-            const renderizarReservas = (filtro = "") => {
-                tabelaReservas.innerHTML = "";
-                reservas.filter(r => r.descricao.toLowerCase().includes(filtro.toLowerCase()))
-                        .forEach((reserva, index) => {
-                            const tr = document.createElement("tr");
-                            tr.innerHTML = `
-                                <td>${reserva.descricao}</td>
-                                <td>R$ ${parseFloat(reserva.valor).toFixed(2)}</td>
-                                <td>${new Date(reserva.data).toLocaleDateString("pt-BR")}</td>
-                                <td>
-                                    <button class="btn btn-sm btn-danger" onclick="removerReserva(${index})">Excluir</button>
-                                </td>`;
-                            tabelaReservas.appendChild(tr);
-                        });
-            };
+        <div id="resultado-simulacao" class="bg-gray-700 p-4 rounded-lg text-center text-lg font-semibold text-purple-400"></div>
 
-            formReserva.addEventListener("submit", (e) => {
-                e.preventDefault();
-                const descricao = document.getElementById("descricao").value;
-                const valor = document.getElementById("valor").value;
-                const data = document.getElementById("data").value;
+        <ul id="reservas-list" class="space-y-2 bg-gray-700 p-4 rounded-lg"></ul>
 
-                reservas.push({ descricao, valor, data });
-                formReserva.reset();
-                bootstrap.Modal.getInstance(document.getElementById("modalReserva")).hide();
-                renderizarReservas();
-            });
+        <div class="flex justify-between items-center mt-6">
+          <button id="exportar-btn" class="bg-blue-500 hover:bg-blue-600 transition rounded-lg py-2 px-4 text-white font-semibold flex items-center justify-center gap-2">
+            <i class="ph ph-upload-simple"></i> Exportar Reservas
+          </button>
+          <button id="importar-btn" class="bg-green-500 hover:bg-green-600 transition rounded-lg py-2 px-4 text-white font-semibold flex items-center justify-center gap-2">
+            <i class="ph ph-download-simple"></i> Importar Reservas
+          </button>
+          <button id="relatorio-btn" class="bg-yellow-500 hover:bg-yellow-600 transition rounded-lg py-2 px-4 text-white font-semibold flex items-center justify-center gap-2">
+            <i class="ph ph-file-text"></i> Gerar Relatório
+          </button>
+        </div>
+      </section>
+    </main>
 
-            searchReserva.addEventListener("input", (e) => {
-                renderizarReservas(e.target.value);
-            });
+    <footer class="bg-gray-800 py-6 text-center shadow-lg">
+      <p class="text-gray-400 flex items-center justify-center gap-2">
+        <i class="ph ph-copyright"></i> 2025 FinancEasy. Todos os direitos reservados.
+      </p>
+    </footer>
 
-            window.removerReserva = (index) => {
-                reservas.splice(index, 1);
-                renderizarReservas(searchReserva.value);
-            };
-        });
-    </script>
-</body>
+    <div id="notificacao" class="fixed top-4 right-4 p-4 rounded-lg text-white"></div>
+
+    <script src="script.js"></script>
+  </body>
 </html>

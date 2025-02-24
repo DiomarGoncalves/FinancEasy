@@ -34,5 +34,13 @@ contextBridge.exposeInMainWorld('controle', {
     inserirDespesasAnoCompleto: () => ipcRenderer.invoke('inserir-despesas-ano-completo').catch(error => { console.error(error.message); }),
     addInvestment: (investment) => ipcRenderer.invoke('add-investment', investment),
     deleteInvestment: (id) => ipcRenderer.invoke('delete-investment', id),
-    getInvestments: () => ipcRenderer.invoke('get-investments'),
+    getInvestments: () => ipcRenderer.invoke('get-investments').catch(error => { console.error(error.message); }),
+    markReceitaAsReceived: (id) => ipcRenderer.invoke('mark-receita-as-received', id).catch(error => { console.error(error.message); }),
+    getHistoricoReceitasFiltradas: (filtros) => ipcRenderer.invoke('get-historicoReceitas-filtradas', filtros).catch(error => { console.error(error.message); }),
+    getReservas: () => ipcRenderer.invoke('get-reservas').catch(error => { console.error(error.message); }),
+    addReserva: (reserva) => ipcRenderer.invoke('add-reserva', reserva).catch(error => { console.error(error.message); }),
+    deleteReserva: (id) => ipcRenderer.invoke('delete-reserva', id).catch(error => { console.error(error.message); }),
+    updateReserva: (reserva) => ipcRenderer.invoke('update-reserva', reserva).catch(error => { console.error(error.message); }),
+    getObjetivo: () => ipcRenderer.invoke('get-objetivo').catch(error => { console.error(error.message); }),
+    setObjetivo: (objetivo) => ipcRenderer.invoke('set-objetivo', objetivo).catch(error => { console.error(error.message); })
 });

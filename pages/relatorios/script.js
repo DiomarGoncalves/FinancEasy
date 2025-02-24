@@ -20,15 +20,24 @@ async function gerarGraficos() {
       dataInicio,
       dataFim,
     });
+    const historicoReceitas = await window.controle.getHistoricoReceitasFiltradas({
+      dataInicio,
+      dataFim,
+    });
+    const investments = await window.controle.getInvestments();
 
     console.log("Despesas:", despesas); // Log para depuração
     console.log("Receitas:", receitas); // Log para depuração
+    console.log("Investimentos:", investments); // Log para depuração
 
     const despesasMensais = Array(12).fill(0);
     const historicoDespesasMensais = Array(12).fill(0);
+    const historicoReceitasMensais = Array(12).fill(0);
     const receitasMensais = Array(12).fill(0);
     const formasPagamento = {};
+    const formasRecebimento = {};
     const tiposReceitas = {};
+    const tiposInvestimentos = {};
 
     historicoDespesas.forEach((historicoDespesas) => {
       const mes = new Date(historicoDespesas.data).getMonth();
@@ -38,6 +47,25 @@ async function gerarGraficos() {
         formasPagamento[historicoDespesas.forma_pagamento] += historicoDespesas.valor;
       } else {
         formasPagamento[historicoDespesas.forma_pagamento] = historicoDespesas.valor;
+      }
+    });
+
+    historicoReceitas.forEach((historicoReceitas) => {
+      const mes = new Date(historicoReceitas.data).getMonth();
+      historicoReceitasMensais[mes] += historicoReceitas.valor;
+
+      if (formasRecebimento[historicoReceitas.forma_recebimento]) {
+        formasRecebimento[historicoReceitas.forma_recebimento] += historicoReceitas.valor;
+      } else {
+        formasRecebimento[historicoReceitas.forma_recebimento] = historicoReceitas.valor;
+      }
+    });
+
+    investments.forEach((investment) => {
+      if (tiposInvestimentos[investment.tipo_investimento]) {
+        tiposInvestimentos[investment.tipo_investimento] += investment.valor_investido;
+      } else {
+        tiposInvestimentos[investment.tipo_investimento] = investment.valor_investido;
       }
     });
 
@@ -119,6 +147,35 @@ async function gerarGraficos() {
             data: despesasMensais,
             backgroundColor: "rgba(255, 99, 132, 0.2)",
             borderColor: "rgba(255, 99, 132, 1)",
+            borderWidth: 1,
+          },
+        ],
+      },
+    });
+
+    new Chart(document.getElementById("historicoReceitaMensaisChart"), {
+      type: "bar",
+      data: {
+        labels: [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec",
+        ],
+        datasets: [
+          {
+            label: "Receitas Mensais",
+            data: historicoReceitasMensais,
+            backgroundColor: "rgba(75, 192, 192, 0.2)",
+            borderColor: "rgba(75, 192, 192, 1)",
             borderWidth: 1,
           },
         ],
@@ -227,6 +284,39 @@ async function gerarGraficos() {
           {
             label: "Tipos de Receitas",
             data: tiposReceitasData,
+            backgroundColor: [
+              "rgba(255, 99, 132, 0.2)",
+              "rgba(54, 162, 235, 0.2)",
+              "rgba(255, 206, 86, 0.2)",
+              "rgba(75, 192, 192, 0.2)",
+              "rgba(153, 102, 255, 0.2)",
+              "rgba(255, 159, 64, 0.2)",
+            ],
+            borderColor: [
+              "rgba(255, 99, 132, 1)",
+              "rgba(54, 162, 235, 1)",
+              "rgba(255, 206, 86, 1)",
+              "rgba(75, 192, 192, 1)",
+              "rgba(153, 102, 255, 1)",
+              "rgba(255, 159, 64, 1)",
+            ],
+            borderWidth: 1,
+          },
+        ],
+      },
+    });
+
+    const tiposInvestimentosLabels = Object.keys(tiposInvestimentos);
+    const tiposInvestimentosData = Object.values(tiposInvestimentos);
+
+    new Chart(document.getElementById("tiposInvestimentosChart"), {
+      type: "pie",
+      data: {
+        labels: tiposInvestimentosLabels,
+        datasets: [
+          {
+            label: "Tipos de Investimentos",
+            data: tiposInvestimentosData,
             backgroundColor: [
               "rgba(255, 99, 132, 0.2)",
               "rgba(54, 162, 235, 0.2)",

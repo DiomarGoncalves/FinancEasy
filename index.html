@@ -1,272 +1,108 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FinancEasy</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
   </head>
-  <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <div class="container">
-        <a class="navbar-brand" href="#">FinancEasy</a>
-        <button
-          class="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-              <a class="nav-link" href="#funcionalidades">Funcionalidades</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#capturas">Capturas de Tela</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#versoes">Downloads</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#autor">Autor</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#licenca">Licença</a>
-            </li>
-          </ul>
+  <body class="bg-gray-900 text-white min-h-screen flex flex-col">
+    <nav class="bg-gray-800 p-4 shadow-lg">
+      <div class="container mx-auto flex justify-between items-center">
+        <a class="text-purple-500 text-2xl font-bold flex items-center gap-2" href="#">
+          <i class="ph ph-wallet text-purple-400 text-3xl"></i>
+          FinancEasy
+        </a>
+        <div class="space-x-6 flex items-center">
+          <a class="flex items-center gap-1 text-white hover:text-purple-400 transition" href="#funcionalidades">
+            <i class="ph ph-list"></i> Funcionalidades
+          </a>
+          <a class="flex items-center gap-1 text-white hover:text-purple-400 transition" href="#capturas">
+            <i class="ph ph-image"></i> Capturas
+          </a>
+          <a class="flex items-center gap-1 text-white hover:text-purple-400 transition" href="#versoes">
+            <i class="ph ph-download"></i> Downloads
+          </a>
+          <a class="flex items-center gap-1 text-white hover:text-purple-400 transition" href="#autor">
+            <i class="ph ph-user"></i> Autor
+          </a>
+          <a class="flex items-center gap-1 text-white hover:text-purple-400 transition" href="#licenca">
+            <i class="ph ph-file-text"></i> Licença
+          </a>
         </div>
       </div>
     </nav>
 
-    <div class="hero">
-      <div class="container">
-        <img src="assets/icon.png" alt="FinancEasy" />
-        <h1>FinancEasy</h1>
-        <p>Gerencie suas finanças pessoais de forma fácil e intuitiva.</p>
+    <header class="bg-gray-800 py-16 text-center shadow-lg">
+      <div class="container mx-auto">
+        <img src="assets/icon.png" alt="FinancEasy" class="mx-auto w-32 mb-6" />
+        <h1 class="text-5xl font-bold text-purple-500 mb-4">FinancEasy</h1>
+        <p class="text-lg">Gerencie suas finanças pessoais de forma fácil e intuitiva.</p>
       </div>
-    </div>
+    </header>
 
-    <div class="container">
-        <div id="funcionalidades" class="section">
-            <h2>Funcionalidades</h2>
-            <ul class="list-unstyled">
-                <li><i class="bi bi-check-circle icon"></i>Controle de despesas e receitas</li>
-                <li><i class="bi bi-check-circle icon"></i>Geração de relatórios detalhados</li>
-                <li><i class="bi bi-check-circle icon"></i>Cálculo do saldo atual</li>
-                <li><i class="bi bi-check-circle icon"></i>Interface amigável e intuitiva</li>
-            </ul>
-        </div>
-
-      <div id="capturas" class="section">
-        <h2>Capturas de Tela</h2>
-        <div class="row">
-          <div class="col-md-6">
-            <h3>Tela Principal</h3>
-            <img
-              src="assets/tela-principal.png"
-              alt="Tela Principal"
-              class="img-fluid mb-3"
-            />
-          </div>
-          <div class="col-md-6">
-            <h3>Relatórios</h3>
-            <img
-              src="assets/relatorios.png"
-              alt="Relatórios"
-              class="img-fluid mb-3"
-            />
-          </div>
-          <div class="col-md-6">
-            <h3>Adicionar Despesa</h3>
-            <img
-              src="assets/adicionar-despesa.png"
-              alt="Adicionar Despesa"
-              class="img-fluid mb-3"
-            />
-          </div>
-          <div class="col-md-6">
-            <h3>Adicionar Receita</h3>
-            <img
-              src="assets/adicionar-receita.png"
-              alt="Adicionar Receita"
-              class="img-fluid mb-3"
-            />
-          </div>
-          <div class="col-md-6">
-            <h3>Histórico de Despesas</h3>
-            <img
-              src="assets/historico-despesas.png"
-              alt="Histórico de Despesas"
-              class="img-fluid mb-3"
-            />
-          </div>
-          <div class="col-md-6">
-            <h3>Gerenciamento de Cartões</h3>
-            <img
-              src="assets/gerenciamento-cartoes.png"
-              alt="Gerenciamento de Cartões"
-              class="img-fluid mb-3"
-            />
-          </div>
-        </div>
-      </div>
-
-      <div id="versoes" class="section">
-        <h2>Versões Disponíveis</h2>
-        <ul class="list-unstyled">
-          <li>
-            <a
-              href="https://www.mediafire.com/file/v2fgx3ie7au6wry/FinancEasyV0.0.1apha.exe/file"
-              target="_blank"
-              rel="noopener"
-              >Windows - Versão 0.0.1 - alpha</a
-            >
-          </li>
-          <li>
-            <a
-              href="https://www.mediafire.com/file/b673zgtil32mkij/FinancEasyV0.0.2apha.exe/file"
-              target="_blank"
-              rel="noopener"
-              >Windows - Versão 0.0.2 - alpha</a
-            >
-          </li>
-          <li>
-            <a
-              href="https://www.mediafire.com/file/agv6qr212oymrvm/FinancEasyV0.0.3apha.exe/file"
-              target="_blank"
-              rel="noopener"
-              >Windows - Versão 0.0.3 - alpha</a
-            >
-          </li>
-          <li><a href="#">macOS</a></li>
-          <li><a href="#">Linux</a></li>
-          <li>
-            <a href="pages/home/home.html" target="_blank" rel="external"
-              >Versão Demo</a
-            >
-          </li>
+    <main class="container mx-auto px-4 py-10 space-y-16">
+      <section id="funcionalidades" class="bg-gray-800 p-6 rounded-2xl shadow-lg">
+        <h2 class="text-3xl font-semibold text-purple-500 mb-4 flex items-center gap-2">
+          <i class="ph ph-gear"></i> Funcionalidades
+        </h2>
+        <ul class="list-disc pl-6 space-y-2 text-lg">
+          <li class="flex items-center gap-2"><i class="ph ph-trend-up text-purple-400"></i> Controle de despesas e receitas</li>
+          <li class="flex items-center gap-2"><i class="ph ph-chart-bar text-purple-400"></i> Geração de relatórios detalhados</li>
+          <li class="flex items-center gap-2"><i class="ph ph-wallet text-purple-400"></i> Cálculo do saldo atual</li>
+          <li class="flex items-center gap-2"><i class="ph ph-smiley text-purple-400"></i> Interface amigável e intuitiva</li>
         </ul>
-      </div>
+      </section>
 
-      <div id="instrucoes" class="section">
-        <h2>Instruções</h2>
-
-        <h3>📥 Instruções de Instalação</h3>
-        <p>Para instalar o FinancEasy, siga os passos abaixo:</p>
-        <ol class=".list-left">
-          <li>
-            <strong>Baixe</strong> o instalador do FinancEasy na seção
-            <a href="#versoes">Downloads</a>.
-          </li>
-          <li>
-            <strong>Execute</strong> o arquivo de instalação
-            (<code>FinancEasy_Setup.exe</code>).
-          </li>
-          <li>
-            <strong>Siga as etapas</strong> do assistente de instalação (basta
-            clicar em <code>Proximo</code> até o final).
-          </li>
-          <li>
-            <strong>Aguarde</strong> a conclusão da instalação e clique em
-            <code>Fim</code>.
-          </li>
-          <li>
-            <strong>Abra</strong> o FinancEasy pelo atalho criado na área de
-            trabalho.
-          </li>
-        </ol>
-        <p>Veja abaixo um exemplo das telas do instalador:</p>
-        <div class="row">
-          <div class="col-md-6">
-            <h3>Passo 1: Início</h3>
-            <img
-              src="assets/instalação (1).png"
-              alt="Tela de Boas-vindas do Instalador"
-              class="img-fluid mb-3"
-            />
+      <section id="capturas" class="bg-gray-800 p-6 rounded-2xl shadow-lg">
+        <h2 class="text-3xl font-semibold text-purple-500 mb-6 flex items-center gap-2">
+          <i class="ph ph-image"></i> Capturas de Tela
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h3 class="text-xl font-medium mb-2 flex items-center gap-2"><i class="ph ph-monitor"></i> Tela Principal</h3>
+            <img src="assets/tela-principal.png" alt="Tela Principal" class="rounded-lg shadow-md" />
           </div>
-          <div class="col-md-6">
-            <h3>Passo 2: Instalação</h3>
-            <img
-              src="assets/instalação (5).png"
-              alt="Tela de Instalação"
-              class="img-fluid mb-3"
-            />
-          </div>
-          <div class="col-md-6">
-            <h3>Passo 3: Finalização</h3>
-            <img
-              src="assets/instalação (6).png"
-              alt="Tela de Conclusão do Instalador"
-              class="img-fluid mb-3"
-            />
+          <div>
+            <h3 class="text-xl font-medium mb-2 flex items-center gap-2"><i class="ph ph-file-chart"></i> Relatórios</h3>
+            <img src="assets/relatorios.png" alt="Relatórios" class="rounded-lg shadow-md" />
           </div>
         </div>
+      </section>
 
-        <h3>📁 Caminho do Banco de Dados</h3>
-        <p>
-          O banco de dados do FinancEasy é armazenado no seguinte diretório por
-          padrão:
-        </p>
-        <pre><code>C:\Users\posvenda\AppData\Local\FinancEasy</code></pre>
+      <section id="versoes" class="bg-gray-800 p-6 rounded-2xl shadow-lg">
+        <h2 class="text-3xl font-semibold text-purple-500 mb-4 flex items-center gap-2">
+          <i class="ph ph-download-simple"></i> Versões Disponíveis
+        </h2>
+        <ul class="list-disc pl-6 space-y-2 text-lg">
+          <li><a href="#" class="text-purple-400 hover:underline flex items-center gap-2"><i class="ph ph-windows-logo"></i> Windows - Versão 0.0.1 - alpha</a></li>
+          <li><a href="#" class="text-purple-400 hover:underline flex items-center gap-2"><i class="ph ph-windows-logo"></i> Windows - Versão 0.0.2 - alpha</a></li>
+          <li><a href="#" class="text-purple-400 hover:underline flex items-center gap-2"><i class="ph ph-apple-logo"></i> macOS</a></li>
+          <li><a href="#" class="text-purple-400 hover:underline flex items-center gap-2"><i class="ph ph-linux-logo"></i> Linux</a></li>
+          <li><a href="pages/home/home.html" class="text-purple-400 hover:underline flex items-center gap-2"><i class="ph ph-play"></i> Versão Demo</a></li>
+        </ul>
+      </section>
 
-        <h3>⚙ Arquivo de Configuração</h3>
-        <p>
-          O arquivo de configuração do sistema pode ser encontrado no mesmo
-          diretório do banco de dados. Certifique-se de editá-lo apenas se
-          souber o que está fazendo.
-        </p>
+      <section id="autor" class="bg-gray-800 p-6 rounded-2xl shadow-lg">
+        <h2 class="text-3xl font-semibold text-purple-500 mb-4 flex items-center gap-2">
+          <i class="ph ph-user"></i> Autor
+        </h2>
+        <p>Desenvolvido por <a href="https://github.com/DiomarGoncalves" class="text-purple-400 hover:underline flex items-center gap-2"><i class="ph ph-github-logo"></i> Diomar Gonçalves</a>.</p>
+      </section>
 
-        <h3>🔑 Senha de Administrador</h3>
-        <p>
-          Para acessar as configurações administrativas, utilize a seguinte
-          senha padrão:
-        </p>
-        <pre><code>admin=padrão</code></pre>
+      <section id="licenca" class="bg-gray-800 p-6 rounded-2xl shadow-lg">
+        <h2 class="text-3xl font-semibold text-purple-500 mb-4 flex items-center gap-2">
+          <i class="ph ph-lock"></i> Licença
+        </h2>
+        <p>Este projeto está licenciado sob a licença MIT. Veja o arquivo <a href="LICENSE" class="text-purple-400 hover:underline flex items-center gap-2"><i class="ph ph-file"></i> LICENSE</a> para mais detalhes.</p>
+      </section>
+    </main>
 
-        <p>
-          <strong>⚠ Importante:</strong> Por motivos de segurança, recomendamos
-          alterar a senha de administrador após a primeira execução do sistema.
-        </p>
-      </div>
-
-      <div id="autor" class="section">
-        <h2>Autor</h2>
-        <p>
-          Desenvolvido por
-          <a
-            href="https://github.com/DiomarGoncalves"
-            target="_blank"
-            rel="noopener"
-            >Diomar Gonçalves.</a
-          >
-        </p>
-      </div>
-
-      <div id="licenca" class="section">
-        <h2>Licença</h2>
-        <p>
-          Este projeto está licenciado sob a licença MIT. Veja o arquivo
-          <a href="LICENSE" target="_blank">LICENSE</a> para mais detalhes.
-        </p>
-      </div>
-    </div>
-
-    <footer class="footer">
-      <div class="container">
-        <p>&copy; 2023 FinancEasy. Todos os direitos reservados.</p>
-      </div>
+    <footer class="bg-gray-800 py-6 text-center shadow-lg">
+      <p class="text-gray-400 flex items-center justify-center gap-2">
+        <i class="ph ph-copyright"></i> 2025 FinancEasy. Todos os direitos reservados.
+      </p>
     </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   </body>
 </html>

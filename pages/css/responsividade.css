@@ -1,0 +1,158 @@
+/* Estilos gerais para responsividade */
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Estilo personalizado para barras de rolagem */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: #2d2d2d;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #6b7280;
+  border-radius: 10px;
+  border: 3px solid #2d2d2d;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: #4b5563;
+}
+
+/* Responsividade para dispositivos móveis */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .table-auto {
+    width: 100%;
+    display: block;
+    overflow-x: auto;
+  }
+
+  .table-auto th, .table-auto td {
+    white-space: nowrap;
+    padding: 0.5rem;
+    font-size: 0.875rem;
+  }
+
+  .btn {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+
+  .modal-dialog {
+    margin: 1rem;
+  }
+
+  /* Ajuste de tabelas para dispositivos móveis */
+  .table-responsive {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .table-responsive > .table {
+    margin-bottom: 0;
+  }
+}
+
+/* Responsividade para tablets */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .container {
+    padding: 2rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .table-auto {
+    width: 100%;
+    display: block;
+    overflow-x: auto;
+  }
+
+  .table-auto th, .table-auto td {
+    white-space: nowrap;
+    padding: 0.75rem;
+    font-size: 0.875rem;
+  }
+
+  .btn {
+    width: auto;
+    margin-bottom: 1rem;
+  }
+
+  .modal-dialog {
+    margin: 2rem;
+  }
+
+  /* Ajuste de tabelas para tablets */
+  .table-responsive {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .table-responsive > .table {
+    margin-bottom: 0;
+  }
+}
+
+/* Responsividade para desktops */
+@media (min-width: 1025px) {
+  .container {
+    padding: 3rem;
+  }
+
+  .grid {
+    grid-template-columns: 1fr 1fr 1fr !important;
+  }
+
+  .table-auto {
+    width: 100%;
+    display: table;
+  }
+
+  .table-auto th, .table-auto td {
+    white-space: normal;
+    padding: 1rem;
+    font-size: 1rem;
+  }
+
+  .btn {
+    width: auto;
+    margin-bottom: 0;
+  }
+
+  .modal-dialog {
+    margin: 3rem;
+  }
+
+  /* Ajuste de tabelas para desktops */
+  .table-responsive {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .table-responsive > .table {
+    margin-bottom: 0;
+  }
+}

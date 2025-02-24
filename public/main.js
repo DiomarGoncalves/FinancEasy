@@ -363,22 +363,40 @@ ipcMain.handle("pay-despesa", async (event, id) => {
 function inserirValoresTeste() {
   return new Promise((resolve, reject) => {
     const sqls = [
-      // Cartões
-      `INSERT INTO cartoes (nome, banco, limite, vencimento) VALUES ('Cartão A', 'Banco A', 1000.00, '2025-01-10')`,
-      `INSERT INTO cartoes (nome, banco, limite, vencimento) VALUES ('Cartão B', 'Banco B', 2000.00, '2025-02-15')`,
+      `INSERT INTO cartoes (nome, banco, limite, vencimento) VALUES ('Cartão A', 'Banco A', 1000.00, '2025-01-10');`,
+      `INSERT INTO cartoes (nome, banco, limite, vencimento) VALUES ('Cartão B', 'Banco B', 2000.00, '2025-02-15');`,
+      `INSERT INTO cartoes (nome, banco, limite, vencimento) VALUES ('Cartão C', 'Banco C', 3000.00, '2025-03-20');`,
 
-      // Despesas
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Loja A', '2025-01-01', 100.00, 'Crédito', 1, 0, 100.00, 1)`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Loja B', '2025-02-01', 200.00, 'Débito', 2, 1, 100.00, 2)`,
+      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Supermercado', '2025-01-15', 150.00, 'Crédito', 1, 0, 150.00, 1);`,
+      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Padaria', '2025-02-10', 50.00, 'Débito', 1, 0, 50.00, 2);`,
+      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Farmácia', '2025-03-05', 75.00, 'Dinheiro', 1, 0, 75.00, NULL);`,
+      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Restaurante', '2025-04-20', 200.00, 'Crédito', 2, 1, 100.00, 1);`,
+      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Posto de Gasolina', '2025-05-18', 120.00, 'Débito', 1, 0, 120.00, 2);`,
+      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Cinema', '2025-06-25', 60.00, 'Dinheiro', 1, 0, 60.00, NULL);`,
+      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Loja de Roupas', '2025-07-12', 300.00, 'Crédito', 3, 2, 100.00, 1);`,
+      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Supermercado', '2025-08-08', 180.00, 'Débito', 1, 0, 180.00, 2);`,
+      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Padaria', '2025-09-14', 40.00, 'Dinheiro', 1, 0, 40.00, NULL);`,
+      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Farmácia', '2025-10-22', 90.00, 'Crédito', 1, 0, 90.00, 1);`,
+      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Restaurante', '2025-11-30', 250.00, 'Débito', 1, 0, 250.00, 2);`,
+      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Posto de Gasolina', '2025-12-05', 100.00, 'Dinheiro', 1, 0, 100.00, NULL);`,
 
-      // Histórico de Despesas
-      `INSERT INTO historico_despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id, data_pagamento) VALUES ('Loja A', '2025-01-01', 100.00, 'Crédito', 1, 0, 100.00, 1, '2025-01-02')`,
-      `INSERT INTO historico_despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id, data_pagamento) VALUES ('Loja B', '2025-02-01', 200.00, 'Débito', 2, 1, 100.00, 2, '2025-02-02')`,
+      `INSERT INTO historico_despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id, data_pagamento) VALUES ('Supermercado', '2025-01-15', 150.00, 'Crédito', 1, 0, 150.00, 1, '2025-01-16');`,
+      `INSERT INTO historico_despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id, data_pagamento) VALUES ('Padaria', '2025-02-10', 50.00, 'Débito', 1, 0, 50.00, 2, '2025-02-11');`,
 
-      // Receitas
-      `INSERT INTO receitas (descricao, data, valor, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia) VALUES ('Salário', '2025-01-15', 3000.00, 'Salário', 'Empresa X', 'Transferência', 'Conta Corrente', 1, 'Mensal')`,
-      `INSERT INTO receitas (descricao, data, valor, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia) VALUES ('Freelance', '2025-02-10', 1500.00, 'Freelance', 'Cliente Y', 'Dinheiro', 'Carteira Digital', 0, NULL)`,
-      `INSERT INTO receitas (descricao, data, valor, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia) VALUES ('Investimento', '2025-03-20', 500.00, 'Investimentos', 'Corretora Z', 'Pix', 'Poupança', 0, NULL)`
+      `INSERT INTO receitas (descricao, data, valor, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia) VALUES ('Salário', '2025-01-15', 3000.00, 'Salário', 'Empresa X', 'Transferência', 'Conta Corrente', 1, 'Mensal');`,
+      `INSERT INTO receitas (descricao, data, valor, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia) VALUES ('Freelance', '2025-02-10', 1500.00, 'Freelance', 'Cliente Y', 'Dinheiro', 'Carteira Digital', 0, NULL);`,
+      `INSERT INTO receitas (descricao, data, valor, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia) VALUES ('Investimento', '2025-03-20', 500.00, 'Investimentos', 'Corretora Z', 'Pix', 'Poupança', 0, NULL);`,
+
+      `INSERT INTO historico_receitas (descricao, data, valor, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia, data_recebimento) VALUES ('Salário', '2025-01-15', 3000.00, 'Salário', 'Empresa X', 'Transferência', 'Conta Corrente', 1, 'Mensal', '2025-01-16');`,
+      `INSERT INTO historico_receitas (descricao, data, valor, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia, data_recebimento) VALUES ('Freelance', '2025-02-10', 1500.00, 'Freelance', 'Cliente Y', 'Dinheiro', 'Carteira Digital', 0, NULL, '2025-02-11');`,
+
+      `INSERT INTO contas_bancarias (nome, tipo) VALUES ('Conta Corrente', 'Conta Corrente');`,
+      `INSERT INTO contas_bancarias (nome, tipo) VALUES ('Poupança', 'Poupança');`,
+      `INSERT INTO contas_bancarias (nome, tipo) VALUES ('Carteira Digital', 'Carteira Digital');`,
+
+      `INSERT INTO investimentos (nome_ativo, quantidade, valor_investido, data_aquisicao, tipo_investimento, conta_origem, observacoes) VALUES ('Ação XYZ', 100, 5000.00, '2025-01-10', 'Ação', 'Conta Corrente', 'Investimento a longo prazo');`,
+      `INSERT INTO investimentos (nome_ativo, quantidade, valor_investido, data_aquisicao, tipo_investimento, conta_origem, observacoes) VALUES ('FII ABC', 50, 3000.00, '2025-02-15', 'FII', 'Poupança', 'Investimento a médio prazo');`,
+      `INSERT INTO investimentos (nome_ativo, quantidade, valor_investido, data_aquisicao, tipo_investimento, conta_origem, observacoes) VALUES ('Cripto DEF', 10, 2000.00, '2025-03-20', 'Cripto', 'Carteira Digital', 'Investimento a curto prazo');`
     ];
     db.serialize(() => {
       sqls.forEach((sql) => {
@@ -455,57 +473,6 @@ ipcMain.handle("inserir-despesas-ano-completo", async () => {
   return "Despesas inseridas para todos os meses do ano de 2025";
 });
 
-function inserirDadosAnoCompleto() {
-  return new Promise((resolve, reject) => {
-    const sqls = [
-      // Despesas
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Supermercado', '2025-01-15', 150.00, 'Crédito', 1, 0, 150.00, 1)`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Padaria', '2025-02-10', 50.00, 'Débito', 1, 0, 50.00, 2)`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Farmácia', '2025-03-05', 75.00, 'Dinheiro', 1, 0, 75.00, NULL)`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Restaurante', '2025-04-20', 200.00, 'Crédito', 2, 1, 100.00, 1)`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Posto de Gasolina', '2025-05-18', 120.00, 'Débito', 1, 0, 120.00, 2)`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Cinema', '2025-06-25', 60.00, 'Dinheiro', 1, 0, 60.00, NULL)`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Loja de Roupas', '2025-07-12', 300.00, 'Crédito', 3, 2, 100.00, 1)`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Supermercado', '2025-08-08', 180.00, 'Débito', 1, 0, 180.00, 2)`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Padaria', '2025-09-14', 40.00, 'Dinheiro', 1, 0, 40.00, NULL)`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Farmácia', '2025-10-22', 90.00, 'Crédito', 1, 0, 90.00, 1)`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Restaurante', '2025-11-30', 250.00, 'Débito', 1, 0, 250.00, 2)`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Posto de Gasolina', '2025-12-05', 100.00, 'Dinheiro', 1, 0, 100.00, NULL)`,
-
-      // Receitas
-      `INSERT INTO receitas (descricao, data, valor, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia) VALUES ('Salário', '2025-01-15', 3000.00, 'Salário', 'Empresa X', 'Transferência', 'Conta Corrente', 1, 'Mensal')`,
-      `INSERT INTO receitas (descricao, data, valor, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia) VALUES ('Freelance', '2025-02-10', 1500.00, 'Freelance', 'Cliente Y', 'Dinheiro', 'Carteira Digital', 0, NULL)`,
-      `INSERT INTO receitas (descricao, data, valor, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia) VALUES ('Investimento', '2025-03-20', 500.00, 'Investimentos', 'Corretora Z', 'Pix', 'Poupança', 0, NULL)`,
-
-      // Cartões
-      `INSERT INTO cartoes (nome, banco, limite, vencimento) VALUES ('Cartão A', 'Banco A', 1000.00, '2025-01-10')`,
-      `INSERT INTO cartoes (nome, banco, limite, vencimento) VALUES ('Cartão B', 'Banco B', 2000.00, '2025-02-15')`,
-
-      // Contas Bancárias
-      `INSERT INTO contas_bancarias (nome, tipo) VALUES ('Conta Corrente', 'Conta Corrente')`,
-      `INSERT INTO contas_bancarias (nome, tipo) VALUES ('Poupança', 'Poupança')`,
-      `INSERT INTO contas_bancarias (nome, tipo) VALUES ('Carteira Digital', 'Carteira Digital')`
-    ];
-
-    db.serialize(() => {
-      sqls.forEach((sql) => {
-        db.run(sql, (err) => {
-          if (err) {
-            console.error("Erro ao executar SQL:", sql, err); // Log de erro
-            reject(err);
-          }
-        });
-      });
-      resolve();
-    });
-  });
-}
-
-// Adicione um manipulador IPC para chamar essa função
-ipcMain.handle("inserir-dados-ano-completo", async () => {
-  await inserirDadosAnoCompleto();
-  return "Dados inseridos para todos os meses do ano de 2025";
-});
 
 // Função para limpar o banco de dados
 function limparBanco() {
@@ -515,6 +482,9 @@ function limparBanco() {
       `DELETE FROM cartoes`,
       `DELETE FROM historico_despesas`,
       `DELETE FROM receitas`,
+      `DELETE FROM historico_receitas`,
+      `DELETE FROM contas_bancarias`,
+      `DELETE FROM investimentos`,
     ];
     db.serialize(() => {
       sqls.forEach((sql) => {
@@ -617,6 +587,35 @@ ipcMain.handle("get-historicoDespesas-filtradas", async (event, filtros) => {
   }
   if (nome) {
     sql += ` AND estabelecimento LIKE ?`;
+    params.push(`%${nome}%`);
+  }
+
+  return new Promise((resolve, reject) => {
+    db.all(sql, params, (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+});
+
+ipcMain.handle("get-historicoReceitas-filtradas", async (event, filtros = {}) => {
+  const { dataInicio, dataFim, nome } = filtros;
+  let sql = `SELECT * FROM historico_receitas WHERE 1=1`;
+  const params = [];
+
+  if (dataInicio) {
+    sql += ` AND data >= ?`;
+    params.push(dataInicio);
+  }
+  if (dataFim) {
+    sql += ` AND data <= ?`;
+    params.push(dataFim);
+  }
+  if (nome) {
+    sql += ` AND descricao LIKE ?`;
     params.push(`%${nome}%`);
   }
 
@@ -767,9 +766,28 @@ function obterHistoricoDespesas() {
   });
 }
 
+// Função para obter o histórico de Receiats recebidas
+function obterHistoricoReceitas() {
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT * FROM historico_receitas`;
+    db.all(sql, [], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+}
+
 // IPC Handler para obter o histórico de despesas pagas
 ipcMain.handle("get-historico-despesas", async () => {
   return obterHistoricoDespesas();
+});
+
+// IPC Handler para obter o histórico de Receitas recebidas
+ipcMain.handle("get-historico-Receiatas", async () => {
+  return obterHistoricoReceitas();
 });
 
 // Função para obter todas as contas bancárias
@@ -1186,6 +1204,157 @@ ipcMain.handle("get-investments", async () => {
   });
 });
 
+// Função para marcar receita como recebida e mover para o histórico
+ipcMain.handle("mark-receita-as-received", async (event, id) => {
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT * FROM receitas WHERE id = ?`;
+    db.get(sql, [id], (err, receita) => {
+      if (err) {
+        reject(err);
+      } else {
+        const insertSql = `INSERT INTO historico_receitas (descricao, data, valor, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia, data_recebimento) 
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+        const deleteSql = `DELETE FROM receitas WHERE id = ?`;
+        const data_recebimento = new Date().toISOString().split("T")[0];
 
+        db.run(
+          insertSql,
+          [
+            receita.descricao,
+            receita.data,
+            receita.valor,
+            receita.categoria,
+            receita.fonte,
+            receita.forma_recebimento,
+            receita.conta_bancaria,
+            receita.recorrente,
+            receita.intervalo_recorrencia,
+            data_recebimento,
+          ],
+          function (err) {
+            if (err) {
+              reject(err);
+            } else {
+              db.run(deleteSql, [id], function (err) {
+                if (err) {
+                  reject(err);
+                } else {
+                  resolve({ changes: this.changes });
+                }
+              });
+            }
+          }
+        );
+      }
+    });
+  });
+});
 
-// sessão de inovestimentos
+// Funções para manipular reservas de emergência
+function obterReservas() {
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT * FROM reservas`;
+    db.all(sql, [], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    });
+  });
+}
+
+function adicionarReserva(reserva) {
+  return new Promise((resolve, reject) => {
+    const { descricao, valor, data } = reserva;
+    const sql = `INSERT INTO reservas (descricao, valor, data) VALUES (?, ?, ?)`;
+    db.run(sql, [descricao, valor, data], function (err) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve({ id: this.lastID });
+      }
+    });
+  });
+}
+
+function deletarReserva(id) {
+  return new Promise((resolve, reject) => {
+    const sql = `DELETE FROM reservas WHERE id = ?`;
+    db.run(sql, [id], function (err) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve({ changes: this.changes });
+      }
+    });
+  });
+}
+
+function atualizarReserva(reserva) {
+  return new Promise((resolve, reject) => {
+    const { id, descricao, valor, data } = reserva;
+    const sql = `UPDATE reservas SET descricao = ?, valor = ?, data = ? WHERE id = ?`;
+    db.run(sql, [descricao, valor, data, id], function (err) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve({ changes: this.changes });
+      }
+    });
+  });
+}
+
+// IPC Handlers para reservas de emergência
+ipcMain.handle("get-reservas", async () => {
+  return obterReservas();
+});
+
+ipcMain.handle("add-reserva", async (event, reserva) => {
+  return adicionarReserva(reserva);
+});
+
+ipcMain.handle("delete-reserva", async (event, id) => {
+  return deletarReserva(id);
+});
+
+ipcMain.handle("update-reserva", async (event, reserva) => {
+  return atualizarReserva(reserva);
+});
+
+// Funções para manipular o objetivo de poupança
+function obterObjetivo() {
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT * FROM objetivo`;
+    db.get(sql, [], (err, row) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(row);
+      }
+    });
+  });
+}
+
+function definirObjetivo(objetivo) {
+  return new Promise((resolve, reject) => {
+    const { valor } = objetivo;
+    const sql = `INSERT INTO objetivo (id, valor) VALUES (1, ?) ON CONFLICT(id) DO UPDATE SET valor = excluded.valor`;
+    db.run(sql, [valor], function (err) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve({ id: this.lastID });
+      }
+    });
+  });
+}
+
+// IPC Handlers para o objetivo de poupança
+ipcMain.handle("get-objetivo", async () => {
+  return obterObjetivo();
+});
+
+ipcMain.handle("set-objetivo", async (event, objetivo) => {
+  return definirObjetivo(objetivo);
+});
