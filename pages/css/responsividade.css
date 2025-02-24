@@ -36,18 +36,6 @@ body {
     grid-template-columns: 1fr !important;
   }
 
-  .table-auto {
-    width: 100%;
-    display: block;
-    overflow-x: auto;
-  }
-
-  .table-auto th, .table-auto td {
-    white-space: nowrap;
-    padding: 0.5rem;
-    font-size: 0.875rem;
-  }
-
   .btn {
     width: 100%;
     margin-bottom: 1rem;
@@ -55,18 +43,6 @@ body {
 
   .modal-dialog {
     margin: 1rem;
-  }
-
-  /* Ajuste de tabelas para dispositivos móveis */
-  .table-responsive {
-    display: block;
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .table-responsive > .table {
-    margin-bottom: 0;
   }
 }
 
@@ -80,18 +56,6 @@ body {
     grid-template-columns: 1fr 1fr !important;
   }
 
-  .table-auto {
-    width: 100%;
-    display: block;
-    overflow-x: auto;
-  }
-
-  .table-auto th, .table-auto td {
-    white-space: nowrap;
-    padding: 0.75rem;
-    font-size: 0.875rem;
-  }
-
   .btn {
     width: auto;
     margin-bottom: 1rem;
@@ -99,18 +63,6 @@ body {
 
   .modal-dialog {
     margin: 2rem;
-  }
-
-  /* Ajuste de tabelas para tablets */
-  .table-responsive {
-    display: block;
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .table-responsive > .table {
-    margin-bottom: 0;
   }
 }
 
@@ -124,17 +76,6 @@ body {
     grid-template-columns: 1fr 1fr 1fr !important;
   }
 
-  .table-auto {
-    width: 100%;
-    display: table;
-  }
-
-  .table-auto th, .table-auto td {
-    white-space: normal;
-    padding: 1rem;
-    font-size: 1rem;
-  }
-
   .btn {
     width: auto;
     margin-bottom: 0;
@@ -142,17 +83,5 @@ body {
 
   .modal-dialog {
     margin: 3rem;
-  }
-
-  /* Ajuste de tabelas para desktops */
-  .table-responsive {
-    display: block;
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .table-responsive > .table {
-    margin-bottom: 0;
   }
 }
