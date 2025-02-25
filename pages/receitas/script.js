@@ -48,7 +48,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       resetFormAndUnlockInputs(event.target); // Resetar e desbloquear inputs
 
       try {
-        await window.controle.invoke("add-receita", receita);
+        if (recorrente) {
+          await window.controle.adicionarReceitaRecorrentePorAno(receita);
+        } else {
+          await window.controle.invoke("add-receita", receita);
+        }
         showMessage("Receita adicionada com sucesso!", "success");
         loadReceitas();
       } catch (error) {

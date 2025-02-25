@@ -1383,3 +1383,49 @@ ipcMain.handle('executar-atualizacao-sql', async () => {
         });
     });
 });
+
+ipcMain.handle('adicionar-receita-recorrente-por-ano', async (event, receita) => {
+  const { descricao, valor, data, categoria, fonte, forma_recebimento, conta_bancaria, intervalo_recorrencia } = receita;
+  const receitas = [];
+  let currentDate = new Date(data);
+
+  for (let i = 0; i < 12; i++) {
+    receitas.push({
+      descricao,
+      valor,
+      data: currentDate.toISOString().split('T')[0],
+      categoria,
+      fonte,
+      forma_recebimento,
+      conta_bancaria,
+      recorrente: true,
+      intervalo_recorrencia,
+    });
+
+    if (intervalo_recorrencia === 'Mensal') {
+      currentDate.setMonth(currentDate.getMonth() + 1);
+    } else if (intervalo_recorrencia === 'Semanal') {
+      currentDate.setDate(currentDate.getDate() + 7);
+    }
+  }
+
+  return new Promise((resolve, reject) => {
+    db.serialize(() => {
+      const stmt = db.prepare(`INSERT INTO receitas (descricao, valor, data, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`);
+      receitas.forEach((receita) => {
+        stmt.run([receita.descricao, receita.valor, receita.data, receita.categoria, receita.fonte, receita.forma_recebimento, receita.conta_bancaria, receita.recorrente, receita.intervalo_recorrencia], (err) => {
+          if (err) {
+            reject(err);
+          }
+        });
+      });
+      stmt.finalize((err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve({ status: 'success' });
+        }
+      });
+    });
+  });
+});
