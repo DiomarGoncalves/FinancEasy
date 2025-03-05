@@ -1,69 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>📜 Histórico de Despesas</title>
     <script src="https://cdn.tailwindcss.com"></script>
-  
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+      rel="stylesheet"
+    />
     <style>
-        body {
-            background-color: #1e1e2f;
-            color: #fff;
-        }
+      tr {
+        border-bottom: 1px solid #333;
+      }
+
+      /* Estilizando a scrollbar para navegadores baseados em WebKit */
+      ::-webkit-scrollbar {
+        width: 12px; /* Largura da scrollbar */
+      }
+
+      ::-webkit-scrollbar-track {
+        background: #2d3748; /* Cor do fundo da scrollbar */
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background-color: #4a5568; /* Cor da barra de rolagem */
+        border-radius: 10px; /* Arredondamento da barra de rolagem */
+        border: 3px solid #2d3748; /* Espaço ao redor da barra de rolagem */
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background-color: #718096; /* Cor da barra de rolagem ao passar o mouse */
+      }
+
+      /* Aplicando estilos para o corpo da página */
+      body {
+        scrollbar-width: thin;
+        scrollbar-color: #4a5568 #2d3748;
+      }
     </style>
-</head>
-<body class="min-h-screen bg-gray-900 text-white p-4">
+  </head>
+  <body class="min-h-screen bg-gray-900 text-white p-4">
     <div class="container mx-auto">
-        <a href="../../home/home.html" class="btn bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg mb-4">🔙 Voltar para o início</a>
-        <h1 class="text-3xl font-bold text-center mb-6">📅 Histórico de Despesas Pagas</h1>
-        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg">
-            <label for="mes" class="block text-lg mb-2">🗓️ Filtrar por Mês</label>
-            <input type="month" class="form-control bg-gray-700 text-white w-full p-2 rounded-lg mb-4" id="mes">
-            <div class="flex flex-col sm:flex-row gap-4">
-                <button class="bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-2xl w-full sm:w-auto" id="filtrar">🔍 Filtrar</button>
-                <button class="bg-indigo-500 hover:bg-indigo-600 text-white py-2 px-4 rounded-2xl w-full sm:w-auto" id="exportar">📄 Exportar para PDF</button>
-            </div>
+      <a
+        href="../../home/home.html"
+        class="btn bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-lg mb-4"
+        >🔙 Voltar para o início</a
+      >
+      <h1 class="text-3xl font-bold text-center mb-6">
+        📅 Histórico de Despesas Pagas
+      </h1>
+      <div class="bg-gray-800 p-6 rounded-2xl shadow-lg">
+        <label for="mes" class="block text-lg mb-2">🗓️ Filtrar por Mês</label>
+        <input
+          type="month"
+          class="form-control bg-gray-700 text-white w-full p-2 rounded-lg mb-4"
+          id="mes"
+        />
+        <div class="flex flex-col sm:flex-row gap-4">
+          <button
+            class="bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-2xl w-full sm:w-auto"
+            id="filtrar"
+          >
+            🔍 Filtrar
+          </button>
+          <button
+            class="bg-indigo-500 hover:bg-indigo-600 text-white py-2 px-4 rounded-2xl w-full sm:w-auto"
+            id="exportar"
+          >
+            📄 Exportar para PDF
+          </button>
         </div>
-        <div class="overflow-x-auto mt-6 bg-gray-800 p-6 rounded-2xl shadow-lg">
-            <table class="table-auto w-full text-white" id="historicoTable">
-                <thead>
-                    <tr class="bg-gray-700">
-                        <th class="p-3">
-                            <i class="fas fa-calendar-check icon"></i> Data do Pagamento
-                        </th>
-                        <th class="p-3">
-                            <i class="fas fa-calendar-minus icon"></i> Data da Compra
-                        </th>
-                        <th class="p-3">
-                            <i class="fas fa-store icon"></i> Estabelecimento
-                        </th>
-                        <th class="p-3">
-                            <i class="fas fa-dollar-sign icon"></i> Valor
-                        </th>
-                        <th class="p-3">
-                            <i class="fas fa-credit-card icon"></i> Forma de Pagamento
-                        </th>
-                        <th class="p-3">
-                            <i class="fas fa-credit-card icon"></i> Número de Parcelas
-                        </th>
-                        <th class="p-3">
-                            <i class="fas fa-hourglass-half icon"></i> Parcelas Restantes
-                        </th>
-                    </tr>
-                </thead>
-                <tbody id="historicoTableBody" class="divide-y divide-gray-600">
-                    <!-- Linhas serão adicionadas dinamicamente -->
-                </tbody>
-            </table>
-            <h3 id="totalGasto" class="text-xl font-semibold mt-4">
-                <i class="fas fa-wallet icon"></i> Total Gasto: R$ 0,00
-            </h3>
-        </div>
+      </div>
+      <div class="overflow-x-auto mt-6 bg-gray-800 p-6 rounded-2xl shadow-lg">
+        <table class="table-auto w-full text-white" id="historicoTable">
+          <thead>
+            <tr class="bg-gray-700">
+              <th class="p-3">
+                <i class="fas fa-calendar-check icon"></i> Data do Pagamento
+              </th>
+              <th class="p-3">
+                <i class="fas fa-calendar-minus icon"></i> Data da Compra
+              </th>
+              <th class="p-3">
+                <i class="fas fa-store icon"></i> Estabelecimento
+              </th>
+              <th class="p-3"><i class="fas fa-dollar-sign icon"></i> Valor</th>
+              <th class="p-3">
+                <i class="fas fa-credit-card icon"></i> Forma de Pagamento
+              </th>
+              <th class="p-3">
+                <i class="fas fa-credit-card icon"></i> Número de Parcelas
+              </th>
+              <th class="p-3">
+                <i class="fas fa-hourglass-half icon"></i> Parcelas Restantes
+              </th>
+            </tr>
+          </thead>
+          <tbody id="historicoTableBody" class="divide-y divide-gray-600">
+            <!-- Linhas serão adicionadas dinamicamente -->
+          </tbody>
+        </table>
+        <h3 id="totalGasto" class="text-xl font-semibold mt-4">
+          <i class="fas fa-wallet icon"></i> Total Gasto: R$ 0,00
+        </h3>
+      </div>
     </div>
     <script src="script.js"></script>
-</body>
+  </body>
 </html>

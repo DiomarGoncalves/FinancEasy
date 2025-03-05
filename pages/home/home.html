@@ -1,43 +1,105 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FinancEasy - Controle Financeiro</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Tailwind CSS para o estilo moderno -->
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FinancEasy - Controle Financeiro</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
 
-</head>
-<body class="bg-gray-900 text-white  min-h-screen flex items-center justify-center">
-  <div class="home-container bg-gray-800 rounded-3xl shadow-2xl p-6 text-center max-w-lg">
-    <h1 class="text-3xl font-extrabold text-purple-300 mb-6">FinancEasy - Controle Financeiro</h1>
-    <div class="flex flex-col gap-3">
-      <a href="../cartao/cartoes.html" class="btn btn-dark-custom btn-lg btn-custom bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white py-2 px-4 rounded transition-all shadow-lg">
-        Cartões
-      </a>
-      <a href="../despesas/despesas.html" class="btn btn-dark-custom btn-lg btn-custom bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white py-2 px-4 rounded transition-all shadow-lg">
-        Despesas
-      </a>
-      <a href="../receitas/receitas.html" class="btn btn-dark-custom btn-lg btn-custom bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white py-2 px-4 rounded transition-all shadow-lg">
-        Receitas
-      </a>
-      <a href="../investimentos/investimentos.html" class="btn btn-dark-custom btn-lg btn-custom bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white py-2 px-4 rounded transition-all shadow-lg">
-        Investimentos
-      </a>
-      <a href="../reservas/reservas.html" class="btn btn-dark-custom btn-lg btn-custom bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white py-2 px-4 rounded transition-all shadow-lg">
-        Reservas
-      </a>
-      <a href="../relatorios/relatorios.html" class="btn btn-dark-custom btn-lg btn-custom bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white py-2 px-4 rounded transition-all shadow-lg">
-        Relatórios
-      </a>
-      <a href="../configuracao/login/loginConfig.html" class="btn btn-dark-custom btn-lg btn-custom bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white py-2 px-4 rounded transition-all shadow-lg">
-        Configuração
-      </a>
+    <style>
+      tr {
+        border-bottom: 1px solid #333;
+      }
+
+      /* Estilizando a scrollbar para navegadores baseados em WebKit */
+      ::-webkit-scrollbar {
+        width: 12px; /* Largura da scrollbar */
+      }
+
+      ::-webkit-scrollbar-track {
+        background: #2d3748; /* Cor do fundo da scrollbar */
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background-color: #4a5568; /* Cor da barra de rolagem */
+        border-radius: 10px; /* Arredondamento da barra de rolagem */
+        border: 3px solid #2d3748; /* Espaço ao redor da barra de rolagem */
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background-color: #718096; /* Cor da barra de rolagem ao passar o mouse */
+      }
+
+      /* Aplicando estilos para o corpo da página */
+      body {
+        scrollbar-width: thin;
+        scrollbar-color: #4a5568 #2d3748;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gray-900 text-white min-h-screen flex items-center justify-center"
+  >
+    <div
+      class="home-container bg-gray-800 rounded-3xl shadow-2xl p-6 text-center max-w-lg"
+    >
+      <h1 class="text-3xl font-extrabold text-purple-300 mb-6">
+        FinancEasy - Controle Financeiro
+      </h1>
+      <div class="flex flex-col gap-3">
+        <a
+          href="../cartao/cartoes.html"
+          class="btn btn-dark-custom btn-lg btn-custom bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white py-2 px-4 rounded transition-all shadow-lg"
+        >
+          Cartões
+        </a>
+        <a
+          href="../despesas/despesas.html"
+          class="btn btn-dark-custom btn-lg btn-custom bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white py-2 px-4 rounded transition-all shadow-lg"
+        >
+          Despesas
+        </a>
+        <a
+          href="../receitas/receitas.html"
+          class="btn btn-dark-custom btn-lg btn-custom bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white py-2 px-4 rounded transition-all shadow-lg"
+        >
+          Receitas
+        </a>
+        <a
+          href="../investimentos/investimentos.html"
+          class="btn btn-dark-custom btn-lg btn-custom bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white py-2 px-4 rounded transition-all shadow-lg"
+        >
+          Investimentos
+        </a>
+        <a
+          href="../reservas/reservas.html"
+          class="btn btn-dark-custom btn-lg btn-custom bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white py-2 px-4 rounded transition-all shadow-lg"
+        >
+          Reservas
+        </a>
+        <a
+          href="../relatorios/relatorios.html"
+          class="btn btn-dark-custom btn-lg btn-custom bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white py-2 px-4 rounded transition-all shadow-lg"
+        >
+          Relatórios
+        </a>
+        <a
+          href="../configuracao/login/loginConfig.html"
+          class="btn btn-dark-custom btn-lg btn-custom bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white py-2 px-4 rounded transition-all shadow-lg"
+        >
+          Configuração
+        </a>
+      </div>
     </div>
-  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
 </html>

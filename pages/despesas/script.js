@@ -198,7 +198,6 @@ function renderDespesas(despesas) {
               <i class="fas fa-trash-alt icon"></i> Excluir
           </button>
       </td>
-
     `;
     tableBody.appendChild(row); // Adicionar linha à tabela
     totalGasto += despesa.valor;

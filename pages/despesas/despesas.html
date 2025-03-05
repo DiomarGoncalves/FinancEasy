@@ -4,10 +4,43 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.tailwindcss.com"></script>
-  
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+      tr {
+        border-bottom: 1px solid #333;
+      }
+
+      /* Estilizando a scrollbar para navegadores baseados em WebKit */
+      ::-webkit-scrollbar {
+        width: 12px; /* Largura da scrollbar */
+      }
+
+      ::-webkit-scrollbar-track {
+        background: #2d3748; /* Cor do fundo da scrollbar */
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background-color: #4a5568; /* Cor da barra de rolagem */
+        border-radius: 10px; /* Arredondamento da barra de rolagem */
+        border: 3px solid #2d3748; /* Espaço ao redor da barra de rolagem */
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background-color: #718096; /* Cor da barra de rolagem ao passar o mouse */
+      }
+
+      /* Estilizando a scrollbar para Firefox */
+      scrollbar-width: thin; /* Largura da scrollbar */
+      scrollbar-color: #4a5568 #2d3748; /* Cor da barra de rolagem e do fundo */
+
+      /* Aplicando estilos para o corpo da página */
+      body {
+        scrollbar-width: thin;
+        scrollbar-color: #4a5568 #2d3748;
+      }
+    </style>
     <title>Controle de Despesas</title>
   </head>
   <body class="bg-gray-900 text-white">

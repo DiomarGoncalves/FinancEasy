@@ -43,6 +43,5 @@ contextBridge.exposeInMainWorld('controle', {
     updateReserva: (reserva) => ipcRenderer.invoke('update-reserva', reserva).catch(error => { console.error(error.message); }),
     getObjetivo: () => ipcRenderer.invoke('get-objetivo').catch(error => { console.error(error.message); }),
     setObjetivo: (objetivo) => ipcRenderer.invoke('set-objetivo', objetivo).catch(error => { console.error(error.message); }),
-    executarAtualizacaoSql: () => ipcRenderer.invoke('executar-atualizacao-sql').catch(error => { console.error(error.message); }),
-    adicionarReceitaRecorrentePorAno: (receita) => ipcRenderer.invoke('adicionar-receita-recorrente-por-ano', receita).catch(error => { console.error(error.message); })
+    executarAtualizacaoSql: () => ipcRenderer.invoke('executar-atualizacao-sql').catch(error => { console.error(error.message); })
 });

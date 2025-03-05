@@ -1,74 +1,211 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Configurações</title>
-  
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="bg-gradient-to-br from-purple-900 via-purple-800 to-gray-900 text-gray-100 min-h-screen flex items-center justify-center">
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      tr {
+        border-bottom: 1px solid #333;
+      }
 
+      /* Estilizando a scrollbar para navegadores baseados em WebKit */
+      ::-webkit-scrollbar {
+        width: 12px; /* Largura da scrollbar */
+      }
+
+      ::-webkit-scrollbar-track {
+        background: #2d3748; /* Cor do fundo da scrollbar */
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background-color: #4a5568; /* Cor da barra de rolagem */
+        border-radius: 10px; /* Arredondamento da barra de rolagem */
+        border: 3px solid #2d3748; /* Espaço ao redor da barra de rolagem */
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background-color: #718096; /* Cor da barra de rolagem ao passar o mouse */
+      }
+
+      /* Aplicando estilos para o corpo da página */
+      body {
+        scrollbar-width: thin;
+        scrollbar-color: #4a5568 #2d3748;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-gradient-to-br from-purple-900 via-purple-800 to-gray-900 text-gray-100 min-h-screen flex items-center justify-center"
+  >
     <div class="w-full max-w-3xl bg-gray-800 rounded-3xl shadow-2xl p-10">
-        <a href="../home/home.html" class="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors mb-6">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-            </svg>
-            <span>Voltar para o início</span>
-        </a>
+      <a
+        href="../home/home.html"
+        class="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors mb-6"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M15 19l-7-7 7-7"
+          />
+        </svg>
+        <span>Voltar para o início</span>
+      </a>
 
-        <h1 class="text-4xl font-extrabold text-center text-purple-300 mb-10">⚙️ Configurações</h1>
+      <h1 class="text-4xl font-extrabold text-center text-purple-300 mb-10">
+        ⚙️ Configurações
+      </h1>
 
-        <form id="configForm" class="space-y-6">
-            <div>
-                <label for="tema" class="block text-lg font-medium mb-2 text-purple-200">🌙 Tema</label>
-                <select class="w-full bg-purple-700 text-white rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-purple-500" id="tema" name="tema" disabled>
-                    <option value="claro">Claro</option>
-                    <option value="escuro" selected>Escuro</option>
-                </select>
-            </div>
-
-            <div>
-                <label for="notificacoes" class="block text-lg font-medium mb-2 text-purple-200">🔔 Notificações</label>
-                <select class="w-full bg-purple-700 text-white rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-purple-500" id="notificacoes" name="notificacoes" disabled>
-                    <option value="ativadas" selected>Ativadas</option>
-                    <option value="desativadas">Desativadas</option>
-                </select>
-            </div>
-
-            <div>
-                <label for="limiteGastos" class="block text-lg font-medium mb-2 text-purple-200">💸 Limite de Gastos Mensais</label>
-                <input type="number" class="w-full bg-gray-700 text-gray-300 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-purple-500" id="limiteGastos" name="limiteGastos" min="0" step="0.01">
-            </div>
-
-            <div>
-                <label for="dbPath" class="block text-lg font-medium mb-2 text-purple-200">🗄️ Caminho do Banco de Dados</label>
-                <div class="flex space-x-3">
-                    <input type="text" class="w-full bg-gray-700 text-gray-300 rounded-lg py-3 px-4 focus:outline-none" id="dbPath" name="dbPath" readonly>
-                    <button type="button" class="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white rounded-lg px-5 py-3 transition-all" id="selectDbPath">Selecionar Caminho</button>
-                </div>
-            </div>
-
-            <div>
-                <label for="novaSenha" class="block text-lg font-medium mb-2 text-purple-200">🔒 Nova Senha</label>
-                <input type="password" class="w-full bg-gray-700 text-gray-300 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-purple-500" id="novaSenha" name="novaSenha">
-            </div>
-
-            <button type="submit" class="w-full bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white text-lg py-3 rounded-2xl transition-all shadow-lg hover:shadow-purple-700" id="salvarConfiguracoes">
-                💾 Salvar Configurações
-            </button>
-        </form>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-10">
-            <button class="bg-yellow-500 hover:bg-yellow-400 text-white py-3 rounded-xl transition-all shadow-lg" id="inserirTeste">✨ Inserir Valores de Teste</button>
-            <button class="bg-blue-500 hover:bg-blue-400 text-white py-3 rounded-xl transition-all shadow-lg" onclick="inserirDespesasAnoCompleto()">📅 Inserir Despesas para Todos os Meses de 2025</button>
-            <button class="bg-red-500 hover:bg-red-400 text-white py-3 rounded-xl transition-all shadow-lg" id="limparBanco">🗑️ Limpar Banco de Dados</button>
-            <button class="bg-green-500 hover:bg-green-400 text-white py-3 rounded-xl transition-all shadow-lg" id="exportarDados">📤 Exportar Dados</button>
-            <button class="bg-teal-500 hover:bg-teal-400 text-white py-3 rounded-xl transition-all shadow-lg col-span-2" id="importarDados">📥 Importar Dados</button>
-            <button class="bg-indigo-500 hover:bg-indigo-400 text-white py-3 rounded-xl transition-all shadow-lg col-span-2" id="executarSql">⚙️ Executar Atualização SQL</button>
+      <form id="configForm" class="space-y-6">
+        <div>
+          <label
+            for="tema"
+            class="block text-lg font-medium mb-2 text-purple-200"
+            >🌙 Tema</label
+          >
+          <select
+            class="w-full bg-purple-700 text-white rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            id="tema"
+            name="tema"
+            disabled
+          >
+            <option value="claro">Claro</option>
+            <option value="escuro" selected>Escuro</option>
+          </select>
         </div>
+
+        <div>
+          <label
+            for="notificacoes"
+            class="block text-lg font-medium mb-2 text-purple-200"
+            >🔔 Notificações</label
+          >
+          <select
+            class="w-full bg-purple-700 text-white rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            id="notificacoes"
+            name="notificacoes"
+            disabled
+          >
+            <option value="ativadas" selected>Ativadas</option>
+            <option value="desativadas">Desativadas</option>
+          </select>
+        </div>
+
+        <div>
+          <label
+            for="limiteGastos"
+            class="block text-lg font-medium mb-2 text-purple-200"
+            >💸 Limite de Gastos Mensais</label
+          >
+          <input
+            type="number"
+            class="w-full bg-gray-700 text-gray-300 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            id="limiteGastos"
+            name="limiteGastos"
+            min="0"
+            step="0.01"
+          />
+        </div>
+
+        <div>
+          <label
+            for="dbPath"
+            class="block text-lg font-medium mb-2 text-purple-200"
+            >🗄️ Caminho do Banco de Dados</label
+          >
+          <div class="flex space-x-3">
+            <input
+              type="text"
+              class="w-full bg-gray-700 text-gray-300 rounded-lg py-3 px-4 focus:outline-none"
+              id="dbPath"
+              name="dbPath"
+              readonly
+            />
+            <button
+              type="button"
+              class="bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white rounded-lg px-5 py-3 transition-all"
+              id="selectDbPath"
+            >
+              Selecionar Caminho
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label
+            for="novaSenha"
+            class="block text-lg font-medium mb-2 text-purple-200"
+            >🔒 Nova Senha</label
+          >
+          <input
+            type="password"
+            class="w-full bg-gray-700 text-gray-300 rounded-lg py-3 px-4 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            id="novaSenha"
+            name="novaSenha"
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="w-full bg-gradient-to-r from-purple-600 to-purple-500 hover:from-purple-500 hover:to-purple-400 text-white text-lg py-3 rounded-2xl transition-all shadow-lg hover:shadow-purple-700"
+          id="salvarConfiguracoes"
+        >
+          💾 Salvar Configurações
+        </button>
+      </form>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-10">
+        <button
+          class="bg-yellow-500 hover:bg-yellow-400 text-white py-3 rounded-xl transition-all shadow-lg"
+          id="inserirTeste"
+        >
+          ✨ Inserir Valores de Teste
+        </button>
+        <button
+          class="bg-blue-500 hover:bg-blue-400 text-white py-3 rounded-xl transition-all shadow-lg"
+          onclick="inserirDespesasAnoCompleto()"
+        >
+          📅 Inserir Despesas para Todos os Meses de 2025
+        </button>
+        <button
+          class="bg-red-500 hover:bg-red-400 text-white py-3 rounded-xl transition-all shadow-lg"
+          id="limparBanco"
+        >
+          🗑️ Limpar Banco de Dados
+        </button>
+        <button
+          class="bg-green-500 hover:bg-green-400 text-white py-3 rounded-xl transition-all shadow-lg"
+          id="exportarDados"
+        >
+          📤 Exportar Dados
+        </button>
+        <button
+          class="bg-teal-500 hover:bg-teal-400 text-white py-3 rounded-xl transition-all shadow-lg col-span-2"
+          id="importarDados"
+        >
+          📥 Importar Dados
+        </button>
+        <button
+          class="bg-indigo-500 hover:bg-indigo-400 text-white py-3 rounded-xl transition-all shadow-lg col-span-2"
+          id="executarSql"
+        >
+          ⚙️ Executar Atualização SQL
+        </button>
+      </div>
     </div>
 
     <script src="script.js"></script>
-</body>
+  </body>
 </html>
