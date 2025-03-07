@@ -39,27 +39,28 @@ async function gerarGraficos() {
     const tiposReceitas = {};
     const tiposInvestimentos = {};
 
-    historicoDespesas.forEach((historicoDespesas) => {
-      const mes = new Date(historicoDespesas.data).getMonth();
-      historicoDespesasMensais[mes] += historicoDespesas.valor;
+    historicoDespesas.forEach((historicoDespesa) => {
+      const mesDespesas = new Date(historicoDespesa.data).getMonth();
+      historicoDespesasMensais[mesDespesas] += historicoDespesa.valor;
 
-      if (formasPagamento[historicoDespesas.forma_pagamento]) {
-        formasPagamento[historicoDespesas.forma_pagamento] += historicoDespesas.valor;
+      if (formasPagamento[historicoDespesa.forma_pagamento]) {
+        formasPagamento[historicoDespesa.forma_pagamento] += historicoDespesa.valor;
       } else {
-        formasPagamento[historicoDespesas.forma_pagamento] = historicoDespesas.valor;
+        formasPagamento[historicoDespesa.forma_pagamento] = historicoDespesa.valor;
       }
     });
 
-    historicoReceitas.forEach((historicoReceitas) => {
-      const mes = new Date(historicoReceitas.data).getMonth();
-      historicoReceitasMensais[mes] += historicoReceitas.valor;
+    historicoReceitas.forEach((historicoReceita) => {
+      const mesReceitas = new Date(historicoReceita.data).getMonth();
+      historicoReceitasMensais[mesReceitas] += historicoReceita.valor;
 
-      if (formasRecebimento[historicoReceitas.forma_recebimento]) {
-        formasRecebimento[historicoReceitas.forma_recebimento] += historicoReceitas.valor;
+      if (formasRecebimento[historicoReceita.forma_recebimento]) {
+        formasRecebimento[historicoReceita.forma_recebimento] += historicoReceita.valor;
       } else {
-        formasRecebimento[historicoReceitas.forma_recebimento] = historicoReceitas.valor;
+        formasRecebimento[historicoReceita.forma_recebimento] = historicoReceita.valor;
       }
     });
+    console.log("historicoDespesas:", historicoDespesas); // Log para depuração
 
     investments.forEach((investment) => {
       if (tiposInvestimentos[investment.tipo_investimento]) {
@@ -114,7 +115,7 @@ async function gerarGraficos() {
         ],
         datasets: [
           {
-            label: "Despesas Mensais",
+            label: "Histórico de Despesas Mensais",
             data: historicoDespesasMensais,
             backgroundColor: "rgba(255, 99, 132, 0.2)",
             borderColor: "rgba(255, 99, 132, 1)",
