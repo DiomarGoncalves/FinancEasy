@@ -54,6 +54,7 @@
     </style>
   </head>
   <body class="bg-gray-900 text-white">
+    
     <div class="container mx-auto p-6">
       <a
         href="../home/home.html"
@@ -61,6 +62,20 @@
       >
         <i class="fas fa-home"></i> Voltar para o início
       </a>
+      <!-- ...existing code... -->
+    <div class="flex gap-4 mb-6">
+      <label for="anoSelect" class="text-lg">Ano:</label>
+      <input
+        type="number"
+        id="anoSelect"
+        class="form-input bg-gray-700 text-white px-4 py-2 rounded-lg"
+        value="2025"
+        min="2000"
+        max="2100"
+        onchange="atualizarAno()"
+      />
+      <!-- ...existing buttons... -->
+    </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
         <div class="bg-gray-800 p-6 rounded-2xl shadow-lg">
@@ -119,6 +134,24 @@
           onclick="abrirMesModal()"
         >
           <i class="fas fa-calendar-alt"></i> Gerar Relatório Mensal
+        </button>
+        <button
+          class="btn bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg"
+          onclick="showForm('historicoDespesasForm')"
+        >
+          <i class="fas fa-filter"></i> Filtrar Histórico de Despesas
+        </button>
+        <button
+          class="btn bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg"
+          onclick="showForm('historicoReceitasForm')"
+        >
+          <i class="fas fa-filter"></i> Filtrar Histórico de Receitas
+        </button>
+        <button
+          class="btn bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg"
+          onclick="abrirMesModalHistorico()"
+        >
+          <i class="fas fa-calendar-alt"></i> Gerar Relatório Mensal do Histórico
         </button>
       </div>
 
@@ -254,6 +287,138 @@
         </button>
       </div>
 
+      <!-- Formulário de Histórico de Despesas -->
+      <div
+        id="historicoDespesasForm"
+        class="hidden bg-gray-800 p-6 rounded-2xl shadow-lg"
+      >
+        <h2 class="text-2xl font-bold mb-4">📅 Filtrar Histórico de Despesas</h2>
+        <form id="formHistoricoDespesas">
+          <div class="mb-4">
+            <label for="dataInicioHistoricoDespesas" class="text-lg">Início</label>
+            <input
+              type="date"
+              class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
+              id="dataInicioHistoricoDespesas"
+              name="dataInicioHistoricoDespesas"
+            />
+          </div>
+          <div class="mb-4">
+            <label for="dataFimHistoricoDespesas" class="text-lg">Fim</label>
+            <input
+              type="date"
+              class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
+              id="dataFimHistoricoDespesas"
+              name="dataFimHistoricoDespesas"
+            />
+          </div>
+          <div class="flex gap-4">
+            <button
+              type="button"
+              class="btn bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg"
+              onclick="filtrarHistoricoDespesas()"
+            >
+              <i class="fas fa-search"></i> Filtrar
+            </button>
+            <button
+              type="button"
+              class="btn bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg"
+              onclick="hideForm('historicoDespesasForm')"
+            >
+              <i class="fas fa-times"></i> Cancelar
+            </button>
+          </div>
+        </form>
+        <h3 class="mt-4">Pré-visualização</h3>
+        <table class="table table-dark table-striped" id="previewHistoricoDespesasTable">
+          <thead>
+            <tr>
+              <th><i class="fas fa-store icon"></i> Estabelecimento</th>
+              <th><i class="fas fa-calendar-day icon"></i> Data</th>
+              <th><i class="fas fa-dollar-sign icon"></i> Valor</th>
+              <th>
+                <i class="fas fa-credit-card icon"></i> Forma de Pagamento
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Linhas serão adicionadas dinamicamente -->
+          </tbody>
+        </table>
+        <h3 id="totalHistoricoDespesas" class="mt-4">Total Despesas: R$ 0,00</h3>
+        <button
+          class="btn bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg mt-4"
+          onclick="gerarRelatorioHistoricoDespesas()"
+        >
+          <i class="fas fa-download"></i> Gerar Relatório
+        </button>
+      </div>
+
+      <!-- Formulário de Histórico de Receitas -->
+      <div
+        id="historicoReceitasForm"
+        class="hidden bg-gray-800 p-6 rounded-2xl shadow-lg"
+      >
+        <h2 class="text-2xl font-bold mb-4">💰 Filtrar Histórico de Receitas</h2>
+        <form id="formHistoricoReceitas">
+          <div class="mb-4">
+            <label for="dataInicioHistoricoReceitas" class="text-lg">Início</label>
+            <input
+              type="date"
+              class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
+              id="dataInicioHistoricoReceitas"
+              name="dataInicioHistoricoReceitas"
+            />
+          </div>
+          <div class="mb-4">
+            <label for="dataFimHistoricoReceitas" class="text-lg">Fim</label>
+            <input
+              type="date"
+              class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
+              id="dataFimHistoricoReceitas"
+              name="dataFimHistoricoReceitas"
+            />
+          </div>
+          <div class="flex gap-4">
+            <button
+              type="button"
+              class="btn bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg"
+              onclick="filtrarHistoricoReceitas()"
+            >
+              <i class="fas fa-search"></i> Filtrar
+            </button>
+            <button
+              type="button"
+              class="btn bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg"
+              onclick="hideForm('historicoReceitasForm')"
+            >
+              <i class="fas fa-times"></i> Cancelar
+            </button>
+          </div>
+        </form>
+        <h3 class="mt-4">Pré-visualização</h3>
+        <table class="table table-dark table-striped" id="previewHistoricoReceitasTable">
+          <thead>
+            <tr>
+              <th><i class="fas fa-clipboard-list"></i> Descrição</th>
+              <th><i class="fas fa-calendar-day icon"></i> Data</th>
+              <th><i class="fas fa-dollar-sign icon"></i> Valor</th>
+              <th><i class="fas fa-credit-card"></i> Forma de Recebimento</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Linhas serão adicionadas dinamicamente -->
+          </tbody>
+        </table>
+        <h3 id="totalHistoricoReceitas" class="mt-4">Total Receitas: R$ 0,00</h3>
+        <button
+          class="btn bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg mt-4"
+          onclick="gerarRelatorioHistoricoReceitas()"
+        >
+          <i class="fas fa-download"></i> Gerar Relatório
+        </button>
+      </div>
+
       <!-- Modal para selecionar o mês -->
       <div class="modal" id="mesModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
@@ -281,6 +446,48 @@
                 type="button"
                 class="btn bg-purple-600 hover:bg-purple-500 text-white"
                 onclick="submitMesForm()"
+              >
+                <i class="fas fa-check"></i> Gerar Relatório
+              </button>
+              <button
+                type="button"
+                class="btn bg-gray-600 hover:bg-gray-500 text-white"
+                data-dismiss="modal"
+              >
+                <i class="fas fa-times"></i> Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal para selecionar o mês do histórico -->
+      <div class="modal" id="mesModalHistorico" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content bg-gray-800 text-white">
+            <div class="modal-header">
+              <h5 class="modal-title">📅 Selecionar Mês</h5>
+            </div>
+            <div class="modal-body">
+              <form id="mesFormHistorico">
+                <div class="form-group">
+                  <label for="mesInputHistorico">Mês (1-12)</label>
+                  <input
+                    type="number"
+                    class="form-control bg-gray-700 text-white"
+                    id="mesInputHistorico"
+                    min="1"
+                    max="12"
+                    required
+                  />
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn bg-purple-600 hover:bg-purple-500 text-white"
+                onclick="submitMesFormHistorico()"
               >
                 <i class="fas fa-check"></i> Gerar Relatório
               </button>

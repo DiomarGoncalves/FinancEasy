@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 resumoTotal.textContent = `Total Reservado: R$ ${totalReservas.toFixed(2)}`;
                 resumoObjetivo.textContent = `Objetivo: R$ ${objetivo.valor.toFixed(2)}`;
                 if (totalReservas >= objetivo.valor) {
-                    showNotificacao('Parabéns! Você atingiu seu objetivo de poupança!', 'success');
+                    showMessage('Parabéns! Você atingiu seu objetivo de poupança!', 'success');
                 }
             }
         });
@@ -107,6 +107,59 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 3000);
     }
 
+    function showMessage(message, type) {
+        let toastContainer = document.getElementById("toast-container");
+        if (!toastContainer) {
+            toastContainer = document.createElement("div");
+            toastContainer.id = "toast-container";
+            toastContainer.style.position = "fixed";
+            toastContainer.style.top = "20px";
+            toastContainer.style.right = "20px";
+            toastContainer.style.zIndex = "9999";
+            toastContainer.style.display = "flex";
+            toastContainer.style.flexDirection = "column";
+            toastContainer.style.gap = "10px";
+            toastContainer.style.alignItems = "center"; // Centralizar mensagens
+            document.body.appendChild(toastContainer);
+        }
+        
+        const toast = document.createElement("div");
+        toast.className = `toast-message alert alert-${type}`;
+        toast.textContent = message;
+        toast.style.padding = "15px 20px";
+        toast.style.borderRadius = "8px";
+        toast.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.2)";
+        toast.style.color = "#fff";
+        toast.style.fontWeight = "bold";
+        toast.style.opacity = "0";
+        toast.style.transform = "translateY(-20px)";
+        toast.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+        toast.style.display = "flex";
+        toast.style.alignItems = "center";
+        toast.style.justifyContent = "center";
+      
+        const colors = {
+          success: "#4CAF50",
+          error: "#F44336",
+          warning: "#FFC107",
+          info: "#2196F3"
+        };
+        toast.style.backgroundColor = colors[type] || "#333";
+        
+        toastContainer.appendChild(toast);
+      
+        setTimeout(() => {
+          toast.style.opacity = "1";
+          toast.style.transform = "translateY(0)";
+        }, 100);
+        
+        setTimeout(() => {
+          toast.style.opacity = "0";
+          toast.style.transform = "translateY(-20px)";
+          setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
     function addEventListeners() {
         document.querySelectorAll('.editar-reserva').forEach(button => {
             button.addEventListener('click', (event) => {
@@ -126,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const id = event.target.dataset.id;
                 window.controle.deleteReserva(id).then(() => {
                     loadReservas();
-                    showNotificacao('Reserva excluída com sucesso!', 'success');
+                    showMessage('Reserva excluída com sucesso!', 'success');
                 });
             });
         });
@@ -135,7 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.controle.selecionarFormato().then(formato => {
                 if (formato) {
                     window.controle.exportarDados(formato).then(response => {
-                        showNotificacao(response.message, response.status === 'success' ? 'success' : 'error');
+                        showMessage(response.message, response.status === 'success' ? 'success' : 'error');
                     });
                 }
             });
@@ -145,7 +198,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.controle.selecionarFormato().then(formato => {
                 if (formato) {
                     window.controle.importarDados(formato).then(response => {
-                        showNotificacao(response.message, response.status === 'success' ? 'success' : 'error');
+                        showMessage(response.message, response.status === 'success' ? 'success' : 'error');
                         loadReservas();
                     });
                 }
@@ -155,7 +208,7 @@ document.addEventListener('DOMContentLoaded', () => {
         relatorioBtn.addEventListener('click', () => {
             window.controle.getReservas().then(reservas => {
                 gerarRelatorioPDF(reservas);
-                showNotificacao('Relatório gerado com sucesso!', 'success');
+                showMessage('Relatório gerado com sucesso!', 'success');
             });
         });
     }
@@ -174,13 +227,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 loadReservas();
                 addReservaForm.reset();
                 addReservaForm.removeAttribute('data-id');
-                showNotificacao('Reserva atualizada com sucesso!', 'success');
+                showMessage('Reserva atualizada com sucesso!', 'success');
             });
         } else {
             window.controle.addReserva(reserva).then(() => {
                 loadReservas();
                 addReservaForm.reset();
-                showNotificacao('Reserva adicionada com sucesso!', 'success');
+                showMessage('Reserva adicionada com sucesso!', 'success');
             });
         }
     });
@@ -193,7 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.controle.setObjetivo(objetivo).then(() => {
             loadReservas();
             setObjetivoForm.reset();
-            showNotificacao('Objetivo definido com sucesso!', 'success');
+            showMessage('Objetivo definido com sucesso!', 'success');
         });
     });
 

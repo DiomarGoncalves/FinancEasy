@@ -50,8 +50,6 @@ function showMessage(message, type) {
   }, 5000);
 }
 
-
-
 function resetFormAndUnlockInputs(form) {
   form.reset(); // Resetar o formulário
   form.querySelectorAll("input").forEach((input) => (input.disabled = false)); // Desbloquear inputs

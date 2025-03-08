@@ -1,10 +1,25 @@
 let totalReceitas = 0;
 let totalDespesas = 0;
+let anoAtual = new Date().getFullYear();
+
+let charts = [];
+
+function destroyCharts() {
+  charts.forEach(chart => chart.destroy());
+  charts = [];
+}
+
+function atualizarAno() {
+  anoAtual = document.getElementById("anoSelect").value;
+  gerarGraficos();
+  return anoAtual;
+}
 
 async function gerarGraficos() {
   try {
-    const dataAtual = new Date();
-    const anoAtual = dataAtual.getFullYear();
+    destroyCharts();
+    // const dataAtual = new Date();
+    // const anoAtual = dataAtual.getFullYear();
     const dataInicio = `${anoAtual}-01-01`;
     const dataFim = `${anoAtual}-12-31`; // Último dia do ano
 
@@ -96,7 +111,7 @@ async function gerarGraficos() {
       (receita, index) => receita - despesasMensais[index]
     );
 
-    new Chart(document.getElementById("historicoDespesasMensaisChart"), {
+    const historicoDespesasChart = new Chart(document.getElementById("historicoDespesasMensaisChart"), {
       type: "bar",
       data: {
         labels: [
@@ -124,8 +139,9 @@ async function gerarGraficos() {
         ],
       },
     });
+    charts.push(historicoDespesasChart);
 
-    new Chart(document.getElementById("despesasMensaisChart"), {
+    const despesasMensaisChart = new Chart(document.getElementById("despesasMensaisChart"), {
       type: "bar",
       data: {
         labels: [
@@ -153,8 +169,9 @@ async function gerarGraficos() {
         ],
       },
     });
+    charts.push(despesasMensaisChart);
 
-    new Chart(document.getElementById("historicoReceitaMensaisChart"), {
+    const historicoReceitasChart = new Chart(document.getElementById("historicoReceitaMensaisChart"), {
       type: "bar",
       data: {
         labels: [
@@ -182,8 +199,9 @@ async function gerarGraficos() {
         ],
       },
     });
+    charts.push(historicoReceitasChart);
 
-    new Chart(document.getElementById("receitasMensaisChart"), {
+    const receitasMensaisChart = new Chart(document.getElementById("receitasMensaisChart"), {
       type: "bar",
       data: {
         labels: [
@@ -211,8 +229,9 @@ async function gerarGraficos() {
         ],
       },
     });
+    charts.push(receitasMensaisChart);
 
-    new Chart(document.getElementById("saldoMensalChart"), {
+    const saldoMensalChart = new Chart(document.getElementById("saldoMensalChart"), {
       type: "line",
       data: {
         labels: [
@@ -240,11 +259,12 @@ async function gerarGraficos() {
         ],
       },
     });
+    charts.push(saldoMensalChart);
 
     const formasPagamentoLabels = Object.keys(formasPagamento);
     const formasPagamentoData = Object.values(formasPagamento);
 
-    new Chart(document.getElementById("formasPagamentoChart"), {
+    const formasPagamentoChart = new Chart(document.getElementById("formasPagamentoChart"), {
       type: "pie",
       data: {
         labels: formasPagamentoLabels,
@@ -273,11 +293,12 @@ async function gerarGraficos() {
         ],
       },
     });
+    charts.push(formasPagamentoChart);
 
     const tiposReceitasLabels = Object.keys(tiposReceitas);
     const tiposReceitasData = Object.values(tiposReceitas);
 
-    new Chart(document.getElementById("tiposReceitasChart"), {
+    const tiposReceitasChart = new Chart(document.getElementById("tiposReceitasChart"), {
       type: "pie",
       data: {
         labels: tiposReceitasLabels,
@@ -306,11 +327,12 @@ async function gerarGraficos() {
         ],
       },
     });
+    charts.push(tiposReceitasChart);
 
     const tiposInvestimentosLabels = Object.keys(tiposInvestimentos);
     const tiposInvestimentosData = Object.values(tiposInvestimentos);
 
-    new Chart(document.getElementById("tiposInvestimentosChart"), {
+    const tiposInvestimentosChart = new Chart(document.getElementById("tiposInvestimentosChart"), {
       type: "pie",
       data: {
         labels: tiposInvestimentosLabels,
@@ -339,6 +361,7 @@ async function gerarGraficos() {
         ],
       },
     });
+    charts.push(tiposInvestimentosChart);
   } catch (error) {
     console.error(`Erro ao gerar gráficos: ${error.message}`);
   }
@@ -463,15 +486,128 @@ function gerarRelatorioReceitas() {
   }
 }
 
+function gerarRelatorioHistoricoDespesas() {
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.text("Relatório de Histórico de Despesas", 10, 10);
+    doc.autoTable({
+      html: "#previewHistoricoDespesasTable",
+      didDrawCell: (data) => {
+        if (data.column.index === 2) {
+          const valorText = data.cell.raw || "0";
+          const valor = parseFloat(String(valorText).replace("R$ ", ""));
+          totalDespesas += isNaN(valor) ? 0 : valor;
+        }
+      },
+    });
+    const finalY = doc.lastAutoTable.finalY || 10;
+    doc.text(`Total Gasto: R$ ${totalDespesas.toFixed(2)}`, 10, finalY + 10);
+    doc.save("relatorio_historico_despesas.pdf");
+  } catch (error) {
+    console.error(`Erro ao gerar relatório de histórico de despesas: ${error.message}`);
+  }
+}
+
+function gerarRelatorioHistoricoReceitas() {
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.text("Relatório de Histórico de Receitas", 10, 10);
+    doc.autoTable({
+      html: "#previewHistoricoReceitasTable",
+      didDrawCell: (data) => {
+        if (data.column.index === 2) {
+          const valorText = data.cell.raw || "0";
+          const valor = parseFloat(String(valorText).replace("R$ ", ""));
+          totalReceitas += isNaN(valor) ? 0 : valor;
+        }
+      },
+    });
+    const finalY = doc.lastAutoTable.finalY || 10;
+    doc.text(`Total Recebido: R$ ${totalReceitas.toFixed(2)}`, 10, finalY + 10);
+    doc.save("relatorio_historico_receitas.pdf");
+  } catch (error) {
+    console.error(`Erro ao gerar relatório de histórico de receitas: ${error.message}`);
+  }
+}
+
+async function filtrarHistoricoDespesas() {
+  try {
+    const dataInicio = document.getElementById("dataInicioHistoricoDespesas").value;
+    const dataFim = document.getElementById("dataFimHistoricoDespesas").value;
+    const filtros = { dataInicio, dataFim };
+    console.log("Filtros:", filtros); // Log para depuração
+    const despesas = await window.controle.getHistoricoDespesasFiltradas(filtros);
+    console.log("Despesas filtradas:", despesas); // Log para depuração
+    const tableBody = document.querySelector("#previewHistoricoDespesasTable tbody");
+    tableBody.innerHTML = ""; // Limpar tabela
+    totalDespesas = 0;
+
+    despesas.forEach((despesa) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+                      <td>${despesa.estabelecimento}</td>
+                      <td>${despesa.data}</td>
+                      <td>R$ ${despesa.valor.toFixed(2)}</td>
+                      <td>${despesa.forma_pagamento}</td>
+                  `;
+      tableBody.appendChild(row); // Adicionar linha à tabela
+      totalDespesas += despesa.valor; // Atualizar total de despesas
+    });
+    document.getElementById(
+      "totalHistoricoDespesas"
+    ).innerText = `Total Despesas: R$ ${totalDespesas.toFixed(2)}`;
+  } catch (error) {
+    console.error(`Erro ao filtrar histórico de despesas: ${error.message}`);
+  }
+}
+
+async function filtrarHistoricoReceitas() {
+  try {
+    const dataInicio = document.getElementById("dataInicioHistoricoReceitas").value;
+    const dataFim = document.getElementById("dataFimHistoricoReceitas").value;
+    const filtros = { dataInicio, dataFim };
+    console.log("Filtros:", filtros); // Log para depuração
+    const receitas = await window.controle.getHistoricoReceitasFiltradas(filtros);
+    console.log("Receitas filtradas:", receitas); // Log para depuração
+    const tableBody = document.querySelector("#previewHistoricoReceitasTable tbody");
+    tableBody.innerHTML = ""; // Limpar tabela
+    totalReceitas = 0;
+
+    receitas.forEach((receita) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+                      <td>${receita.descricao}</td>
+                      <td>${receita.data}</td>
+                      <td>R$ ${receita.valor.toFixed(2)}</td>
+                      <td>${receita.forma_recebimento}</td>
+                  `;
+      tableBody.appendChild(row); // Adicionar linha à tabela
+      totalReceitas += receita.valor; // Atualizar total de receitas
+    });
+    document.getElementById(
+      "totalHistoricoReceitas"
+    ).innerText = `Total Receitas: R$ ${totalReceitas.toFixed(2)}`;
+  } catch (error) {
+    console.error(`Erro ao filtrar histórico de receitas: ${error.message}`);
+  }
+}
+
 function abrirMesModal() {
   const mesModal = new bootstrap.Modal(document.getElementById("mesModal"));
   mesModal.show();
 }
 
+function abrirMesModalHistorico() {
+  const mesModalHistorico = new bootstrap.Modal(document.getElementById("mesModalHistorico"));
+  mesModalHistorico.show();
+}
+
 async function submitMesForm() {
   try {
     const mes = document.getElementById("mesInput").value;
-    const ano = new Date().getFullYear();
+    const ano = anoAtual;
     const dataInicio = `${ano}-${mes.padStart(2, "0")}-01`;
     const dataFim = new Date(ano, mes, 0).toISOString().split("T")[0]; // Último dia do mês
 
@@ -536,4 +672,127 @@ async function submitMesForm() {
   } catch (error) {
     console.error(`Erro ao gerar relatório mensal: ${error.message}`);
   }
+}
+
+async function submitMesFormHistorico() {
+  try {
+    const mes = document.getElementById("mesInputHistorico").value;
+    const ano = anoAtual;
+    const dataInicio = `${ano}-${mes.padStart(2, "0")}-01`;
+    const dataFim = new Date(ano, mes, 0).toISOString().split("T")[0]; // Último dia do mês
+
+    const despesas = await window.controle.getHistoricoDespesasFiltradas({
+      dataInicio,
+      dataFim,
+    });
+    const receitas = await window.controle.getHistoricoReceitasFiltradas({
+      dataInicio,
+      dataFim,
+    });
+
+    console.log("Histórico de Despesas:", despesas); // Log para depuração
+    console.log("Histórico de Receitas:", receitas); // Log para depuração
+
+    const totalDespesas = despesas.reduce(
+      (acc, despesa) => acc + despesa.valor,
+      0
+    );
+    const totalReceitas = receitas.reduce(
+      (acc, receita) => acc + receita.valor,
+      0
+    );
+    const saldo = totalReceitas - totalDespesas;
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    doc.text(`Relatório Mensal do Histórico - ${mes}/${ano}`, 10, 10);
+    doc.text(`Total de Despesas: R$ ${totalDespesas.toFixed(2)}`, 10, 20);
+    doc.text(`Total de Receitas: R$ ${totalReceitas.toFixed(2)}`, 10, 30);
+    doc.text(`Saldo: R$ ${saldo.toFixed(2)}`, 10, 40);
+
+    doc.autoTable({
+      head: [["Descrição", "Data", "Valor", "Forma de Pagamento"]],
+      body: despesas.map((despesa) => [
+        despesa.estabelecimento,
+        despesa.data,
+        `R$ ${despesa.valor.toFixed(2)}`,
+        despesa.forma_pagamento,
+      ]),
+      startY: 50,
+      theme: "striped",
+      headStyles: { fillColor: [255, 0, 0] },
+      margin: { top: 10 },
+    });
+
+    doc.autoTable({
+      head: [["Descrição", "Data", "Valor", "Forma de Recebimento"]],
+      body: receitas.map((receita) => [
+        receita.descricao,
+        receita.data,
+        `R$ ${receita.valor.toFixed(2)}`,
+        receita.forma_recebimento,
+      ]),
+      startY: doc.previousAutoTable.finalY + 10,
+      theme: "striped",
+      headStyles: { fillColor: [0, 255, 0] },
+      margin: { top: 10 },
+    });
+
+    doc.save(`relatorio_mensal_historico_${mes}_${ano}.pdf`);
+  } catch (error) {
+    console.error(`Erro ao gerar relatório mensal do histórico: ${error.message}`);
+  }
+}
+
+function showMessage(message, type) {
+  let toastContainer = document.getElementById("toast-container");
+  if (!toastContainer) {
+    toastContainer = document.createElement("div");
+    toastContainer.id = "toast-container";
+    toastContainer.style.position = "fixed";
+    toastContainer.style.top = "20px";
+    toastContainer.style.right = "20px";
+    toastContainer.style.zIndex = "9999";
+    toastContainer.style.display = "flex";
+    toastContainer.style.flexDirection = "column";
+    toastContainer.style.gap = "10px";
+    toastContainer.style.alignItems = "center"; // Centralizar mensagens
+    document.body.appendChild(toastContainer);
+  }
+  
+  const toast = document.createElement("div");
+  toast.className = `toast-message alert alert-${type}`;
+  toast.textContent = message;
+  toast.style.padding = "15px 20px";
+  toast.style.borderRadius = "8px";
+  toast.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.2)";
+  toast.style.color = "#fff";
+  toast.style.fontWeight = "bold";
+  toast.style.opacity = "0";
+  toast.style.transform = "translateY(-20px)";
+  toast.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+  toast.style.display = "flex";
+  toast.style.alignItems = "center";
+  toast.style.justifyContent = "center";
+
+  const colors = {
+    success: "#4CAF50",
+    error: "#F44336",
+    warning: "#FFC107",
+    info: "#2196F3"
+  };
+  toast.style.backgroundColor = colors[type] || "#333";
+  
+  toastContainer.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = "1";
+    toast.style.transform = "translateY(0)";
+  }, 100);
+  
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(-20px)";
+    setTimeout(() => toast.remove(), 300);
+  }, 3000);
 }

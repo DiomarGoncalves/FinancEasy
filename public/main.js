@@ -32,6 +32,7 @@ function createWindow() {
   mainWindow.loadFile(path.join(__dirname, "..", "pages", "home", "home.html")); // Carrega o arquivo HTML principal
 }
 
+
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();
