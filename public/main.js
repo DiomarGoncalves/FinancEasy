@@ -2,12 +2,13 @@ const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 const path = require("path");
 const fs = require("fs");
 const os = require("os"); // Adicionar importação do módulo 'os'
-const db = require("./database/db");
 const localAppDataPathConfig =
   process.env.LOCALAPPDATA || path.join(os.homedir(), ".local", "share");
 const appFolderConfig = path.join(localAppDataPathConfig, "FinancEasyV2");
 const configPath = path.join(appFolderConfig, "config.json");
 const { exec } = require('child_process');
+
+const db = require("./database/db");
 
 if (process.env.NODE_ENV === "development") {
   try {
