@@ -7,8 +7,8 @@ const localAppDataPathConfig =
 const appFolderConfig = path.join(localAppDataPathConfig, "FinancEasyV2");
 const configPath = path.join(appFolderConfig, "config.json");
 const { exec } = require('child_process');
-
 const db = require("./database/db");
+
 
 if (process.env.NODE_ENV === "development") {
   try {
@@ -69,6 +69,7 @@ app.whenReady().then(() => {
 
 // Função para carregar configurações
 function loadConfig() {
+  const db = require("./database/db");
   try {
     const data = fs.readFileSync(configPath);
     return JSON.parse(data);
