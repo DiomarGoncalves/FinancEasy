@@ -2,6 +2,12 @@ const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 const path = require("path");
 const fs = require("fs");
 const os = require("os"); // Adicionar importação do módulo 'os'
+const server = require('./server'); // Importar o servidor Express
+
+// Variável para configurar o IP da máquina
+const IP_MAQUINA = "192.168.1.56"; // Substitua pelo IP da máquina, se necessário
+const PORT = 3050;
+
 const localAppDataPathConfig =
   process.env.LOCALAPPDATA || path.join(os.homedir(), ".local", "share");
 const appFolderConfig = path.join(localAppDataPathConfig, "FinancEasyV2");
@@ -18,7 +24,39 @@ if (process.env.NODE_ENV === "development") {
   }
 }
 
+let serverInstance;
+
+function startServer() {
+  const config = loadConfig();
+  const ip = config.ipServidor || '127.0.0.1';
+  const port = config.portaServidor || 3050;
+
+  if (serverInstance) {
+    serverInstance.close(() => {
+      console.log('Servidor reiniciado com novas configurações.');
+    });
+  }
+
+  serverInstance = server.listen(port, ip, () => {
+    console.log(`Servidor rodando em http://${ip}:${port}`);
+  });
+}
+
+// Iniciar o servidor com as configurações atuais
+startServer();
+
+// Atualizar o servidor ao salvar novas configurações
+ipcMain.handle('save-config', async (event, config) => {
+  saveConfig(config);
+  startServer(); // Reiniciar o servidor com as novas configurações
+  return { status: 'success' };
+});
+
 function createWindow() {
+  const config = loadConfig();
+  const ip = config.ipServidor || '127.0.0.1';
+  const port = config.portaServidor || 3050;
+
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
@@ -30,9 +68,11 @@ function createWindow() {
   });
   mainWindow.maximize();
 
-  mainWindow.loadFile(path.join(__dirname, "..", "pages", "home", "home.html")); // Carrega o arquivo HTML principal
+  // Carregar a URL do servidor Express
+  mainWindow.loadURL(`http://${ip}:${port}/pages/home/home.html`);
 }
 
+app.on("ready", createWindow);
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
@@ -54,11 +94,11 @@ app.whenReady().then(() => {
       limiteGastos: 0,
       dbPath: appFolderConfig,
       senha: "admin",
+      ipServidor: "127.0.0.1",
+      portaServidor: 3050,
     };
     fs.writeFileSync(configPath, JSON.stringify(defaultConfig));
   }
-
-  createWindow();
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) {
@@ -79,6 +119,8 @@ function loadConfig() {
       limiteGastos: 0,
       senha: "admin",
       dbPath: appFolderConfig,
+      ipServidor: "127.0.0.1",
+      portaServidor: 3050,
     }; // Configurações padrão
   }
 }
@@ -97,11 +139,6 @@ function saveConfig(config) {
 // IPC Handlers para configurações
 ipcMain.handle("load-config", async () => {
   return loadConfig();
-});
-
-ipcMain.handle("save-config", async (event, config) => {
-  saveConfig(config);
-  return { status: "success" };
 });
 
 // IPC Handler para verificar a senha
@@ -392,7 +429,7 @@ function inserirValoresTeste() {
       `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Farmácia', '2025-10-22', 90.00, 'Crédito', 1, 0, 90.00, 1);`,
       `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Restaurante', '2025-11-30', 250.00, 'Débito', 1, 0, 250.00, 2);`,
       `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Posto de Gasolina', '2025-12-05', 100.00, 'Dinheiro', 1, 0, 100.00, NULL);`,
-
+      
       `INSERT INTO historico_despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id, data_pagamento) VALUES ('Supermercado', '2025-01-15', 150.00, 'Crédito', 1, 0, 150.00, 1, '2025-01-16');`,
       `INSERT INTO historico_despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id, data_pagamento) VALUES ('Padaria', '2025-02-10', 50.00, 'Débito', 1, 0, 50.00, 2, '2025-02-11');`,
 
@@ -483,9 +520,8 @@ function inserirDespesasAnoCompleto() {
 // Adicione um manipulador IPC para chamar essa função
 ipcMain.handle("inserir-despesas-ano-completo", async () => {
   await inserirDespesasAnoCompleto();
-  return "Despesas inseridas para todos os meses do ano de 2025";
+  return { status: "success", message: "Despesas inseridas para todos os meses do ano de 2025!" };
 });
-
 
 // Função para limpar o banco de dados
 function limparBanco() {

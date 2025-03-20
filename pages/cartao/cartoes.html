@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../css/style.css">
   <title>Lista de Cartões</title>
   <link rel="stylesheet" href="styles.css">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
@@ -42,7 +44,7 @@
   <!-- Container para as notificações (toasts) -->
   <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3"></div>
 
-  <div class="w-full max-w-4xl bg-gray-800 rounded-3xl shadow-2xl p-10">
+  <div class="w-full max-w-4xl bg-gray-800 rounded-3xl shadow-2xl p-1 mobile0">
     <a href="../home/home.html" class="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors mb-6">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
@@ -56,12 +58,12 @@
       <table class="min-w-full text-left text-sm text-gray-100" id="cartoesTable">
         <thead class="bg-purple-700">
           <tr>
-            <th scope="col" class="px-4 py-3">Nome</th>
-            <th scope="col" class="px-4 py-3">Banco</th>
-            <th scope="col" class="px-4 py-3">Limite</th>
-            <th scope="col" class="px-4 py-3">Limite Gasto</th>
-            <th scope="col" class="px-4 py-3">Limite Disponível</th>
-            <th scope="col" class="px-4 py-3">Ações</th>
+            <th scope="col" class="pd-3">Nome</th>
+            <th scope="col" class="p-1 mobile">Banco</th>
+            <th scope="col" class="p-1 mobile">Limite</th>
+            <th scope="col" class="p-1 mobile">Limite Gasto</th>
+            <th scope="col" class="p-1 mobile">Limite Disponível</th>
+            <th scope="col" class="p-1 mobile">Ações</th>
           </tr>
         </thead>
         <tbody>

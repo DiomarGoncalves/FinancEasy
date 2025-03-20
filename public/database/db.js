@@ -1,13 +1,13 @@
 const path = require('path');
 const fs = require('fs');
 const sqlite3 = require('sqlite3').verbose();
+const os = require('os'); // Certifique-se de importar o módulo 'os'
 
-// // Obter o caminho do LocalAppData
+// Obter o caminho do LocalAppData
 const localAppDataPath = process.env.LOCALAPPDATA || path.join(os.homedir(), '.local', 'share');
 
-// // Definir a pasta do banco dentro do LocalAppData
+// Definir a pasta do banco dentro do LocalAppData
 const appFolder = path.join(localAppDataPath, 'FinancEasyV2');
-// const defaultDbPath = path.join(appFolder, 'FinancEasy.db');
 
 // Criar a pasta se não existir
 if (!fs.existsSync(appFolder)) {
@@ -18,6 +18,7 @@ if (!fs.existsSync(appFolder)) {
 const configPath = path.join(appFolder, 'config.json');
 let dbPath = '';
 
+// Carregar o caminho do banco de dados a partir da configuração
 if (fs.existsSync(configPath)) {
     const config = JSON.parse(fs.readFileSync(configPath));
     if (config.dbPath) {
@@ -26,7 +27,22 @@ if (fs.existsSync(configPath)) {
 }
 
 // Criar ou abrir o banco de dados
-const db = new sqlite3.Database(dbPath);
+if (!dbPath) {
+    dbPath = path.join(appFolder, 'FinancEasy.db'); // Caminho padrão
+}
+
+// Verificar se o arquivo do banco de dados existe, caso contrário, criar um arquivo vazio
+if (!fs.existsSync(dbPath)) {
+    fs.writeFileSync(dbPath, '');
+}
+
+const db = new sqlite3.Database(dbPath, (err) => {
+    if (err) {
+        console.error(`Erro ao abrir o banco de dados: ${err.message}`);
+    } else {
+        console.log(`Banco de dados conectado em: ${dbPath}`);
+    }
+});
 
 db.serialize(() => {
     // **Ativar suporte a chaves estrangeiras**

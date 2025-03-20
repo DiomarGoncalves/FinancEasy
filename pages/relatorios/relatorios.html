@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../css/style.css">
     <title>Relatórios</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link
@@ -58,7 +59,7 @@
     <div class="container mx-auto p-6">
       <a
         href="../home/home.html"
-        class="btn bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg mb-4 inline-block"
+        class="btn bg-purple-600 hover:bg-purple-500 text-white p-1 mobile rounded-lg mb-4 inline-block"
       >
         <i class="fas fa-home"></i> Voltar para o início
       </a>
@@ -68,7 +69,7 @@
       <input
         type="number"
         id="anoSelect"
-        class="form-input bg-gray-700 text-white px-4 py-2 rounded-lg"
+        class="form-input bg-gray-700 text-white p-1 mobile rounded-lg"
         value="2025"
         min="2000"
         max="2100"
@@ -118,37 +119,37 @@
 
       <div class="flex gap-4 mb-6">
         <button
-          class="btn bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg"
+          class="btn bg-purple-600 hover:bg-purple-500 text-white p-1 mobile rounded-lg"
           onclick="showForm('despesasForm')"
         >
           <i class="fas fa-filter"></i> Filtrar Despesas
         </button>
         <button
-          class="btn bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg"
+          class="btn bg-purple-600 hover:bg-purple-500 text-white p-1 mobile rounded-lg"
           onclick="showForm('receitasForm')"
         >
           <i class="fas fa-filter"></i> Filtrar Receitas
         </button>
         <button
-          class="btn bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg"
+          class="btn bg-purple-600 hover:bg-purple-500 text-white p-1 mobile rounded-lg"
           onclick="abrirMesModal()"
         >
           <i class="fas fa-calendar-alt"></i> Gerar Relatório Mensal
         </button>
         <button
-          class="btn bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg"
+          class="btn bg-purple-600 hover:bg-purple-500 text-white p-1 mobile rounded-lg"
           onclick="showForm('historicoDespesasForm')"
         >
           <i class="fas fa-filter"></i> Filtrar Histórico de Despesas
         </button>
         <button
-          class="btn bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg"
+          class="btn bg-purple-600 hover:bg-purple-500 text-white p-1 mobile rounded-lg"
           onclick="showForm('historicoReceitasForm')"
         >
           <i class="fas fa-filter"></i> Filtrar Histórico de Receitas
         </button>
         <button
-          class="btn bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg"
+          class="btn bg-purple-600 hover:bg-purple-500 text-white p-1 mobile rounded-lg"
           onclick="abrirMesModalHistorico()"
         >
           <i class="fas fa-calendar-alt"></i> Gerar Relatório Mensal do Histórico
@@ -183,14 +184,14 @@
           <div class="flex gap-4">
             <button
               type="button"
-              class="btn bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg"
+              class="btn bg-purple-600 hover:bg-purple-500 text-white p-1 mobile rounded-lg"
               onclick="filtrarDespesas()"
             >
               <i class="fas fa-search"></i> Filtrar
             </button>
             <button
               type="button"
-              class="btn bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg"
+              class="btn bg-gray-600 hover:bg-gray-500 text-white p-1 mobile rounded-lg"
               onclick="hideForm('despesasForm')"
             >
               <i class="fas fa-times"></i> Cancelar
@@ -215,7 +216,7 @@
         </table>
         <h3 id="totalDespesas" class="mt-4">Total Despesas: R$ 0,00</h3>
         <button
-          class="btn bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg mt-4"
+          class="btn bg-green-600 hover:bg-green-500 text-white p-1 mobile rounded-lg mt-4"
           onclick="gerarRelatorioDespesas()"
         >
           <i class="fas fa-download"></i> Gerar Relatório
@@ -250,14 +251,14 @@
           <div class="flex gap-4">
             <button
               type="button"
-              class="btn bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg"
+              class="btn bg-purple-600 hover:bg-purple-500 text-white p-1 mobile rounded-lg"
               onclick="filtrarReceitas()"
             >
               <i class="fas fa-search"></i> Filtrar
             </button>
             <button
               type="button"
-              class="btn bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg"
+              class="btn bg-gray-600 hover:bg-gray-500 text-white p-1 mobile rounded-lg"
               onclick="hideForm('receitasForm')"
             >
               <i class="fas fa-times"></i> Cancelar
@@ -280,7 +281,7 @@
         </table>
         <h3 id="totalReceitas" class="mt-4">Total Receitas: R$ 0,00</h3>
         <button
-          class="btn bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg mt-4"
+          class="btn bg-green-600 hover:bg-green-500 text-white p-1 mobile rounded-lg mt-4"
           onclick="gerarRelatorioReceitas()"
         >
           <i class="fas fa-download"></i> Gerar Relatório
@@ -315,14 +316,14 @@
           <div class="flex gap-4">
             <button
               type="button"
-              class="btn bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg"
+              class="btn bg-purple-600 hover:bg-purple-500 text-white p-1 mobile rounded-lg"
               onclick="filtrarHistoricoDespesas()"
             >
               <i class="fas fa-search"></i> Filtrar
             </button>
             <button
               type="button"
-              class="btn bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg"
+              class="btn bg-gray-600 hover:bg-gray-500 text-white p-1 mobile rounded-lg"
               onclick="hideForm('historicoDespesasForm')"
             >
               <i class="fas fa-times"></i> Cancelar
@@ -347,7 +348,7 @@
         </table>
         <h3 id="totalHistoricoDespesas" class="mt-4">Total Despesas: R$ 0,00</h3>
         <button
-          class="btn bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg mt-4"
+          class="btn bg-green-600 hover:bg-green-500 text-white p-1 mobile rounded-lg mt-4"
           onclick="gerarRelatorioHistoricoDespesas()"
         >
           <i class="fas fa-download"></i> Gerar Relatório
@@ -382,14 +383,14 @@
           <div class="flex gap-4">
             <button
               type="button"
-              class="btn bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded-lg"
+              class="btn bg-purple-600 hover:bg-purple-500 text-white p-1 mobile rounded-lg"
               onclick="filtrarHistoricoReceitas()"
             >
               <i class="fas fa-search"></i> Filtrar
             </button>
             <button
               type="button"
-              class="btn bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg"
+              class="btn bg-gray-600 hover:bg-gray-500 text-white p-1 mobile rounded-lg"
               onclick="hideForm('historicoReceitasForm')"
             >
               <i class="fas fa-times"></i> Cancelar
@@ -412,7 +413,7 @@
         </table>
         <h3 id="totalHistoricoReceitas" class="mt-4">Total Receitas: R$ 0,00</h3>
         <button
-          class="btn bg-green-600 hover:bg-green-500 text-white px-4 py-2 rounded-lg mt-4"
+          class="btn bg-green-600 hover:bg-green-500 text-white p-1 mobile rounded-lg mt-4"
           onclick="gerarRelatorioHistoricoReceitas()"
         >
           <i class="fas fa-download"></i> Gerar Relatório

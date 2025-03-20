@@ -1,4 +1,4 @@
-let totalReceita = 0;
+let totalGasto = 0;
 
 document.addEventListener("DOMContentLoaded", async () => {
   try {
@@ -33,7 +33,7 @@ async function fetchHistoricoReceitas() {
 
 async function fetchHistoricoReceitasFiltradas(filtros) {
   try {
-    const response = await fetch("/api/historico-receitas/filtrar", {
+    const response = await fetch("/api/historico-receita/filtrar", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(filtros),
@@ -48,47 +48,40 @@ async function fetchHistoricoReceitasFiltradas(filtros) {
 
 function renderHistorico(historico) {
   const tableBody = document.getElementById("historicoTableBody");
-  if (!tableBody) {
-    console.error("Elemento 'historicoTableBody' não encontrado.");
-    return;
-  }
-
   tableBody.innerHTML = ""; // Limpar tabela
-  totalReceita = 0;
+  totalGasto = 0;
 
-  historico.forEach((receita) => {
+  historico.forEach((receitas) => {
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td>${receita.data_recebimento}</td>
-      <td>${receita.data}</td>
-      <td>${receita.descricao}</td>
-      <td>R$ ${receita.valor.toFixed(2)}</td>
-      <td>${receita.categoria}</td>
-      <td>${receita.fonte}</td>
+      <td>${receitas.data_recebimento}</td>
+      <td>${receitas.data}</td>
+      <td>${receitas.descricao}</td>
+      <td>R$ ${receitas.valor.toFixed(2)}</td>
+      <td>${receitas.categoria}</td>
+      <td>${receitas.conta_bancaria}</td>
+      <td>${receitas.forma_recebimento}</td>
     `;
     tableBody.appendChild(row); // Adicionar linha à tabela
-    totalReceita += receita.valor;
+    totalGasto += receitas.valor;
   });
 
-  const totalReceitaElement = document.getElementById("totalReceita");
-  if (totalReceitaElement) {
-    totalReceitaElement.innerText = `Total Receita: R$ ${totalReceita.toFixed(2)}`;
-  } else {
-    console.error("Elemento 'totalReceita' não encontrado.");
-  }
+  document.getElementById(
+    "totalGasto"
+  ).innerText = `Total Gasto: R$ ${totalGasto.toFixed(2)}`;
 }
 
 function exportarPDF() {
-  console.log(totalReceita);
+  console.log(totalGasto);
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
-  doc.text("Histórico de Receitas Recebidas", 10, 10);
+  doc.text("Histórico de Receita Pagas", 10, 10);
   doc.autoTable({
     html: "#historicoTable",
     didDrawPage: (data) => {
-      // Adicionar o total recebido no final da página
+      // Adicionar o total gasto no final da página
       const pageHeight = doc.internal.pageSize.height;
-      doc.text(`Total Receita: R$ ${totalReceita.toFixed(2)}`, 10, pageHeight - 10);
+      doc.text(`Total Gasto: R$ ${totalGasto.toFixed(2)}`, 10, pageHeight - 10);
     },
   });
   doc.save("historico_receitas.pdf");

@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../css/style.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
@@ -40,9 +41,9 @@
   </head>
   <body class="bg-gray-900 text-white">
     <div class="container mx-auto mt-4">
-      <a href="../home/home.html" class="bg-purple-600 text-white px-4 py-2 rounded-md mb-3 hover:bg-purple-700 inline-block">🏠 Voltar para o início</a>
-      <a href="../despesas/historicoDespesas/historicoDespesas.html" class="bg-purple-600 text-white px-4 py-2 rounded-md mb-3 hover:bg-purple-700 inline-block">📜 Histórico de Despesas Pagas</a>
-      <button class="bg-gray-600 text-white px-4 py-2 rounded-md mb-3 hover:bg-gray-700" id="exportar">📑 Exportar para PDF</button>
+      <a href="../home/home.html" class="bg-purple-600 text-white p-1 mobile rounded-md mb-3 hover:bg-purple-700 inline-block">🏠 Voltar para o início</a>
+      <a href="/pages/historicoDespesas/historicoDespesas.html" class="bg-purple-600 text-white p-1 mobile rounded-md mb-3 hover:bg-purple-700 inline-block">📜 Histórico de Despesas Pagas</a>
+      <button class="bg-gray-600 text-white p-1 mobile rounded-md mb-3 hover:bg-gray-700" id="exportar">📑 Exportar para PDF</button>
 
       <h1 class="text-center text-4xl font-bold mb-4">Controle de Despesas 💸</h1>
 
@@ -122,31 +123,31 @@
           <table class="table-auto w-full bg-gray-800 text-white rounded-md shadow-lg" id="despesasTable">
               <thead class="bg-gray-700">
                   <tr>
-                      <th class="px-4 py-2">
+                      <th class="p-1 mobile">
                           <i class="fas fa-store icon"></i> Estabelecimento
                       </th>
-                      <th class="px-4 py-2">
+                      <th class="p-1 mobile">
                           <i class="fas fa-calendar-day icon"></i> Data
                       </th>
-                      <th class="px-4 py-2">
+                      <th class="p-1 mobile">
                           <i class="fas fa-dollar-sign icon"></i> Valor
                       </th>
-                      <th class="px-4 py-2">
+                      <th class="p-1 mobile">
                           <i class="fas fa-credit-card icon"></i> Forma de Pagamento
                       </th>
-                      <th class="px-4 py-2">
+                      <th class="p-1 mobile">
                           <i class="fas fa-box icon"></i> Parcelas
                       </th>
-                      <th class="px-4 py-2">
+                      <th class="p-1 mobile">
                           <i class="fas fa-hourglass-half icon"></i> Parcelas Restantes
                       </th>
-                      <th class="px-4 py-2">
+                      <th class="p-1 mobile">
                           <i class="fas fa-dollar-sign icon"></i> Valor da Parcela
                       </th>
-                      <th class="px-4 py-2">
+                      <th class="p-1 mobile">
                           <i class="fas fa-credit-card icon"></i> Cartão
                       </th>
-                      <th class="px-4 py-2">
+                      <th class="p-1 mobile">
                           <i class="fas fa-cogs icon"></i> Ações
                       </th>
                   </tr>

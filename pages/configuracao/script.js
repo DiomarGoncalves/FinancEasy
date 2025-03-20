@@ -68,6 +68,8 @@ document.addEventListener('DOMContentLoaded', async (event) => {
         document.getElementById('notificacoes').value = config.notificacoes;
         document.getElementById('limiteGastos').value = config.limiteGastos || 0;
         document.getElementById('dbPath').value = config.dbPath || 'C:\\Users\\User\\AppData\\Local\\FinancEasy';
+        document.getElementById('ipServidor').value = config.ipServidor || '127.0.0.1';
+        document.getElementById('portaServidor').value = config.portaServidor || 3050;
     } catch (error) {
         showMessage(`Erro ao carregar configurações: ${error.message}`, 'danger');
     }
@@ -90,7 +92,9 @@ document.getElementById('configForm').addEventListener('submit', async (event) =
     const config = {
         limiteGastos: document.getElementById('limiteGastos').value,
         dbPath: document.getElementById('dbPath').value,
-        novaSenha: document.getElementById('novaSenha').value
+        novaSenha: document.getElementById('novaSenha').value,
+        ipServidor: document.getElementById('ipServidor').value,
+        portaServidor: parseInt(document.getElementById('portaServidor').value)
     };
 
     try {

@@ -57,7 +57,8 @@ function resetFormAndUnlockInputs(form) {
 
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-    const cartoes = await window.controle.getCartoes();
+    const response = await fetch("/api/cartoes");
+    const cartoes = await response.json();
     const cartaoSelect = document.getElementById("cartao");
     cartoes.forEach((cartao) => {
       const option = document.createElement("option");
@@ -125,9 +126,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       };
 
       try {
-        await window.controle.invoke("add-despesa", despesa);
-        showMessage("Despesa registrada com sucesso!", "success");
-        loadDespesas();
+        const response = await fetch("/api/despesas", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(despesa),
+        });
+        if (response.ok) {
+          showMessage("Despesa registrada com sucesso!", "success");
+          loadDespesas();
+        } else {
+          throw new Error("Erro ao registrar despesa");
+        }
       } catch (error) {
         showMessage(`Erro ao registrar despesa: ${error.message}`, "danger");
       }
@@ -150,10 +159,12 @@ document.addEventListener("DOMContentLoaded", async () => {
       };
 
       try {
-        const despesasFiltradas = await window.controle.invoke(
-          "get-despesas-filtradas",
-          filtros
-        );
+        const response = await fetch("/api/despesas/filtrar", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(filtros),
+        });
+        const despesasFiltradas = await response.json();
         renderDespesas(despesasFiltradas);
       } catch (error) {
         showMessage(`Erro ao filtrar despesas: ${error.message}`, "danger");
@@ -165,7 +176,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 async function loadDespesas() {
   try {
-    const despesas = await window.controle.invoke("get-despesas");
+    const response = await fetch("/api/despesas");
+    const despesas = await response.json();
     renderDespesas(despesas);
   } catch (error) {
     showMessage(`Erro ao carregar despesas: ${error.message}`, "danger");
@@ -202,28 +214,15 @@ function renderDespesas(despesas) {
   });
 }
 
-async function loadCartoes() {
-  try {
-    const cartoes = await window.controle.invoke("get-cartoes");
-    const cartaoSelect = document.getElementById("cartao");
-    cartaoSelect.innerHTML = ""; // Limpar opções
-
-    cartoes.forEach((cartao) => {
-      const option = document.createElement("option");
-      option.value = cartao.id;
-      option.textContent = `${cartao.nome} - Limite: R$${cartao.limite}`;
-      cartaoSelect.appendChild(option); // Adicionar opção ao select
-    });
-  } catch (error) {
-    showMessage (`Erro ao carregar cartões: ${error.message}`, "danger");
-  }
-}
-
 async function payDespesa(id) {
   try {
-    await window.controle.invoke("pay-despesa", id);
-    loadDespesas(); // Atualizar a lista de despesas
-    showMessage("Despesa paga com sucesso!", "success");
+    const response = await fetch(`/api/despesas/${id}/pagar`, { method: "POST" });
+    if (response.ok) {
+      loadDespesas(); // Atualizar a lista de despesas
+      showMessage("Despesa paga com sucesso!", "success");
+    } else {
+      throw new Error("Erro ao pagar despesa");
+    }
   } catch (error) {
     console.error(`Erro ao pagar despesa: ${error.message}`);
     showMessage(`Erro ao pagar despesa: ${error.message}`, "danger");
@@ -232,9 +231,13 @@ async function payDespesa(id) {
 
 async function deleteDespesa(id) {
   try {
-    await window.controle.invoke("delete-despesa", id);
-    loadDespesas(); // Atualizar a lista de despesas
-    showMessage("Despesa excluída com sucesso!", "success");
+    const response = await fetch(`/api/despesas/${id}`, { method: "DELETE" });
+    if (response.ok) {
+      loadDespesas(); // Atualizar a lista de despesas
+      showMessage("Despesa excluída com sucesso!", "success");
+    } else {
+      throw new Error("Erro ao excluir despesa");
+    }
   } catch (error) {
     console.error(`Erro ao excluir despesa: ${error.message}`);
     showMessage(`Erro ao excluir despesa: ${error.message}`, "danger");

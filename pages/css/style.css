@@ -1,0 +1,129 @@
+/* Estilo base e modo escuro */
+body.dark-mode {
+    background-color: #1a1a1a;
+    color: #e0e0e0;
+  }
+  
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+  }
+  
+  .navbar ul {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+  }
+  
+  .navbar a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  
+  .sales-area {
+    padding: 20px;
+  }
+  
+  .search-bar input {
+    margin-right: 10px;
+    padding: 10px;
+    background-color: #444;
+    color: white;
+    border: none;
+    border-radius: 5px;
+  }
+  
+  .order-summary {
+    margin-top: 20px;
+  }
+  
+  #order-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  #order-table th, #order-table td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #ccc;
+  }
+  
+  .payment-methods {
+    margin-top: 20px;
+  }
+  
+  #payment-method {
+    padding: 10px;
+    background-color: #444;
+    color: white;
+    border: none;
+    border-radius: 5px;
+  }
+  
+  button {
+    padding: 10px 20px;
+    background-color: #6a0dad;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background-color: #8e44ad;
+  }
+  
+  /* Responsividade */
+  @media (max-width: 768px) {
+    .mobile {
+      padding: 0,1rem;
+      font-size: 8px;
+    }
+    .navbar ul {
+      display: none;
+      flex-direction: column;
+      background-color: #333;
+      gap: 10px;
+      position: absolute;
+      top: 60px;
+      right: 10px;
+      padding: 10px;
+      border-radius: 5px;
+    }
+  
+    .navbar ul.active {
+      display: flex;
+    }
+  
+    .menu-toggle {
+      display: block;
+      cursor: pointer;
+    }
+  
+    .menu-toggle span {
+      display: block;
+      width: 25px;
+      height: 3px;
+      background-color: white;
+      margin: 5px 0;
+    }
+  
+    .search-bar, .order-summary, .payment-methods {
+      flex-direction: column;
+    }
+  
+    .search-bar input, .payment-methods select, .payment-methods button {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+  
+    .order-summary {
+      margin-top: 10px;
+    }
+  
+    #order-table th, #order-table td {
+      padding: 5px;
+    }
+  }
+  
