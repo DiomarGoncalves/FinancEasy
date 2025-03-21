@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, ipcMain, dialog } = require("electron");
 const path = require("path");
 const fs = require("fs");
 const os = require("os");
@@ -106,6 +106,19 @@ ipcMain.handle("save-config", async (event, config) => {
   saveConfig(config);
   startServer(); // Reiniciar o servidor com as novas configurações
   return { status: 'success' };
+});
+
+// IPC Handler para selecionar o caminho do banco de dados
+ipcMain.handle("select-db-path", async () => {
+  const result = await dialog.showOpenDialog({
+    properties: ["openDirectory"],
+  });
+
+  if (result.canceled) {
+    return null; // Retorna null se o usuário cancelar a seleção
+  }
+
+  return result.filePaths[0]; // Retorna o caminho selecionado
 });
 
 // Função para salvar configurações

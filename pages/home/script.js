@@ -1,10 +1,24 @@
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-    await verificarVencimentos();
+    const config = await fetchConfig();
+    if (config.notificacoes === "ativadas") {
+      await verificarVencimentos();
+    }
   } catch (error) {
     console.error("Erro ao carregar notificações:", error);
   }
 });
+
+async function fetchConfig() {
+  try {
+    const response = await fetch("/api/config");
+    if (!response.ok) throw new Error("Erro ao carregar configurações");
+    return await response.json();
+  } catch (error) {
+    console.error("Erro ao buscar configurações:", error);
+    return { notificacoes: "ativadas" }; // Configuração padrão
+  }
+}
 
 async function verificarVencimentos() {
   try {
