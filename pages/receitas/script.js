@@ -14,6 +14,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     receitaForm.addEventListener("submit", async (event) => {
       event.preventDefault();
       const receita = getFormData();
+
+      if (!receita.descricao || !receita.valor || !receita.data) {
+        alert("Por favor, preencha todos os campos obrigatórios.");
+        return;
+      }
+
       await saveReceita(receita);
       await loadReceitas();
       resetForm();
@@ -25,13 +31,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       await loadReceitas(filtros);
     });
 
-    document.getElementById("filtrar").addEventListener("click", async () => {
-      const mes = document.getElementById("mes").value;
-      const filtros = { dataInicio: `${mes}-01`, dataFim: `${mes}-31` };
-      const historicoFiltrado = await fetchHistoricoReceitasFiltradas(filtros);
-      renderHistorico(historicoFiltrado);
-    });
-
     document.getElementById("exportar").addEventListener("click", () => {
       exportarPDF();
     });
@@ -40,39 +39,9 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-async function fetchHistoricoReceitas() {
-  try {
-    const response = await fetch("/api/historico-receitas");
-    if (!response.ok) throw new Error("Erro ao buscar histórico de Receita");
-    return await response.json();
-  } catch (error) {
-    console.error(`Erro ao buscar histórico de Receita: ${error.message}`);
-    return [];
-  }
-}
-
-async function fetchHistoricoReceitasFiltradas(filtros) {
-  try {
-    const response = await fetch("/api/historico-receitas/filtrar", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(filtros),
-    });
-    if (!response.ok) throw new Error("Erro ao filtrar histórico de Receita");
-    return await response.json();
-  } catch (error) {
-    console.error(`Erro ao filtrar histórico de Receita: ${error.message}`);
-    return [];
-  }
-}
-
 async function loadReceitas(filtros = {}) {
   try {
-    const response = await fetch("/api/receitas", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(filtros),
-    });
+    const response = await fetch("/api/receitas");
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -88,38 +57,6 @@ async function loadReceitas(filtros = {}) {
     renderReceitas(receitas);
   } catch (error) {
     console.error(`Erro ao carregar receitas: ${error.message}`);
-  }
-}
-
-function renderHistorico(historico) {
-  const tableBody = document.getElementById("receitasTable");
-  if (!tableBody) {
-    console.error("Elemento 'historicoTableBody' não encontrado.");
-    return;
-  }
-
-  tableBody.innerHTML = ""; // Limpar tabela
-  totalReceita = 0;
-
-  historico.forEach((receita) => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${receita.data_recebimento}</td>
-      <td>${receita.data}</td>
-      <td>${receita.descricao}</td>
-      <td>R$ ${receita.valor.toFixed(2)}</td>
-      <td>${receita.categoria}</td>
-      <td>${receita.fonte}</td>
-    `;
-    tableBody.appendChild(row); // Adicionar linha à tabela
-    totalReceita += receita.valor;
-  });
-
-  const totalReceitaElement = document.getElementById("totalReceita");
-  if (totalReceitaElement) {
-    totalReceitaElement.innerText = `Total Receita: R$ ${totalReceita.toFixed(2)}`;
-  } else {
-    console.error("Elemento 'totalReceita' não encontrado.");
   }
 }
 
@@ -140,7 +77,7 @@ function renderReceitas(receitas) {
       <td>${receita.recorrente ? "Sim" : "Não"}</td>
       <td>${receita.intervalo_recorrencia || "-"}</td>
       <td>
-        <button class="bg-blue-500 text-white px-3 py-1 rounded" onclick="editReceita(${receita.id})">Editar</button>
+        <button class="bg-green-500 text-white px-3 py-1 rounded" onclick="marcarRecebida(${receita.id})">Receber</button>
         <button class="bg-red-500 text-white px-3 py-1 rounded" onclick="deleteReceita(${receita.id})">Excluir</button>
       </td>
     `;
@@ -148,8 +85,76 @@ function renderReceitas(receitas) {
   });
 }
 
+// Função para exibir notificações estilo toast
+function showMessage(message, type) {
+  let toastContainer = document.getElementById("toast-container");
+  if (!toastContainer) {
+    toastContainer = document.createElement("div");
+    toastContainer.id = "toast-container";
+    toastContainer.style.position = "fixed";
+    toastContainer.style.top = "20px";
+    toastContainer.style.right = "20px";
+    toastContainer.style.zIndex = "9999";
+    toastContainer.style.display = "flex";
+    toastContainer.style.flexDirection = "column";
+    toastContainer.style.gap = "10px";
+    document.body.appendChild(toastContainer);
+  }
+  
+  const toast = document.createElement("div");
+  toast.className = `toast-message alert alert-${type}`;
+  toast.textContent = message;
+  toast.style.padding = "15px 20px";
+  toast.style.borderRadius = "8px";
+  toast.style.boxShadow = "0 4px 10px rgba(0, 0, 0, 0.2)";
+  toast.style.color = "#fff";
+  toast.style.fontWeight = "bold";
+  toast.style.opacity = "0";
+  toast.style.transform = "translateY(-20px)";
+  toast.style.transition = "opacity 0.3s ease, transform 0.3s ease";
+
+  const colors = {
+    success: "#4CAF50",
+    error: "#F44336",
+    warning: "#FFC107",
+    info: "#2196F3"
+  };
+  toast.style.backgroundColor = colors[type] || "#333";
+  
+  toastContainer.appendChild(toast);
+
+  setTimeout(() => {
+    toast.style.opacity = "1";
+    toast.style.transform = "translateY(0)";
+  }, 100);
+  
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateY(-20px)";
+    setTimeout(() => toast.remove(), 300);
+  }, 5000);
+}
+
+async function marcarRecebida(id) {
+  try {
+    const response = await fetch(`/api/receitas/${id}/receber`, { method: "POST" });
+    if (!response.ok) throw new Error("Erro ao marcar receita como recebida");
+    showMessage("Receita marcada como recebida com sucesso!", "success");
+    await loadReceitas();
+  } catch (error) {
+    console.error(`Erro ao marcar receita como recebida: ${error.message}`);
+    showMessage("Erro ao marcar receita como recebida.", "error");
+  }
+}
+
 async function saveReceita(receita) {
   try {
+    if (!receita.descricao || !receita.valor || !receita.data) {
+      console.error("Dados obrigatórios ausentes:", receita);
+      alert("Por favor, preencha todos os campos obrigatórios.");
+      return;
+    }
+
     const method = receita.id ? "PUT" : "POST";
     const endpoint = receita.id ? `/api/receitas/${receita.id}` : "/api/receitas";
     const response = await fetch(endpoint, {
@@ -157,9 +162,16 @@ async function saveReceita(receita) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(receita),
     });
-    if (!response.ok) throw new Error("Erro ao salvar receita");
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Erro na API: ${response.statusText} - ${errorText}`);
+    }
+
+    showMessage("Receita salva com sucesso!", "success");
   } catch (error) {
     console.error(`Erro ao salvar receita: ${error.message}`);
+    showMessage("Erro ao salvar receita.", "error");
   }
 }
 
@@ -167,9 +179,11 @@ async function deleteReceita(id) {
   try {
     const response = await fetch(`/api/receitas/${id}`, { method: "DELETE" });
     if (!response.ok) throw new Error("Erro ao excluir receita");
+    showMessage("Receita excluída com sucesso!", "error");
     await loadReceitas();
   } catch (error) {
     console.error(`Erro ao excluir receita: ${error.message}`);
+    showMessage("Erro ao excluir receita.", "error");
   }
 }
 
@@ -181,17 +195,26 @@ function editReceita(id) {
 }
 
 function getFormData() {
+  const descricao = document.getElementById("descricao")?.value.trim();
+  const valor = parseFloat(document.getElementById("valor")?.value);
+  const data = document.getElementById("data")?.value;
+
+  if (!descricao || isNaN(valor) || !data) {
+    console.error("Dados inválidos no formulário:", { descricao, valor, data });
+    return {};
+  }
+
   return {
     id: document.getElementById("receitaForm").dataset.id || null,
-    descricao: document.getElementById("descricao").value,
-    valor: parseFloat(document.getElementById("valor").value),
-    data: document.getElementById("data").value,
-    categoria: document.getElementById("categoria").value,
-    fonte: document.getElementById("fonte").value,
-    forma_recebimento: document.getElementById("forma_recebimento").value,
-    conta_bancaria: document.getElementById("conta_bancaria").value,
-    recorrente: document.getElementById("recorrente").checked,
-    intervalo_recorrencia: document.getElementById("intervalo_recorrencia").value || null,
+    descricao,
+    valor,
+    data,
+    categoria: document.getElementById("categoria")?.value || null,
+    fonte: document.getElementById("fonte")?.value || null,
+    forma_recebimento: document.getElementById("forma_recebimento")?.value || null,
+    conta_bancaria: document.getElementById("conta_bancaria")?.value || null,
+    recorrente: document.getElementById("recorrente")?.checked || false,
+    intervalo_recorrencia: document.getElementById("intervalo_recorrencia")?.value || null,
   };
 }
 
@@ -224,14 +247,9 @@ function exportarPDF() {
   console.log(totalReceita);
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
-  doc.text("Histórico de Receitas Recebidas", 10, 10);
+  doc.text("Receitas", 10, 10);
   doc.autoTable({
-    html: "#historicoTable",
-    didDrawPage: (data) => {
-      // Adicionar o total recebido no final da página
-      const pageHeight = doc.internal.pageSize.height;
-      doc.text(`Total Receita: R$ ${totalReceita.toFixed(2)}`, 10, pageHeight - 10);
-    },
+    html: "#receitasTable",
   });
-  doc.save("historico_receitas.pdf");
+  doc.save("receitas.pdf");
 }

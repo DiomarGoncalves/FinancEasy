@@ -1,4 +1,4 @@
-let totalGasto = 0;
+let totalrecebido = 0;
 
 document.addEventListener("DOMContentLoaded", async () => {
   try {
@@ -33,7 +33,7 @@ async function fetchHistoricoReceitas() {
 
 async function fetchHistoricoReceitasFiltradas(filtros) {
   try {
-    const response = await fetch("/api/historico-receita/filtrar", {
+    const response = await fetch("/api/historico-receitas/filtrar", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(filtros),
@@ -63,12 +63,12 @@ function renderHistorico(historico) {
       <td>${receitas.forma_recebimento}</td>
     `;
     tableBody.appendChild(row); // Adicionar linha à tabela
-    totalGasto += receitas.valor;
+    totalrecebido += receitas.valor;
   });
 
   document.getElementById(
     "totalGasto"
-  ).innerText = `Total Gasto: R$ ${totalGasto.toFixed(2)}`;
+  ).innerText = `Total Gasto: R$ ${totalrecebido.toFixed(2)}`;
 }
 
 function exportarPDF() {

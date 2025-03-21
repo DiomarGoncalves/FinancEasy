@@ -8,6 +8,10 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+      rel="stylesheet"
+    />
 
     <style>
       tr {
@@ -218,6 +222,28 @@
           id="reservas-list"
           class="space-y-2 bg-gray-700 p-4 rounded-lg"
         ></ul>
+
+        <table id="reserveTable" class="table-auto w-full text-white">
+          <thead>
+            <tr class="bg-gray-700">
+              <th class="p-1 mobile">Descrição</th>
+              <th class="p-1 mobile">Valor</th>
+              <th class="p-1 mobile">Data</th>
+              <th class="p-1 mobile">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Reservas serão exibidas aqui -->
+          </tbody>
+        </table>
+
+        <div
+          id="alertMessage"
+          class="alert bg-yellow-500 text-black text-center p-4 mt-4 rounded-lg"
+          style="display: none"
+        >
+          Nenhuma reserva cadastrada.
+        </div>
 
         <div class="flex justify-between items-center mt-6">
           <button

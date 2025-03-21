@@ -52,8 +52,11 @@ document.addEventListener('DOMContentLoaded', () => {
         URL.revokeObjectURL(url);
     }
 
-    function loadReservas() {
-        window.controle.getReservas().then(reservas => {
+    async function loadReservas() {
+        try {
+            const response = await fetch('/api/reservas');
+            if (!response.ok) throw new Error('Erro ao carregar reservas');
+            const reservas = await response.json();
             reservasList.innerHTML = '';
             let totalReservas = 0;
             reservas.forEach(reserva => {
@@ -71,11 +74,16 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             updateProgresso(totalReservas);
             addEventListeners();
-        });
+        } catch (error) {
+            console.error('Erro ao carregar reservas:', error);
+        }
     }
 
-    function updateProgresso(totalReservas) {
-        window.controle.getObjetivo().then(objetivo => {
+    async function updateProgresso(totalReservas) {
+        try {
+            const response = await fetch('/api/objetivo');
+            if (!response.ok) throw new Error('Erro ao carregar objetivo');
+            const objetivo = await response.json();
             if (objetivo) {
                 const progresso = (totalReservas / objetivo.valor) * 100;
                 progressoBar.style.width = `${progresso}%`;
@@ -86,7 +94,41 @@ document.addEventListener('DOMContentLoaded', () => {
                     showMessage('Parabéns! Você atingiu seu objetivo de poupança!', 'success');
                 }
             }
+        } catch (error) {
+            console.error('Erro ao carregar objetivo:', error);
+        }
+    }
+
+    async function addReserva(reserva) {
+        const response = await fetch('/api/reservas', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(reserva),
         });
+        if (!response.ok) throw new Error('Erro ao adicionar reserva');
+    }
+
+    async function updateReserva(reserva) {
+        const response = await fetch(`/api/reservas/${reserva.id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(reserva),
+        });
+        if (!response.ok) throw new Error('Erro ao atualizar reserva');
+    }
+
+    async function deleteReserva(id) {
+        const response = await fetch(`/api/reservas/${id}`, { method: 'DELETE' });
+        if (!response.ok) throw new Error('Erro ao excluir reserva');
+    }
+
+    async function setObjetivo(objetivo) {
+        const response = await fetch('/api/objetivo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(objetivo),
+        });
+        if (!response.ok) throw new Error('Erro ao definir objetivo');
     }
 
     function calcularSimulacao(valorInicial, taxa, periodo) {
@@ -96,15 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
             valorFinal += valorFinal * taxaMensal;
         }
         return valorFinal.toFixed(2);
-    }
-
-    function showNotificacao(mensagem, tipo) {
-        notificacao.textContent = mensagem;
-        notificacao.className = `fixed top-4 right-4 p-4 rounded-lg ${tipo === 'success' ? 'bg-green-500' : 'bg-red-500'} text-white`;
-        setTimeout(() => {
-            notificacao.textContent = '';
-            notificacao.className = '';
-        }, 3000);
     }
 
     function showMessage(message, type) {
@@ -162,25 +195,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function addEventListeners() {
         document.querySelectorAll('.editar-reserva').forEach(button => {
-            button.addEventListener('click', (event) => {
+            button.addEventListener('click', async (event) => {
                 const id = event.target.dataset.id;
-                window.controle.getReservas().then(reservas => {
-                    const reserva = reservas.find(r => r.id == id);
+                try {
+                    const response = await fetch(`/api/reservas/${id}`);
+                    if (!response.ok) throw new Error('Erro ao carregar reserva');
+                    const reserva = await response.json();
                     descricaoInput.value = reserva.descricao;
                     valorInput.value = reserva.valor;
                     dataInput.value = reserva.data;
                     addReservaForm.dataset.id = id;
-                });
+                } catch (error) {
+                    console.error('Erro ao carregar reserva:', error);
+                }
             });
         });
 
         document.querySelectorAll('.excluir-reserva').forEach(button => {
-            button.addEventListener('click', (event) => {
+            button.addEventListener('click', async (event) => {
                 const id = event.target.dataset.id;
-                window.controle.deleteReserva(id).then(() => {
+                try {
+                    await deleteReserva(id);
                     loadReservas();
                     showMessage('Reserva excluída com sucesso!', 'success');
-                });
+                } catch (error) {
+                    console.error('Erro ao excluir reserva:', error);
+                }
             });
         });
 
@@ -213,55 +253,58 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    addReservaForm.addEventListener('submit', (event) => {
+    addReservaForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const reserva = {
             descricao: descricaoInput.value,
             valor: parseFloat(valorInput.value),
-            data: dataInput.value
+            data: dataInput.value,
         };
         const id = addReservaForm.dataset.id;
-        if (id) {
-            reserva.id = id;
-            window.controle.updateReserva(reserva).then(() => {
-                loadReservas();
-                addReservaForm.reset();
-                addReservaForm.removeAttribute('data-id');
+        try {
+            if (id) {
+                reserva.id = id;
+                await updateReserva(reserva);
                 showMessage('Reserva atualizada com sucesso!', 'success');
-            });
-        } else {
-            window.controle.addReserva(reserva).then(() => {
-                loadReservas();
-                addReservaForm.reset();
+            } else {
+                await addReserva(reserva);
                 showMessage('Reserva adicionada com sucesso!', 'success');
-            });
+            }
+            loadReservas();
+            addReservaForm.reset();
+            addReservaForm.removeAttribute('data-id');
+        } catch (error) {
+            console.error('Erro ao salvar reserva:', error);
         }
     });
 
-    setObjetivoForm.addEventListener('submit', (event) => {
+    setObjetivoForm.addEventListener('submit', async (event) => {
         event.preventDefault();
-        const objetivo = {
-            valor: parseFloat(objetivoInput.value)
-        };
-        window.controle.setObjetivo(objetivo).then(() => {
+        const objetivo = { valor: parseFloat(objetivoInput.value) };
+        try {
+            await setObjetivo(objetivo);
             loadReservas();
             setObjetivoForm.reset();
             showMessage('Objetivo definido com sucesso!', 'success');
-        });
+        } catch (error) {
+            console.error('Erro ao definir objetivo:', error);
+        }
     });
 
-    simulacaoForm.addEventListener('submit', (event) => {
+    simulacaoForm.addEventListener('submit', async (event) => {
         event.preventDefault();
         const taxa = parseFloat(taxaInput.value);
         const periodo = parseInt(periodoInput.value);
-        window.controle.getReservas().then(reservas => {
-            let totalReservas = 0;
-            reservas.forEach(reserva => {
-                totalReservas += reserva.valor;
-            });
+        try {
+            const response = await fetch('/api/reservas');
+            if (!response.ok) throw new Error('Erro ao carregar reservas');
+            const reservas = await response.json();
+            let totalReservas = reservas.reduce((total, reserva) => total + reserva.valor, 0);
             const valorFinal = calcularSimulacao(totalReservas, taxa, periodo);
             resultadoSimulacao.textContent = `Valor após ${periodo} meses: R$ ${valorFinal}`;
-        });
+        } catch (error) {
+            console.error('Erro ao calcular simulação:', error);
+        }
     });
 
     loadReservas();
