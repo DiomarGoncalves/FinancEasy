@@ -67,9 +67,11 @@ document.addEventListener('DOMContentLoaded', async (event) => {
         document.getElementById('tema').value = config.tema;
         document.getElementById('notificacoes').value = config.notificacoes;
         document.getElementById('limiteGastos').value = config.limiteGastos || 0;
-        document.getElementById('dbPath').value = config.dbPath || 'C:\\Users\\User\\AppData\\Local\\FinancEasy';
+        document.getElementById('dbPath').value = config.dbPath || 'C:\\Users\\User\\AppData\\Local\\FinancEasyV2';
         document.getElementById('ipServidor').value = config.ipServidor || '127.0.0.1';
         document.getElementById('portaServidor').value = config.portaServidor || 3050;
+
+        atualizarEstadoBotaoNotificacao(config.notificacoes);
     } catch (error) {
         showMessage(`Erro ao carregar configurações: ${error.message}`, 'danger');
     }
@@ -166,6 +168,26 @@ document.getElementById('executarSql').addEventListener('click', async () => {
         showMessage(`Erro ao executar atualização SQL: ${error.message}`, 'danger');
     }
 });
+
+document.getElementById('notificacoes').addEventListener('click', async () => {
+    try {
+        const config = await window.controle.loadConfig();
+        const novaConfiguracao = config.notificacoes === "ativadas" ? "desativadas" : "ativadas";
+        await window.controle.saveConfig({ notificacoes: novaConfiguracao });
+        atualizarEstadoBotaoNotificacao(novaConfiguracao);
+        showMessage(`Notificações ${novaConfiguracao === "ativadas" ? "ativadas" : "desativadas"} com sucesso!`, 'success');
+    } catch (error) {
+        showMessage(`Erro ao atualizar configuração de notificações: ${error.message}`, 'danger');
+    }
+});
+
+function atualizarEstadoBotaoNotificacao(estado) {
+    const notificacoesBtn = document.getElementById('notificacoes');
+    notificacoesBtn.textContent = estado === "ativadas" ? "Desativar Notificações" : "Ativar Notificações";
+    notificacoesBtn.className = estado === "ativadas" 
+        ? "bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg"
+        : "bg-green-500 hover:bg-green-600 text-white p-2 rounded-lg";
+}
 
 async function loadReceitas() {
     try {

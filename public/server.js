@@ -977,6 +977,23 @@ app.post("/api/objetivo", (req, res) => {
   });
 });
 
+// Rota para verificar despesas próximas do vencimento
+app.get("/api/notificacoes/vencimentos", (req, res) => {
+  const sql = `
+    SELECT * FROM despesas
+    WHERE DATE(data) BETWEEN DATE('now') AND DATE('now', '+3 days')
+  `;
+
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      console.error("Erro ao buscar despesas próximas do vencimento:", err);
+      res.status(500).json({ error: "Erro ao buscar despesas próximas do vencimento" });
+    } else {
+      res.json(rows);
+    }
+  });
+});
+
 // Rota para servir qualquer página HTML dentro da pasta "pages"
 app.get("/pages/:folder/:file", (req, res) => {
   const { folder, file } = req.params;

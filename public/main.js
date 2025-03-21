@@ -67,10 +67,13 @@ app.whenReady().then(() => {
   // Verificar e criar o arquivo de configuração se não existir
   if (!fs.existsSync(configPath)) {
     const defaultConfig = {
-      tema: "escuro",
-      notificacoes: "ativadas",
-      ipServidor: "127.0.0.1",
-      portaServidor: 3050,
+      tema:"escuro",
+      notificacoes:"ativadas",
+      limiteGastos:"0",
+      senha:"admin",
+      ipServidor:"127.0.0.1",
+      portaServidor:3050,
+      novaSenha:"",
     };
     fs.writeFileSync(configPath, JSON.stringify(defaultConfig));
   }
@@ -83,10 +86,13 @@ function loadConfig() {
     return JSON.parse(data);
   } catch (error) {
     return {
-      tema: "escuro",
-      notificacoes: "ativadas",
-      ipServidor: "127.0.0.1",
-      portaServidor: 3050,
+      tema:"escuro",
+      notificacoes:"ativadas",
+      limiteGastos:"0",
+      senha:"admin",
+      ipServidor:"127.0.0.1",
+      portaServidor:3050,
+      novaSenha:"",
     }; // Configurações padrão
   }
 }
