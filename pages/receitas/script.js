@@ -92,7 +92,7 @@ async function loadReceitas(filtros = {}) {
 }
 
 function renderHistorico(historico) {
-  const tableBody = document.getElementById("historicoTableBody");
+  const tableBody = document.getElementById("receitasTable");
   if (!tableBody) {
     console.error("Elemento 'historicoTableBody' não encontrado.");
     return;
