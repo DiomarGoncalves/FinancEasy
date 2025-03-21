@@ -327,6 +327,11 @@ app.post("/api/receitas", (req, res) => {
     intervalo_recorrencia,
   } = req.body;
 
+  if (!descricao || !valor || !data) {
+    console.error("Dados inválidos recebidos:", req.body);
+    return res.status(400).json({ error: "Dados inválidos" });
+  }
+
   const sql = `INSERT INTO receitas (descricao, valor, data, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia) 
                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 

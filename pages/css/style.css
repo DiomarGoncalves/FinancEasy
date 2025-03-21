@@ -125,5 +125,115 @@ body.dark-mode {
     #order-table th, #order-table td {
       padding: 5px;
     }
-  }
+
+    .container {
+      padding: 1rem;
+    }
   
+    h1, h2, h3 {
+      font-size: 1.5rem;
+      text-align: center;
+    }
+  
+    .btn {
+      font-size: 0.875rem;
+      padding: 0.5rem 1rem;
+    }
+  
+    table {
+      font-size: 0.75rem;
+    }
+  
+    table th, table td {
+      padding: 0.5rem;
+    }
+  
+    .form-group {
+      margin-bottom: 1rem;
+    }
+  
+    input, select, textarea, button {
+      font-size: 0.875rem;
+      padding: 0.5rem;
+    }
+  
+    .mobile {
+      font-size: 0.75rem;
+      padding: 0.25rem;
+    }
+  
+    .navbar ul {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+  
+    .navbar a {
+      font-size: 0.875rem;
+    }
+
+    /* Ajustes para tabelas em dispositivos móveis */
+    table {
+      font-size: 0.75rem;
+      width: 100%;
+    }
+
+    table th, table td {
+      padding: 0.5rem;
+      text-align: left;
+    }
+
+    table thead {
+      display: none; /* Esconde o cabeçalho da tabela */
+    }
+
+    table tr {
+      display: block;
+      margin-bottom: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      padding: 0.5rem;
+    }
+
+    table td {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+    }
+
+    table td::before {
+      content: attr(data-label);
+      font-weight: bold;
+      color: #ccc;
+      margin-right: 0.5rem;
+    }
+  }
+
+  /* Ajustes para telas muito pequenas (ex.: smartphones) */
+  @media (max-width: 480px) {
+    .container {
+      padding: 0.5rem;
+    }
+  
+    h1, h2, h3 {
+      font-size: 1.25rem;
+    }
+  
+    .btn {
+      font-size: 0.75rem;
+      padding: 0.5rem;
+    }
+  
+    table {
+      font-size: 0.625rem;
+    }
+  
+    input, select, textarea, button {
+      font-size: 0.75rem;
+      padding: 0.25rem;
+    }
+  
+    .mobile {
+      font-size: 0.625rem;
+      padding: 0.25rem;
+    }
+  }

@@ -44,13 +44,48 @@
         scrollbar-width: thin;
         scrollbar-color: #4a5568 #2d3748;
       }
+
+      /* Ajustes para responsividade */
+      @media (max-width: 768px) {
+        .home-container {
+          padding: 1rem;
+          max-width: 250px;
+        }
+        .text-3xl {
+          font-size: 1.5rem;
+        }
+
+        h1 {
+          font-size: 1.5rem;
+        }
+
+        .btn {
+          font-size: 0.875rem;
+          padding: 0.5rem 1rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .home-container {
+          padding: 0.5rem;
+        }
+
+        h1 {
+          font-size: 1.25rem;
+        }
+
+        .btn {
+          font-size: 0.75rem;
+          padding: 0.5rem;
+        }
+      }
     </style>
   </head>
   <body
     class="bg-gray-900 text-white min-h-screen flex items-center justify-center"
   >
     <div
-      class="home-container bg-gray-800 rounded-3xl shadow-2xl p-6 text-center max-w-lg"
+      class="home-container bg-gray-800 rounded-3xl shadow-2xl p-6 text-center max-w-lg w-full"
     >
       <h1 class="text-3xl font-extrabold text-purple-300 mb-6">
         FinancEasy - Controle Financeiro

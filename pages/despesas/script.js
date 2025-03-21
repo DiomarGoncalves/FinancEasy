@@ -234,7 +234,7 @@ async function deleteDespesa(id) {
     const response = await fetch(`/api/despesas/${id}`, { method: "DELETE" });
     if (response.ok) {
       loadDespesas(); // Atualizar a lista de despesas
-      showMessage("Despesa excluída com sucesso!", "success");
+      showMessage("Despesa excluída com sucesso!", "error");
     } else {
       throw new Error("Erro ao excluir despesa");
     }
