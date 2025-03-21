@@ -81,8 +81,8 @@ async function loadCartoes() {
         <td class="p-1 mobile">${cartao.limite_gasto || 0}</td>
         <td class="p-1 mobile">${cartao.limite_disponivel || 0}</td>
         <td class="p-1 mobile">
-          <button class="btn btn-warning btn-sm" onclick="showEditModal(${cartao.id}, '${cartao.nome}', '${cartao.banco}', ${cartao.limite})">Editar</button>
-          <button class="btn btn-danger btn-sm" onclick="deleteCartao(${cartao.id})">Excluir</button>
+          <button class="btn btn-warning btn-sm bg-green-600 hover:bg-green-700" onclick="showEditModal(${cartao.id}, '${cartao.nome}', '${cartao.banco}', ${cartao.limite})">Editar</button>
+          <button class="btn btn-danger btn-sm bg-red-600 hover:bg-red-700" onclick="deleteCartao(${cartao.id})">Excluir</button>
         </td>
       `;
       tableBody.appendChild(row);

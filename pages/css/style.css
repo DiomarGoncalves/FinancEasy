@@ -158,7 +158,7 @@ body.dark-mode {
     }
   
     .mobile {
-      font-size: 0.75rem;
+      font-size: 50px;
       padding: 0.25rem;
     }
   
@@ -232,8 +232,8 @@ body.dark-mode {
       padding: 0.25rem;
     }
   
-    .mobile {
-      font-size: 0.625rem;
+    .mobile, td {
+      font-size: 0.99rem;
       padding: 0.25rem;
     }
   }

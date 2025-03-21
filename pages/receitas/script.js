@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     filtroForm.addEventListener("submit", async (event) => {
       event.preventDefault();
       const filtros = getFiltroData();
-      await loadReceitas(filtros);
+      await filtrarReceitas(filtros);
     });
 
     document.getElementById("exportar").addEventListener("click", () => {
@@ -57,6 +57,32 @@ async function loadReceitas(filtros = {}) {
     renderReceitas(receitas);
   } catch (error) {
     console.error(`Erro ao carregar receitas: ${error.message}`);
+  }
+}
+
+async function filtrarReceitas(filtros) {
+  try {
+    const response = await fetch("/api/receitas/filtrar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(filtros),
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Erro na API: ${response.statusText} - ${errorText}`);
+    }
+
+    const receitas = await response.json();
+
+    if (!Array.isArray(receitas)) {
+      throw new Error("A resposta da API não é um array.");
+    }
+
+    renderReceitas(receitas);
+  } catch (error) {
+    console.error(`Erro ao filtrar receitas: ${error.message}`);
+    showMessage("Erro ao filtrar receitas.", "error");
   }
 }
 

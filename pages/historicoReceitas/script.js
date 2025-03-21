@@ -1,4 +1,4 @@
-let totalrecebido = 0;
+let totalRecebido = 0;
 
 document.addEventListener("DOMContentLoaded", async () => {
   try {
@@ -7,6 +7,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     document.getElementById("filtrar").addEventListener("click", async () => {
       const mes = document.getElementById("mes").value;
+      if (!mes) {
+        alert("Por favor, selecione um mês para filtrar.");
+        return;
+      }
       const filtros = { dataInicio: `${mes}-01`, dataFim: `${mes}-31` };
       const historicoFiltrado = await fetchHistoricoReceitasFiltradas(filtros);
       renderHistorico(historicoFiltrado);
@@ -16,17 +20,17 @@ document.addEventListener("DOMContentLoaded", async () => {
       exportarPDF();
     });
   } catch (error) {
-    console.error(`Erro ao carregar histórico de Receita: ${error.message}`);
+    console.error(`Erro ao carregar histórico de receitas: ${error.message}`);
   }
 });
 
 async function fetchHistoricoReceitas() {
   try {
     const response = await fetch("/api/historico-receitas");
-    if (!response.ok) throw new Error("Erro ao buscar histórico de Receita");
+    if (!response.ok) throw new Error("Erro ao buscar histórico de receitas");
     return await response.json();
   } catch (error) {
-    console.error(`Erro ao buscar histórico de Receita: ${error.message}`);
+    console.error(`Erro ao buscar histórico de receitas: ${error.message}`);
     return [];
   }
 }
@@ -38,10 +42,10 @@ async function fetchHistoricoReceitasFiltradas(filtros) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(filtros),
     });
-    if (!response.ok) throw new Error("Erro ao filtrar histórico de Receita");
+    if (!response.ok) throw new Error("Erro ao filtrar histórico de receitas");
     return await response.json();
   } catch (error) {
-    console.error(`Erro ao filtrar histórico de Receita: ${error.message}`);
+    console.error(`Erro ao filtrar histórico de receitas: ${error.message}`);
     return [];
   }
 }
@@ -49,39 +53,43 @@ async function fetchHistoricoReceitasFiltradas(filtros) {
 function renderHistorico(historico) {
   const tableBody = document.getElementById("historicoTableBody");
   tableBody.innerHTML = ""; // Limpar tabela
-  totalGasto = 0;
+  totalRecebido = 0;
 
-  historico.forEach((receitas) => {
+  if (historico.length === 0) {
+    tableBody.innerHTML = `<tr><td colspan="7" class="text-center">Nenhuma receita encontrada.</td></tr>`;
+    document.getElementById("totalRecebido").innerText = `Total Recebido: R$ 0,00`;
+    return;
+  }
+
+  historico.forEach((receita) => {
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td>${receitas.data_recebimento}</td>
-      <td>${receitas.data}</td>
-      <td>${receitas.descricao}</td>
-      <td>R$ ${receitas.valor.toFixed(2)}</td>
-      <td>${receitas.categoria}</td>
-      <td>${receitas.conta_bancaria}</td>
-      <td>${receitas.forma_recebimento}</td>
+      <td>${receita.data_recebimento || "-"}</td>
+      <td>${receita.data || "-"}</td>
+      <td>${receita.descricao}</td>
+      <td>R$ ${receita.valor.toFixed(2)}</td>
+      <td>${receita.categoria || "-"}</td>
+      <td>${receita.conta_bancaria || "-"}</td>
+      <td>${receita.forma_recebimento || "-"}</td>
     `;
-    tableBody.appendChild(row); // Adicionar linha à tabela
-    totalrecebido += receitas.valor;
+    tableBody.appendChild(row);
+    totalRecebido += receita.valor;
   });
 
   document.getElementById(
-    "totalGasto"
-  ).innerText = `Total Gasto: R$ ${totalrecebido.toFixed(2)}`;
+    "totalRecebido"
+  ).innerText = `Total Recebido: R$ ${totalRecebido.toFixed(2)}`;
 }
 
 function exportarPDF() {
-  console.log(totalGasto);
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
-  doc.text("Histórico de Receita Pagas", 10, 10);
+  doc.text("Histórico de Receitas Recebidas", 10, 10);
   doc.autoTable({
     html: "#historicoTable",
     didDrawPage: (data) => {
-      // Adicionar o total gasto no final da página
       const pageHeight = doc.internal.pageSize.height;
-      doc.text(`Total Gasto: R$ ${totalGasto.toFixed(2)}`, 10, pageHeight - 10);
+      doc.text(`Total Recebido: R$ ${totalRecebido.toFixed(2)}`, 10, pageHeight - 10);
     },
   });
   doc.save("historico_receitas.pdf");

@@ -719,35 +719,34 @@ app.get("/api/historico-receitas", (req, res) => {
     }
   });
 });
-// Rota para filtrar o histórico de despesas
+// Rota para filtrar o histórico de receitas
 app.post("/api/historico-receitas/filtrar", (req, res) => {
   const { dataInicio, dataFim, nome } = req.body;
   let sql = `SELECT * FROM historico_receitas WHERE 1=1`;
   const params = [];
 
   if (dataInicio) {
-    sql += ` AND data_pagamento >= ?`;
+    sql += ` AND data_recebimento >= ?`; // Substituído data_pagamento por data_recebimento
     params.push(dataInicio);
   }
   if (dataFim) {
-    sql += ` AND data_pagamento <= ?`;
+    sql += ` AND data_recebimento <= ?`; // Substituído data_pagamento por data_recebimento
     params.push(dataFim);
   }
   if (nome) {
-    sql += ` AND estabelecimento LIKE ?`;
+    sql += ` AND descricao LIKE ?`;
     params.push(`%${nome}%`);
   }
 
   db.all(sql, params, (err, rows) => {
     if (err) {
-      console.error("Erro ao filtrar histórico de despesas:", err);
-      res.status(500).json({ error: "Erro ao filtrar histórico de despesas" });
+      console.error("Erro ao filtrar histórico de receitas:", err);
+      res.status(500).json({ error: "Erro ao filtrar histórico de receitas" });
     } else {
       res.json(rows);
     }
   });
 });
-
 
 // Rota para obter todas as contas bancárias
 app.get("/api/contas-bancarias", (req, res) => {
