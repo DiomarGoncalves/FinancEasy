@@ -56,10 +56,14 @@ app.get("/api/receitas", (req, res) => {
 
 // Rota para listar despesas
 app.get("/api/despesas", (req, res) => {
-  const sql = `SELECT * FROM despesas`;
+  const sql = `
+    SELECT d.*, c.nome AS cartao_nome 
+    FROM despesas d 
+    LEFT JOIN cartoes c ON d.cartao_id = c.id
+  `;
   db.all(sql, [], (err, rows) => {
     if (err) {
-      console.error("Erro ao buscar despesas:", err);
+      console.error("Erro ao buscar despesas:", err.message);
       res.status(500).json({ error: "Erro ao buscar despesas" });
     } else {
       res.json(rows);
@@ -169,26 +173,35 @@ app.delete("/api/despesas/:id", (req, res) => {
 
 // Rota para filtrar despesas
 app.post("/api/despesas/filtrar", (req, res) => {
-  const { dataInicio, dataFim, nome } = req.body;
-  let sql = `SELECT * FROM despesas WHERE 1=1`;
+  const { dataInicio, dataFim, nome, banco } = req.body;
+  let sql = `
+    SELECT d.*, c.nome AS cartao_nome, c.banco AS banco_nome 
+    FROM despesas d 
+    LEFT JOIN cartoes c ON d.cartao_id = c.id 
+    WHERE 1=1
+  `;
   const params = [];
 
   if (dataInicio) {
-    sql += ` AND data >= ?`;
+    sql += " AND d.data >= ?";
     params.push(dataInicio);
   }
   if (dataFim) {
-    sql += ` AND data <= ?`;
+    sql += " AND d.data <= ?";
     params.push(dataFim);
   }
   if (nome) {
-    sql += ` AND estabelecimento LIKE ?`;
+    sql += " AND d.estabelecimento LIKE ?";
     params.push(`%${nome}%`);
+  }
+  if (banco) {
+    sql += " AND c.banco = ?";
+    params.push(banco);
   }
 
   db.all(sql, params, (err, rows) => {
     if (err) {
-      console.error("Erro ao filtrar despesas:", err);
+      console.error("Erro ao filtrar despesas:", err.message);
       res.status(500).json({ error: "Erro ao filtrar despesas" });
     } else {
       res.json(rows);

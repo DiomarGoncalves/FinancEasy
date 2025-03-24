@@ -56,6 +56,27 @@ function resetFormAndUnlockInputs(form) {
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
+  const filtroBanco = document.getElementById("filtroBanco");
+
+  // Carregar opções de bancos no filtro
+  async function loadBancos() {
+    try {
+      const response = await fetch("/api/cartoes");
+      if (!response.ok) throw new Error("Erro ao carregar bancos");
+      const cartoes = await response.json();
+      const bancos = [...new Set(cartoes.map((cartao) => cartao.banco))];
+      filtroBanco.innerHTML = '<option value="">Todos os Bancos</option>';
+      bancos.forEach((banco) => {
+        const option = document.createElement("option");
+        option.value = banco;
+        option.textContent = banco;
+        filtroBanco.appendChild(option);
+      });
+    } catch (error) {
+      console.error("Erro ao carregar bancos:", error);
+    }
+  }
+
   try {
     const response = await fetch("/api/cartoes");
     const cartoes = await response.json();
@@ -144,33 +165,18 @@ document.addEventListener("DOMContentLoaded", async () => {
       resetFormAndUnlockInputs(event.target); // Resetar e desbloquear inputs
     });
 
-  document
-    .getElementById("filtroForm")
-    .addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const dataInicio = document.getElementById("filtroDataInicio").value;
-      const dataFim = document.getElementById("filtroDataFim").value;
-      const nome = document.getElementById("filtroNome").value;
+  document.getElementById("filtroForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const filtros = {
+      dataInicio: document.getElementById("filtroDataInicio").value,
+      dataFim: document.getElementById("filtroDataFim").value,
+      nome: document.getElementById("filtroNome").value,
+      banco: filtroBanco.value,
+    };
+    await filtrarDespesas(filtros);
+  });
 
-      const filtros = {
-        dataInicio: dataInicio || null,
-        dataFim: dataFim || null,
-        nome: nome || null,
-      };
-
-      try {
-        const response = await fetch("/api/despesas/filtrar", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(filtros),
-        });
-        const despesasFiltradas = await response.json();
-        renderDespesas(despesasFiltradas);
-      } catch (error) {
-        showMessage(`Erro ao filtrar despesas: ${error.message}`, "danger");
-      }
-    });
-
+  await loadBancos();
   loadDespesas();
 });
 
@@ -199,7 +205,7 @@ function renderDespesas(despesas) {
       <td>${despesa.numero_parcelas}</td>
       <td>${despesa.parcelas_restantes}</td>
       <td>R$ ${despesa.valor_parcela}</td>
-      <td>${despesa.cartao_id}</td>
+      <td>${despesa.cartao_nome || "-"}</td>
       <td colspan="1" class="text-center">
           <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md mr-2" onclick="payDespesa(${despesa.id})">
               <i class="fas fa-dollar-sign icon"></i> Pagar
@@ -241,6 +247,24 @@ async function deleteDespesa(id) {
   } catch (error) {
     console.error(`Erro ao excluir despesa: ${error.message}`);
     showMessage(`Erro ao excluir despesa: ${error.message}`, "danger");
+  }
+}
+
+async function filtrarDespesas(filtros) {
+  try {
+    const response = await fetch("/api/despesas/filtrar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(filtros),
+    });
+
+    if (!response.ok) throw new Error("Erro ao filtrar despesas");
+
+    const despesas = await response.json();
+    renderDespesas(despesas);
+  } catch (error) {
+    console.error("Erro ao filtrar despesas:", error);
+    showMessage(`Erro ao filtrar despesas: ${error.message}`, "error");
   }
 }
 

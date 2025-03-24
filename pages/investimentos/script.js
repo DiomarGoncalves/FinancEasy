@@ -68,7 +68,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     if (!response.ok) throw new Error("Erro ao salvar investimento");
   }
 
-  async function deleteInvestment(id) {
+  // Tornar deleteInvestment acessível globalmente
+  window.deleteInvestment = async function (id) {
     try {
       const response = await fetch(`/api/investimentos/${id}`, { method: "DELETE" });
       if (!response.ok) throw new Error("Erro ao excluir investimento");
@@ -79,7 +80,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       console.error("Erro ao excluir investimento:", error);
       showMessage("Erro ao excluir investimento.", "error");
     }
-  }
+  };
 
   function getFormData() {
     const nome_ativo = document.getElementById("assetName").value;

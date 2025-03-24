@@ -209,7 +209,7 @@ body.dark-mode {
   }
 
   /* Ajustes para telas muito pequenas (ex.: smartphones) */
-  @media (max-width: 480px) {
+  @media (max-width: 980px) {
     .container {
       padding: 0.5rem;
     }
