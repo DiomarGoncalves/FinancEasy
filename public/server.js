@@ -1007,6 +1007,48 @@ app.get("/api/notificacoes/vencimentos", (req, res) => {
   });
 });
 
+// Rota para registrar despesas parceladas
+app.post("/api/despesas/parceladas", (req, res) => {
+  const despesas = req.body;
+
+  const sql = `
+    INSERT INTO despesas (
+      estabelecimento, data, valor, forma_pagamento, 
+      numero_parcelas, parcelas_restantes, valor_parcela, cartao_id
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  const db = require("./database/db");
+  const promises = despesas.map((despesa) =>
+    new Promise((resolve, reject) => {
+      db.run(
+        sql,
+        [
+          despesa.estabelecimento,
+          despesa.data,
+          despesa.valor,
+          despesa.forma_pagamento,
+          despesa.numero_parcelas,
+          despesa.parcelas_restantes,
+          despesa.valor_parcela,
+          despesa.cartao_id,
+        ],
+        (err) => {
+          if (err) reject(err);
+          else resolve();
+        }
+      );
+    })
+  );
+
+  Promise.all(promises)
+    .then(() => res.status(201).json({ message: "Despesas parceladas registradas com sucesso!" }))
+    .catch((err) => {
+      console.error("Erro ao registrar despesas parceladas:", err.message);
+      res.status(500).json({ error: "Erro ao registrar despesas parceladas" });
+    });
+});
+
 // Rota para servir qualquer página HTML dentro da pasta "pages"
 app.get("/pages/:folder/:file", (req, res) => {
   const { folder, file } = req.params;

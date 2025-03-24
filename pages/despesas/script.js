@@ -108,62 +108,77 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     });
 
-  document
-    .getElementById("numero_parcelas")
-    .addEventListener("input", (event) => {
-      const valor = parseFloat(document.getElementById("valor").value);
-      const numeroParcelas = parseInt(event.target.value);
+  document.getElementById("numero_parcelas").addEventListener("input", (event) => {
+    const valor = parseFloat(document.getElementById("valor").value) || 0;
+    const numeroParcelas = parseInt(event.target.value) || 1;
+  
+    if (numeroParcelas > 0) {
       const valorParcela = valor / numeroParcelas;
       document.getElementById("valor_parcela").value = valorParcela.toFixed(2);
-    });
+    } else {
+      document.getElementById("valor_parcela").value = "0.00";
+    }
+  });
 
-  document
-    .getElementById("despesaForm")
-    .addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const estabelecimento = document.getElementById("estabelecimento").value;
-      const data = document.getElementById("data").value;
-      const valor = parseFloat(document.getElementById("valor").value);
-      let formaPagamento = document.getElementById("forma_pagamento").value;
-      if (formaPagamento === "Cartão de Crédito") {
-        formaPagamento = "Crédito";
-      }
-      const numeroParcelas =
-        formaPagamento === "Crédito"
-          ? parseInt(document.getElementById("numero_parcelas").value)
-          : 1;
-      const cartaoId =
-        formaPagamento === "Crédito"
-          ? parseInt(document.getElementById("cartao").value)
-          : null;
+  document.getElementById("despesaForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const estabelecimento = document.getElementById("estabelecimento").value;
+    const data = document.getElementById("data").value;
+    const valor = parseFloat(document.getElementById("valor").value);
+    let formaPagamento = document.getElementById("forma_pagamento").value;
 
-      const despesa = {
+    // Validação do campo forma_pagamento
+    const formasPermitidas = ["Crédito", "Débito", "Dinheiro", "Pix"];
+    if (!formasPermitidas.includes(formaPagamento)) {
+      showMessage("Forma de pagamento inválida!", "error");
+      return;
+    }
+
+    const numeroParcelas = formaPagamento === "Crédito" 
+      ? parseInt(document.getElementById("numero_parcelas").value) || 1 
+      : 1;
+    const valorParcela = formaPagamento === "Crédito" 
+      ? parseFloat(document.getElementById("valor_parcela").value) || valor 
+      : valor;
+    const cartaoId = formaPagamento === "Crédito" 
+      ? parseInt(document.getElementById("cartao").value) 
+      : null;
+  
+    const parcelas = [];
+    let dataParcela = new Date(data);
+  
+    for (let i = 0; i < numeroParcelas; i++) {
+      parcelas.push({
         estabelecimento,
-        data,
-        valor,
+        data: dataParcela.toISOString().split("T")[0],
+        valor: valorParcela,
         forma_pagamento: formaPagamento,
         numero_parcelas: numeroParcelas,
+        parcelas_restantes: numeroParcelas - i,
+        valor_parcela: valorParcela,
         cartao_id: cartaoId,
-      };
-
-      try {
-        const response = await fetch("/api/despesas", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(despesa),
-        });
-        if (response.ok) {
-          showMessage("Despesa registrada com sucesso!", "success");
-          loadDespesas();
-        } else {
-          throw new Error("Erro ao registrar despesa");
-        }
-      } catch (error) {
-        showMessage(`Erro ao registrar despesa: ${error.message}`, "danger");
+      });
+      dataParcela.setMonth(dataParcela.getMonth() + 1); // Avançar para o próximo mês
+    }
+  
+    try {
+      const response = await fetch("/api/despesas/parceladas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(parcelas),
+      });
+      if (response.ok) {
+        showMessage("Despesa parcelada registrada com sucesso!", "success");
+        loadDespesas();
+      } else {
+        throw new Error("Erro ao registrar despesa parcelada");
       }
-
-      resetFormAndUnlockInputs(event.target); // Resetar e desbloquear inputs
-    });
+    } catch (error) {
+      showMessage(`Erro ao registrar despesa parcelada: ${error.message}`, "danger");
+    }
+  
+    resetFormAndUnlockInputs(event.target);
+  });
 
   document.getElementById("filtroForm").addEventListener("submit", async (event) => {
     event.preventDefault();
