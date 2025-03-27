@@ -149,6 +149,29 @@ db.serialize(() => {
         id INTEGER PRIMARY KEY CHECK (id = 1),
         valor REAL NOT NULL
     )`);
+
+    // **Tabela de Comissões**
+    db.run(`CREATE TABLE IF NOT EXISTS comissoes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nf TEXT NOT NULL,
+        pedidoNectar TEXT NOT NULL,
+        notaNectar TEXT NOT NULL,
+        valorVenda REAL NOT NULL,
+        dataVenda TEXT NOT NULL,
+        recebido INTEGER DEFAULT 0
+    )`);
+
+    // **Tabela de Histórico de Comissões**
+    db.run(`CREATE TABLE IF NOT EXISTS historico_comissoes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nf TEXT NOT NULL,
+        pedidoNectar TEXT NOT NULL,
+        notaNectar TEXT NOT NULL,
+        valorVenda REAL NOT NULL,
+        dataVenda TEXT NOT NULL,
+        valorComissao REAL NOT NULL,
+        dataRecebimento TEXT NOT NULL
+    )`);
 });
 
 module.exports = db;

@@ -33,8 +33,11 @@ const PORT = config.portaServidor || 3050;
 // Middleware para JSON
 app.use(express.json());
 
-// Servir arquivos estáticos
-app.use(express.static(path.join(__dirname, "../pages")));
+// Servir arquivos estáticos da pasta "pages"
+app.use("/pages", express.static(path.join(__dirname, "../pages")));
+
+// Servir arquivos estáticos da pasta "public"
+app.use("/public", express.static(path.join(__dirname)));
 
 // Rota inicial para teste
 app.get("/", (req, res) => {
@@ -1047,6 +1050,181 @@ app.post("/api/despesas/parceladas", (req, res) => {
       console.error("Erro ao registrar despesas parceladas:", err.message);
       res.status(500).json({ error: "Erro ao registrar despesas parceladas" });
     });
+});
+
+// Rota para listar comissões pendentes
+app.get("/api/comissoes", (req, res) => {
+  const sql = `SELECT * FROM comissoes WHERE recebido = 0`;
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      console.error("Erro ao buscar comissões:", err);
+      res.status(500).json({ error: "Erro ao buscar comissões" });
+    } else {
+      res.json(rows);
+    }
+  });
+});
+
+// Rota para adicionar uma nova comissão
+app.post("/api/comissoes", (req, res) => {
+  const { nf, pedidoNectar, notaNectar, valorVenda, dataVenda } = req.body;
+  const sql = `INSERT INTO comissoes (nf, pedidoNectar, notaNectar, valorVenda, dataVenda, recebido) VALUES (?, ?, ?, ?, ?, 0)`;
+
+  db.run(sql, [nf, pedidoNectar, notaNectar, valorVenda, dataVenda], function (err) {
+    if (err) {
+      console.error("Erro ao adicionar comissão:", err);
+      res.status(500).json({ error: "Erro ao adicionar comissão" });
+    } else {
+      res.json({ id: this.lastID });
+    }
+  });
+});
+
+// Rota para marcar comissão como recebida
+app.put("/api/comissoes/:id/recebido", (req, res) => {
+  const { id } = req.params;
+  const sqlSelect = `SELECT * FROM comissoes WHERE id = ?`;
+  const sqlDelete = `DELETE FROM comissoes WHERE id = ?`;
+  const sqlInsertHistorico = `
+    INSERT INTO historico_comissoes (nf, pedidoNectar, notaNectar, valorVenda, dataVenda, valorComissao, dataRecebimento)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `;
+  const sqlInsertReceita = `
+    INSERT INTO receitas (descricao, data, valor, categoria, fonte, forma_recebimento, conta_bancaria)
+    VALUES (?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  db.get(sqlSelect, [id], (err, comissao) => {
+    if (err || !comissao) {
+      console.error("Erro ao buscar comissão:", err);
+      return res.status(500).json({ error: "Erro ao buscar comissão" });
+    }
+
+    const valorComissao = comissao.valorVenda * 0.025;
+    const dataRecebimento = new Date().toISOString().split("T")[0];
+    const descricaoReceita = `Comissão referente à venda NF-e: ${comissao.nf}`;
+
+    db.run(
+      sqlInsertHistorico,
+      [
+        comissao.nf,
+        comissao.pedidoNectar,
+        comissao.notaNectar,
+        comissao.valorVenda,
+        comissao.dataVenda,
+        valorComissao,
+        dataRecebimento,
+      ],
+      (err) => {
+        if (err) {
+          console.error("Erro ao inserir no histórico de comissões:", err);
+          return res.status(500).json({ error: "Erro ao inserir no histórico de comissões" });
+        }
+
+        db.run(
+          sqlInsertReceita,
+          [
+            descricaoReceita,
+            dataRecebimento,
+            valorComissao,
+            "Comissão",
+            "Venda",
+            "Transferência",
+            "Conta Corrente",
+          ],
+          (err) => {
+            if (err) {
+              console.error("Erro ao inserir receita:", err);
+              return res.status(500).json({ error: "Erro ao inserir receita" });
+            }
+
+            db.run(sqlDelete, [id], (err) => {
+              if (err) {
+                console.error("Erro ao excluir comissão:", err);
+                return res.status(500).json({ error: "Erro ao excluir comissão" });
+              }
+              res.json({ status: "success" });
+            });
+          }
+        );
+      }
+    );
+  });
+});
+
+// Rota para listar o histórico de comissões recebidas
+app.get("/api/comissoes/historico", (req, res) => {
+  const sql = `SELECT * FROM historico_comissoes`;
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      console.error("Erro ao buscar histórico de comissões:", err);
+      res.status(500).json({ error: "Erro ao buscar histórico de comissões" });
+    } else {
+      res.json(rows);
+    }
+  });
+});
+
+// Rota para filtrar o histórico de comissões por mês
+app.post("/api/comissoes/historico/filtrar", (req, res) => {
+  const { mes } = req.body;
+  const sql = `
+    SELECT * FROM historico_comissoes 
+    WHERE strftime('%Y-%m', dataRecebimento) = ?
+  `;
+  db.all(sql, [mes], (err, rows) => {
+    if (err) {
+      console.error("Erro ao filtrar histórico de comissões:", err);
+      res.status(500).json({ error: "Erro ao filtrar histórico de comissões" });
+    } else {
+      res.json(rows);
+    }
+  });
+});
+
+// Rota para excluir uma comissão
+app.delete("/api/comissoes/:id", (req, res) => {
+  const { id } = req.params;
+  const sql = `DELETE FROM comissoes WHERE id = ?`;
+
+  db.run(sql, [id], function (err) {
+    if (err) {
+      console.error("Erro ao excluir comissão:", err);
+      res.status(500).json({ error: "Erro ao excluir comissão" });
+    } else {
+      res.json({ changes: this.changes });
+    }
+  });
+});
+
+// Rota para listar o histórico de comissões recebidas
+app.get("/api/comissoes/historico", (req, res) => {
+  const sql = `SELECT * FROM comissoes WHERE recebido = 1`;
+  db.all(sql, [], (err, rows) => {
+    if (err) {
+      console.error("Erro ao buscar histórico de comissões:", err);
+      res.status(500).json({ error: "Erro ao buscar histórico de comissões" });
+    } else {
+      res.json(rows);
+    }
+  });
+});
+
+// Rota para filtrar o histórico de comissões por mês
+app.post("/api/comissoes/historico/filtrar", (req, res) => {
+  const { mes } = req.body;
+  const sql = `
+    SELECT * FROM comissoes 
+    WHERE recebido = 1 AND strftime('%Y-%m', dataVenda) = ?
+  `;
+  db.all(sql, [mes], (err, rows) => {
+    if (err) {
+      console.error("Erro ao filtrar histórico de comissões:", err);
+      res.status(500).json({ error: "Erro ao filtrar histórico de comissões" });
+    } else {
+      res.json(rows);
+    }
+  });
 });
 
 // Rota para servir qualquer página HTML dentro da pasta "pages"
