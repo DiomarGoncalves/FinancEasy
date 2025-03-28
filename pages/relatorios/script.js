@@ -625,3 +625,36 @@ function showMessage(message, type) {
     setTimeout(() => toast.remove(), 300);
   }, 3000);
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const exportarBtn = document.querySelector("#exportar");
+  const relatorioTable = document.querySelector("#relatorioTable");
+
+  // Exportar para PDF
+  exportarBtn.addEventListener("click", () => {
+    const doc = new jsPDF();
+    doc.autoTable({ html: relatorioTable });
+    doc.save("relatorio.pdf");
+  });
+
+  // Exemplo de gráfico
+  const ctx = document.getElementById("graficoRelatorio").getContext("2d");
+  new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels: ["Janeiro", "Fevereiro", "Março"],
+      datasets: [
+        {
+          label: "Despesas",
+          data: [500, 300, 400],
+          backgroundColor: "rgba(255, 99, 132, 0.5)",
+        },
+        {
+          label: "Receitas",
+          data: [700, 800, 600],
+          backgroundColor: "rgba(54, 162, 235, 0.5)",
+        },
+      ],
+    },
+  });
+});

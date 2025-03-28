@@ -18,6 +18,21 @@ document.addEventListener("DOMContentLoaded", async () => {
   } catch (error) {
     console.error(`Erro ao carregar histórico de despesas: ${error.message}`);
   }
+
+  const historicoTable = document.querySelector("#historicoTable");
+  const filtroForm = document.querySelector("#filtroForm");
+
+  // Filtrar histórico
+  filtroForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const dataInicio = document.querySelector("#dataInicio").value;
+    const dataFim = document.querySelector("#dataFim").value;
+
+    if (dataInicio && dataFim) {
+      console.log(`Filtrando de ${dataInicio} até ${dataFim}`);
+      // Adicione lógica de filtro aqui
+    }
+  });
 });
 
 async function fetchHistoricoDespesas() {

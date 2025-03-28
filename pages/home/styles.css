@@ -37,3 +37,16 @@ a{
 .btn-dark-custom:hover {
     background-color: #333;
 }
+
+.hidden {
+    display: none;
+}
+
+#modal-transacao {
+    z-index: 1000;
+}
+
+iframe {
+    border-radius: 10px;
+    overflow: hidden;
+}

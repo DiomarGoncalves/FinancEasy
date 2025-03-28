@@ -2,7 +2,8 @@ let totalReceita = 0;
 
 document.addEventListener("DOMContentLoaded", async () => {
   try {
-    const receitaForm = document.getElementById("receitaForm");
+    const receitasTable = document.querySelector("#receitasTable");
+    const receitaForm = document.querySelector("#receitaForm");
     const filtroForm = document.getElementById("filtroForm");
 
     if (!receitaForm || !filtroForm) {
@@ -18,6 +19,22 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!receita.descricao || !receita.valor || !receita.data) {
         alert("Por favor, preencha todos os campos obrigatórios.");
         return;
+      }
+
+      const descricao = document.querySelector("#descricao").value;
+      const valor = document.querySelector("#valor").value;
+      const data = document.querySelector("#data").value;
+
+      if (descricao && valor && data) {
+        const novaLinha = `
+          <tr>
+            <td>${descricao}</td>
+            <td>${valor}</td>
+            <td>${data}</td>
+          </tr>
+        `;
+        receitasTable.querySelector("tbody").insertAdjacentHTML("beforeend", novaLinha);
+        receitaForm.reset();
       }
 
       await saveReceita(receita);

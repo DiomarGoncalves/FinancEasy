@@ -43,131 +43,151 @@
       }
     </style>
   </head>
-  <body class="bg-gray-900 text-white">
-    <div class="container mx-auto mt-4 p-4">
-      <a
-        href="../home/home.html"
-        class="btn bg-purple-600 hover:bg-purple-500 text-white p-1 mobile rounded-lg mb-3 inline-block"
-      >
-        <i class="fas fa-home"></i> Voltar para a Home
-      </a>
-      <h1 class="text-3xl font-bold mb-4">📈 Controle de Investimentos</h1>
-
-      <div class="bg-gray-800 p-6 rounded-2xl shadow-lg mb-8">
-        <h2 class="text-2xl font-bold mb-4">➕ Adicionar Investimento</h2>
-        <form id="investmentForm">
-          <div class="mb-4">
-            <label for="assetName" class="block text-lg"
-              >🧑‍💼 Nome do Ativo</label
-            >
-            <select
-              id="assetName"
-              class="form-select bg-gray-700 text-white w-full p-3 rounded-lg"
-              required
-            >
-              <option value="Ação">📈 Ação</option>
-              <option value="FII">🏢 FII</option>
-              <option value="Cripto">💻 Criptomoeda</option>
-            </select>
-          </div>
-          <div class="mb-4">
-            <label for="quantity" class="block text-lg"
-              >🔢 Quantidade Adquirida</label
-            >
-            <input
-              type="number"
-              id="quantity"
-              class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
-              required
-            />
-          </div>
-          <div class="mb-4">
-            <label for="investmentValue" class="block text-lg"
-              >💸 Valor Investido</label
-            >
-            <input
-              type="number"
-              id="investmentValue"
-              class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
-              required
-            />
-          </div>
-          <div class="mb-4">
-            <label for="acquisitionDate" class="block text-lg"
-              >📅 Data de Aquisição</label
-            >
-            <input
-              type="date"
-              id="acquisitionDate"
-              class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
-              required
-            />
-          </div>
-          <div class="mb-4">
-            <label for="account" class="block text-lg"
-              >🏦 Conta de Origem</label
-            >
-            <input
-              type="text"
-              id="account"
-              class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
-              required
-            />
-          </div>
-          <div class="mb-4">
-            <label for="observations" class="block text-lg"
-              >💬 Observações (opcional)</label
-            >
-            <textarea
-              id="observations"
-              class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
-              rows="3"
-            ></textarea>
-          </div>
-          <button
-            type="submit"
-            class="btn bg-purple-600 hover:bg-purple-500 text-white p-1 mobile rounded-lg"
-          >
-            <i class="fas fa-plus-circle"></i> Adicionar Investimento
-          </button>
-        </form>
-      </div>
-
-      <div class="bg-gray-800 p-6 rounded-2xl shadow-lg">
-        <h2 class="text-2xl font-bold mb-4">💼 Lista de Investimentos</h2>
-        <table id="investmentTable" class="table-auto w-full text-white">
-          <thead>
-            <tr class="bg-gray-700">
-              <th class="p-1 mobile"><i class="fas fa-briefcase"></i> Ativo</th>
-              <th class="p-1 mobile"><i class="fas fa-cogs"></i> Quantidade</th>
-              <th class="p-1 mobile">
-                <i class="fas fa-dollar-sign"></i> Valor Investido
-              </th>
-              <th class="p-1 mobile">
-                <i class="fas fa-calendar-alt"></i> Data de Aquisição
-              </th>
-              <th class="p-1 mobile">
-                <i class="fas fa-university"></i> Conta de Origem
-              </th>
-              <th class="p-1 mobile">
-                <i class="fas fa-comment-dots"></i> Observações
-              </th>
-              <th class="p-1 mobile"><i class="fas fa-cogs"></i> Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Dados de investimentos serão exibidos aqui -->
-          </tbody>
-        </table>
-        <div
-          id="alertMessage"
-          class="alert bg-yellow-500 text-black text-center p-4 mt-4 rounded-lg"
-          style="display: none"
-        >
-          Nenhum investimento cadastrado.
+  <body class="bg-gray-900 text-white min-h-screen flex">
+    <nav class="sidebar">
+      <a href="/pages/home/home.html"><h2 class="text-purple-300 text-xl font-bold mb-4">FinancEasy</h2></a>
+  
+      <a href="/pages/cartao/cartoes.html">💳 Cartões</a>
+      <div class="dropdown">
+        <a href="#" class="text-white">📊 Transações</a>
+        <div class="dropdown-content">
+          <a href="/pages/despesas/despesas.html">📉 Despesas</a>
+          <a href="/pages/receitas/receitas.html">📈 Receitas</a>
         </div>
       </div>
-    </div>
+      <a href="/pages/investimentos/investimentos.html">📊 Investimentos</a>
+      <a href="/pages/comissao/comissao.html">💰 Comissões</a>
+      <a href="/pages/reservas/reservas.html">🏦 Reservas</a>
+      <a href="/pages/relatorios/relatorios.html">📋 Relatórios</a>
+      <a href="/pages/configuracao/configuracao.html">⚙️ Configuração</a>
+    </nav>
+
+    <main class="main-content ml-64 p-6">
+      <div class="container mx-auto mt-4 p-4">
+        <a
+          href="../home/home.html"
+          class="btn bg-purple-600 hover:bg-purple-500 text-white p-1 mobile rounded-lg mb-3 inline-block"
+        >
+          <i class="fas fa-home"></i> Voltar para a Home
+        </a>
+        <h1 class="text-3xl font-bold mb-4">📈 Controle de Investimentos</h1>
+
+        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg mb-8">
+          <h2 class="text-2xl font-bold mb-4">➕ Adicionar Investimento</h2>
+          <form id="investmentForm">
+            <div class="mb-4">
+              <label for="assetName" class="block text-lg"
+                >🧑‍💼 Nome do Ativo</label
+              >
+              <select
+                id="assetName"
+                class="form-select bg-gray-700 text-white w-full p-3 rounded-lg"
+                required
+              >
+                <option value="Ação">📈 Ação</option>
+                <option value="FII">🏢 FII</option>
+                <option value="Cripto">💻 Criptomoeda</option>
+              </select>
+            </div>
+            <div class="mb-4">
+              <label for="quantity" class="block text-lg"
+                >🔢 Quantidade Adquirida</label
+              >
+              <input
+                type="number"
+                id="quantity"
+                class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
+                required
+              />
+            </div>
+            <div class="mb-4">
+              <label for="investmentValue" class="block text-lg"
+                >💸 Valor Investido</label
+              >
+              <input
+                type="number"
+                id="investmentValue"
+                class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
+                required
+              />
+            </div>
+            <div class="mb-4">
+              <label for="acquisitionDate" class="block text-lg"
+                >📅 Data de Aquisição</label
+              >
+              <input
+                type="date"
+                id="acquisitionDate"
+                class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
+                required
+              />
+            </div>
+            <div class="mb-4">
+              <label for="account" class="block text-lg"
+                >🏦 Conta de Origem</label
+              >
+              <input
+                type="text"
+                id="account"
+                class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
+                required
+              />
+            </div>
+            <div class="mb-4">
+              <label for="observations" class="block text-lg"
+                >💬 Observações (opcional)</label
+              >
+              <textarea
+                id="observations"
+                class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
+                rows="3"
+              ></textarea>
+            </div>
+            <button
+              type="submit"
+              class="btn bg-purple-600 hover:bg-purple-500 text-white p-1 mobile rounded-lg"
+            >
+              <i class="fas fa-plus-circle"></i> Adicionar Investimento
+            </button>
+          </form>
+        </div>
+
+        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg">
+          <h2 class="text-2xl font-bold mb-4">💼 Lista de Investimentos</h2>
+          <table id="investmentTable" class="table-auto w-full text-white">
+            <thead>
+              <tr class="bg-gray-700">
+                <th class="p-1 mobile"><i class="fas fa-briefcase"></i> Ativo</th>
+                <th class="p-1 mobile"><i class="fas fa-cogs"></i> Quantidade</th>
+                <th class="p-1 mobile">
+                  <i class="fas fa-dollar-sign"></i> Valor Investido
+                </th>
+                <th class="p-1 mobile">
+                  <i class="fas fa-calendar-alt"></i> Data de Aquisição
+                </th>
+                <th class="p-1 mobile">
+                  <i class="fas fa-university"></i> Conta de Origem
+                </th>
+                <th class="p-1 mobile">
+                  <i class="fas fa-comment-dots"></i> Observações
+                </th>
+                <th class="p-1 mobile"><i class="fas fa-cogs"></i> Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Dados de investimentos serão exibidos aqui -->
+            </tbody>
+          </table>
+          <div
+            id="alertMessage"
+            class="alert bg-yellow-500 text-black text-center p-4 mt-4 rounded-lg"
+            style="display: none"
+          >
+            Nenhum investimento cadastrado.
+          </div>
+        </div>
+      </div>
+    </main>
 
     <script src="script.js"></script>
   </body>

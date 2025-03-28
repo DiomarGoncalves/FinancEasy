@@ -1,8 +1,17 @@
 const express = require("express");
-const db = require("./database/db");
+const sqlite3 = require("sqlite3").verbose();
+const { promisify } = require("util");
 const path = require("path");
 const fs = require("fs");
 const os = require("os"); // Adicionar importação do módulo 'os'
+
+// Configuração do banco de dados
+const db = new sqlite3.Database(path.join(__dirname, "database.db"));
+
+// Promisify para suportar métodos assíncronos
+db.getAsync = promisify(db.get);
+db.allAsync = promisify(db.all);
+db.runAsync = promisify(db.run);
 
 // Variável para configurar o IP da máquina
 
@@ -29,6 +38,92 @@ function loadConfig() {
 const config = loadConfig();
 const IP_MAQUINA = config.ipServidor || "127.0.0.1";
 const PORT = config.portaServidor || 3050;
+
+// Função para criar tabelas no banco de dados, se não existirem
+function initializeDatabase() {
+  const createReceitasTable = `
+    CREATE TABLE IF NOT EXISTS receitas (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      descricao TEXT NOT NULL,
+      valor REAL NOT NULL,
+      data TEXT NOT NULL,
+      categoria TEXT,
+      fonte TEXT,
+      forma_recebimento TEXT,
+      conta_bancaria TEXT,
+      recorrente INTEGER DEFAULT 0,
+      intervalo_recorrencia TEXT
+    );
+  `;
+
+  const createDespesasTable = `
+    CREATE TABLE IF NOT EXISTS despesas (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      estabelecimento TEXT NOT NULL,
+      data TEXT NOT NULL,
+      valor REAL NOT NULL,
+      forma_pagamento TEXT,
+      numero_parcelas INTEGER DEFAULT 1,
+      parcelas_restantes INTEGER DEFAULT 1,
+      valor_parcela REAL,
+      cartao_id INTEGER,
+      FOREIGN KEY (cartao_id) REFERENCES cartoes (id)
+    );
+  `;
+
+  const createCartoesTable = `
+    CREATE TABLE IF NOT EXISTS cartoes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      nome TEXT NOT NULL,
+      banco TEXT,
+      limite REAL,
+      vencimento TEXT
+    );
+  `;
+
+  const createHistoricoDespesasTable = `
+    CREATE TABLE IF NOT EXISTS historico_despesas (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      estabelecimento TEXT NOT NULL,
+      data TEXT NOT NULL,
+      valor REAL NOT NULL,
+      forma_pagamento TEXT,
+      numero_parcelas INTEGER,
+      parcelas_restantes INTEGER,
+      valor_parcela REAL,
+      cartao_id INTEGER,
+      data_pagamento TEXT,
+      FOREIGN KEY (cartao_id) REFERENCES cartoes (id)
+    );
+  `;
+
+  const createHistoricoReceitasTable = `
+    CREATE TABLE IF NOT EXISTS historico_receitas (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      descricao TEXT NOT NULL,
+      data TEXT NOT NULL,
+      valor REAL NOT NULL,
+      categoria TEXT,
+      fonte TEXT,
+      forma_recebimento TEXT,
+      conta_bancaria TEXT,
+      recorrente INTEGER DEFAULT 0,
+      intervalo_recorrencia TEXT,
+      data_recebimento TEXT
+    );
+  `;
+
+  db.serialize(() => {
+    db.run(createReceitasTable);
+    db.run(createDespesasTable);
+    db.run(createCartoesTable);
+    db.run(createHistoricoDespesasTable);
+    db.run(createHistoricoReceitasTable);
+  });
+}
+
+// Inicializar o banco de dados
+initializeDatabase();
 
 // Middleware para JSON
 app.use(express.json());
@@ -550,113 +645,6 @@ app.post("/api/teste/inserir-despesas-ano-completo", (req, res) => {
   });
 });
 
-// Rota para inserir valores de teste
-app.post("/api/teste/inserir-valores", (req, res) => {
-  const sqls = [
-    `INSERT INTO cartoes (nome, banco, limite, vencimento) VALUES ('Cartão A', 'Banco A', 1000.00, '2025-01-10');`,
-      `INSERT INTO cartoes (nome, banco, limite, vencimento) VALUES ('Cartão B', 'Banco B', 2000.00, '2025-02-15');`,
-      `INSERT INTO cartoes (nome, banco, limite, vencimento) VALUES ('Cartão C', 'Banco C', 3000.00, '2025-03-20');`,
-
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Supermercado', '2025-01-15', 150.00, 'Crédito', 1, 0, 150.00, 1);`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Padaria', '2025-02-10', 50.00, 'Débito', 1, 0, 50.00, 2);`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Farmácia', '2025-03-05', 75.00, 'Dinheiro', 1, 0, 75.00, NULL);`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Restaurante', '2025-04-20', 200.00, 'Crédito', 2, 1, 100.00, 1);`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Posto de Gasolina', '2025-05-18', 120.00, 'Débito', 1, 0, 120.00, 2);`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Cinema', '2025-06-25', 60.00, 'Dinheiro', 1, 0, 60.00, NULL);`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Loja de Roupas', '2025-07-12', 300.00, 'Crédito', 3, 2, 100.00, 1);`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Supermercado', '2025-08-08', 180.00, 'Débito', 1, 0, 180.00, 2);`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Padaria', '2025-09-14', 40.00, 'Dinheiro', 1, 0, 40.00, NULL);`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Farmácia', '2025-10-22', 90.00, 'Crédito', 1, 0, 90.00, 1);`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Restaurante', '2025-11-30', 250.00, 'Débito', 1, 0, 250.00, 2);`,
-      `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Posto de Gasolina', '2025-12-05', 100.00, 'Dinheiro', 1, 0, 100.00, NULL);`,
-
-      `INSERT INTO historico_despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id, data_pagamento) VALUES ('Supermercado', '2025-01-15', 150.00, 'Crédito', 1, 0, 150.00, 1, '2025-01-16');`,
-      `INSERT INTO historico_despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id, data_pagamento) VALUES ('Padaria', '2025-02-10', 50.00, 'Débito', 1, 0, 50.00, 2, '2025-02-11');`,
-
-      `INSERT INTO receitas (descricao, data, valor, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia) VALUES ('Salário', '2025-01-15', 3000.00, 'Salário', 'Empresa X', 'Transferência', 'Conta Corrente', 1, 'Mensal');`,
-      `INSERT INTO receitas (descricao, data, valor, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia) VALUES ('Freelance', '2025-02-10', 1500.00, 'Freelance', 'Cliente Y', 'Dinheiro', 'Carteira Digital', 0, NULL);`,
-      `INSERT INTO receitas (descricao, data, valor, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia) VALUES ('Investimento', '2025-03-20', 500.00, 'Investimentos', 'Corretora Z', 'Pix', 'Poupança', 0, NULL);`,
-
-      `INSERT INTO historico_receitas (descricao, data, valor, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia, data_recebimento) VALUES ('Salário', '2025-01-15', 3000.00, 'Salário', 'Empresa X', 'Transferência', 'Conta Corrente', 1, 'Mensal', '2025-01-16');`,
-      `INSERT INTO historico_receitas (descricao, data, valor, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia, data_recebimento) VALUES ('Freelance', '2025-02-10', 1500.00, 'Freelance', 'Cliente Y', 'Dinheiro', 'Carteira Digital', 0, NULL, '2025-02-11');`,
-
-      `INSERT INTO contas_bancarias (nome, tipo) VALUES ('Conta Corrente', 'Conta Corrente');`,
-      `INSERT INTO contas_bancarias (nome, tipo) VALUES ('Poupança', 'Poupança');`,
-      `INSERT INTO contas_bancarias (nome, tipo) VALUES ('Carteira Digital', 'Carteira Digital');`,
-
-      `INSERT INTO investimentos (nome_ativo, quantidade, valor_investido, data_aquisicao, tipo_investimento, conta_origem, observacoes) VALUES ('Ação XYZ', 100, 5000.00, '2025-01-10', 'Ação', 'Conta Corrente', 'Investimento a longo prazo');`,
-      `INSERT INTO investimentos (nome_ativo, quantidade, valor_investido, data_aquisicao, tipo_investimento, conta_origem, observacoes) VALUES ('FII ABC', 50, 3000.00, '2025-02-15', 'FII', 'Poupança', 'Investimento a médio prazo');`,
-      `INSERT INTO investimentos (nome_ativo, quantidade, valor_investido, data_aquisicao, tipo_investimento, conta_origem, observacoes) VALUES ('Cripto DEF', 10, 2000.00, '2025-03-20', 'Cripto', 'Carteira Digital', 'Investimento a curto prazo');`
-  ];
-
-  db.serialize(() => {
-    sqls.forEach((sql) => {
-      db.run(sql, (err) => {
-        if (err) {
-          console.error("Erro ao executar SQL:", sql, err);
-          return res.status(500).json({ error: "Erro ao inserir valores de teste" });
-        }
-      });
-    });
-    res.json({ status: "success", message: "Valores de teste inseridos com sucesso!" });
-  });
-});
-
-// Rota para inserir despesas do ano completo
-app.post("/api/teste/inserir-despesas-ano-completo", (req, res) => {
-  const sqls = [
-    // Cartões
-    `INSERT INTO cartoes (nome, banco, limite, vencimento) VALUES ('Cartão A', 'Banco A', 1000.00, '2025-01-10')`,
-    `INSERT INTO cartoes (nome, banco, limite, vencimento) VALUES ('Cartão B', 'Banco B', 2000.00, '2025-02-15')`,
-
-    // Despesas
-    `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Supermercado', '2025-01-15', 150.00, 'Crédito', 1, 0, 150.00, 1)`,
-    `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Padaria', '2025-02-10', 50.00, 'Débito', 1, 0, 50.00, 2)`,
-    `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Farmácia', '2025-03-05', 75.00, 'Dinheiro', 1, 0, 75.00, NULL)`,
-    `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Restaurante', '2025-04-20', 200.00, 'Crédito', 2, 1, 100.00, 1)`,
-    `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Posto de Gasolina', '2025-05-18', 120.00, 'Débito', 1, 0, 120.00, 2)`,
-    `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Cinema', '2025-06-25', 60.00, 'Dinheiro', 1, 0, 60.00, NULL)`,
-    `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Loja de Roupas', '2025-07-12', 300.00, 'Crédito', 3, 2, 100.00, 1)`,
-    `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Supermercado', '2025-08-08', 180.00, 'Débito', 1, 0, 180.00, 2)`,
-    `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Padaria', '2025-09-14', 40.00, 'Dinheiro', 1, 0, 40.00, NULL)`,
-    `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Farmácia', '2025-10-22', 90.00, 'Crédito', 1, 0, 90.00, 1)`,
-    `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Restaurante', '2025-11-30', 250.00, 'Débito', 1, 0, 250.00, 2)`,
-    `INSERT INTO despesas (estabelecimento, data, valor, forma_pagamento, numero_parcelas, parcelas_restantes, valor_parcela, cartao_id) VALUES ('Posto de Gasolina', '2025-12-05', 100.00, 'Dinheiro', 1, 0, 100.00, NULL)`,
-    
-    // receitas
-    `INSERT INTO receitas (descricao, data, valor, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia) VALUES ('Salário', '2025-01-15', 3000.00, 'Salário', 'Empresa X', 'Transferência', 'Conta Corrente', 1, 'Mensal')`,
-    `INSERT INTO receitas (descricao, data, valor, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia) VALUES ('Freelance', '2025-02-10', 1500.00, 'Freelance', 'Cliente Y', 'Dinheiro', 'Carteira Digital', 0, NULL)`,
-    `INSERT INTO receitas (descricao, data, valor, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia) VALUES ('Investimento', '2025-03-20', 500.00, 'Investimentos', 'Corretora Z', 'Pix', 'Poupança', 0, NULL)`,
-    `INSERT INTO receitas (descricao, data, valor, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia) VALUES ('Salário', '2025-04-15', 3000.00, 'Salário', 'Empresa X', 'Transferência', 'Conta Corrente', 1, 'Mensal')`,
-    `INSERT INTO receitas (descricao, data, valor, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia) VALUES ('Freelance', '2025-05-10', 1500.00, 'Freelance', 'Cliente Y', 'Dinheiro', 'Carteira Digital', 0, NULL)`,
-    `INSERT INTO receitas (descricao, data, valor, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia) VALUES ('Investimento', '2025-06-20', 500.00, 'Investimentos', 'Corretora Z', 'Pix', 'Poupança', 0, NULL)`,
-    `INSERT INTO receitas (descricao, data, valor, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia) VALUES ('Salário', '2025-07-15', 3000.00, 'Salário', 'Empresa X', 'Transferência', 'Conta Corrente', 1, 'Mensal')`,
-    `INSERT INTO receitas (descricao, data, valor, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia) VALUES ('Freelance', '2025-08-10', 1500.00, 'Freelance', 'Cliente Y', 'Dinheiro', 'Carteira Digital', 0, NULL)`,
-    `INSERT INTO receitas (descricao, data, valor, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia) VALUES ('Investimento', '2025-09-20', 500.00, 'Investimentos', 'Corretora Z', 'Pix', 'Poupança', 0, NULL)`,
-    `INSERT INTO receitas (descricao, data, valor, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia) VALUES ('Salário', '2025-10-15', 3000.00, 'Salário', 'Empresa X', 'Transferência', 'Conta Corrente', 1, 'Mensal')`,
-    `INSERT INTO receitas (descricao, data, valor, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia) VALUES ('Freelance', '2025-11-10', 1500.00, 'Freelance', 'Cliente Y', 'Dinheiro', 'Carteira Digital', 0, NULL)`,
-    `INSERT INTO receitas (descricao, data, valor, categoria, fonte, forma_recebimento, conta_bancaria, recorrente, intervalo_recorrencia) VALUES ('Investimento', '2025-12-20', 500.00, 'Investimentos', 'Corretora Z', 'Pix', 'Poupança', 0, NULL)`
-  
-  ];
-
-  db.serialize(() => {
-    let hasError = false;
-    sqls.forEach((sql) => {
-      db.run(sql, (err) => {
-        if (err) {
-          console.error("Erro ao executar SQL:", sql, err);
-          hasError = true;
-        }
-      });
-    });
-
-    if (hasError) {
-      return res.status(500).json({ error: "Erro ao inserir despesas do ano completo" });
-    }
-    res.json({ status: "success", message: "Despesas do ano completo inseridas com sucesso!" });
-  });
-});
-
 // Rota para calcular saldo
 app.get("/api/saldo", (req, res) => {
   const sqlDespesas = `SELECT SUM(valor) as totalDespesas FROM despesas`;
@@ -780,24 +768,121 @@ app.get("/api/contas-bancarias", (req, res) => {
 // Rota para obter dados do dashboard
 app.get("/api/dashboard", async (req, res) => {
   try {
-    const despesas = await new Promise((resolve, reject) => {
-      db.all(`SELECT * FROM despesas`, [], (err, rows) => {
-        if (err) reject(err);
-        else resolve(rows);
-      });
-    });
+    const saldoQuery = `SELECT 
+                          (SELECT IFNULL(SUM(valor), 0) FROM receitas) - 
+                          (SELECT IFNULL(SUM(valor), 0) FROM despesas) AS saldoAtual`;
+    const despesasQuery = `SELECT IFNULL(SUM(valor), 0) AS totalDespesas FROM despesas`;
+    const receitasQuery = `SELECT IFNULL(SUM(valor), 0) AS totalReceitas FROM receitas`;
+    const comissoesPendentesQuery = `SELECT IFNULL(SUM(valor), 0) AS comissoesPendentes FROM comissoes WHERE recebido = 0`;
+    const comissoesRecebidasQuery = `SELECT IFNULL(SUM(valor), 0) AS comissoesRecebidas FROM comissoes WHERE recebido = 1`;
 
-    const receitas = await new Promise((resolve, reject) => {
-      db.all(`SELECT * FROM receitas`, [], (err, rows) => {
-        if (err) reject(err);
-        else resolve(rows);
-      });
-    });
+    const desempenhoMensalQuery = `
+      SELECT 
+        strftime('%m', data) AS mes, 
+        SUM(CASE WHEN tipo = 'despesa' THEN valor ELSE 0 END) AS despesas,
+        SUM(CASE WHEN tipo = 'receita' THEN valor ELSE 0 END) AS receitas
+      FROM (
+        SELECT data, valor, 'despesa' AS tipo FROM despesas
+        UNION ALL
+        SELECT data, valor, 'receita' AS tipo FROM receitas
+      )
+      GROUP BY mes
+      ORDER BY mes
+    `;
 
-    res.json({ despesas, receitas });
+    const [saldo, despesas, receitas, comissoesPendentes, comissoesRecebidas, desempenhoMensal] = await Promise.all([
+      db.getAsync(saldoQuery),
+      db.getAsync(despesasQuery),
+      db.getAsync(receitasQuery),
+      db.getAsync(comissoesPendentesQuery),
+      db.getAsync(comissoesRecebidasQuery),
+      db.allAsync(desempenhoMensalQuery),
+    ]);
+
+    const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+    const desempenhoMensalData = {
+      meses: desempenhoMensal.map((row) => meses[parseInt(row.mes) - 1]),
+      despesas: desempenhoMensal.map((row) => row.despesas || 0),
+      receitas: desempenhoMensal.map((row) => row.receitas || 0),
+    };
+
+    res.json({
+      saldoAtual: saldo?.saldoAtual || 0,
+      totalDespesas: despesas?.totalDespesas || 0,
+      totalReceitas: receitas?.totalReceitas || 0,
+      comissoesPendentes: comissoesPendentes?.comissoesPendentes || 0,
+      comissoesRecebidas: comissoesRecebidas?.comissoesRecebidas || 0,
+      desempenhoMensal: desempenhoMensalData,
+    });
   } catch (error) {
-    console.error("Erro ao buscar dados do dashboard:", error);
-    res.status(500).json({ error: "Erro ao buscar dados do dashboard" });
+    console.error("Erro ao obter dados do dashboard:", error);
+    res.status(500).json({ error: "Erro ao obter dados do dashboard" });
+  }
+});
+
+// Rota para retornar dados mensais do dashboard
+app.get("/api/dashboard/mensal", async (req, res) => {
+  try {
+    const { mes, ano } = req.query;
+
+    // Validar os parâmetros de entrada
+    if (!mes || !ano || isNaN(mes) || isNaN(ano)) {
+      return res.status(400).json({ error: "Parâmetros 'mes' e 'ano' são obrigatórios e devem ser números." });
+    }
+
+    const mesFormatado = mes.padStart(2, "0"); // Garantir que o mês tenha dois dígitos
+
+    const saldoQuery = `
+      SELECT 
+        (SELECT IFNULL(SUM(valor), 0) FROM receitas WHERE strftime('%m', data) = ? AND strftime('%Y', data) = ?) - 
+        (SELECT IFNULL(SUM(valor), 0) FROM despesas WHERE strftime('%m', data) = ? AND strftime('%Y', data) = ?) AS saldoAtual
+    `;
+    const despesasQuery = `
+      SELECT IFNULL(SUM(valor), 0) AS totalDespesas 
+      FROM despesas 
+      WHERE strftime('%m', data) = ? AND strftime('%Y', data) = ?
+    `;
+    const receitasQuery = `
+      SELECT IFNULL(SUM(valor), 0) AS totalReceitas 
+      FROM receitas 
+      WHERE strftime('%m', data) = ? AND strftime('%Y', data) = ?
+    `;
+    const desempenhoMensalQuery = `
+      SELECT 
+        strftime('%d', data) AS dia, 
+        SUM(CASE WHEN tipo = 'despesa' THEN valor ELSE 0 END) AS despesas,
+        SUM(CASE WHEN tipo = 'receita' THEN valor ELSE 0 END) AS receitas
+      FROM (
+        SELECT data, valor, 'despesa' AS tipo FROM despesas WHERE strftime('%m', data) = ? AND strftime('%Y', data) = ?
+        UNION ALL
+        SELECT data, valor, 'receita' AS tipo FROM receitas WHERE strftime('%m', data) = ? AND strftime('%Y', data) = ?
+      )
+      GROUP BY dia
+      ORDER BY dia
+    `;
+
+    const [saldo, despesas, receitas, desempenhoMensal] = await Promise.all([
+      db.getAsync(saldoQuery, [mesFormatado, ano, mesFormatado, ano]),
+      db.getAsync(despesasQuery, [mesFormatado, ano]),
+      db.getAsync(receitasQuery, [mesFormatado, ano]),
+      db.allAsync(desempenhoMensalQuery, [mesFormatado, ano, mesFormatado, ano]),
+    ]);
+
+    const desempenhoMensalData = {
+      meses: desempenhoMensal.map((row) => row.dia),
+      despesas: desempenhoMensal.map((row) => row.despesas || 0),
+      receitas: desempenhoMensal.map((row) => row.receitas || 0),
+    };
+
+    res.json({
+      saldoAtual: saldo?.saldoAtual || 0,
+      totalDespesas: despesas?.totalDespesas || 0,
+      totalReceitas: receitas?.totalReceitas || 0,
+      desempenhoMensal: desempenhoMensalData,
+    });
+  } catch (error) {
+    console.error("Erro ao obter dados mensais do dashboard:", error);
+    res.status(500).json({ error: "Erro ao obter dados mensais do dashboard" });
   }
 });
 

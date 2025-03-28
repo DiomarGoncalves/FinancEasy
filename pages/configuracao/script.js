@@ -77,6 +77,20 @@ document.addEventListener('DOMContentLoaded', async (event) => {
     }
 });
 
+document.addEventListener("DOMContentLoaded", () => {
+    const configForm = document.querySelector("#configForm");
+
+    // Salvar configurações
+    configForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const ipServidor = document.querySelector("#ipServidor").value;
+        const portaServidor = document.querySelector("#portaServidor").value;
+
+        console.log(`Configurações salvas: IP ${ipServidor}, Porta ${portaServidor}`);
+        // Adicione lógica para salvar configurações aqui
+    });
+});
+
 document.getElementById('selectDbPath').addEventListener('click', async (event) => {
     event.preventDefault();
     try {

@@ -2,6 +2,8 @@ document.addEventListener("DOMContentLoaded", async () => {
   const investmentForm = document.getElementById("investmentForm");
   const investmentTableBody = document.querySelector("#investmentTable tbody");
   const alertMessage = document.getElementById("alertMessage");
+  const investimentosTable = document.querySelector("#investimentosTable");
+  const investimentoForm = document.querySelector("#investimentoForm");
 
   investmentForm.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -16,6 +18,25 @@ document.addEventListener("DOMContentLoaded", async () => {
     } catch (error) {
       console.error("Erro ao salvar investimento:", error);
       showMessage("Erro ao salvar investimento.", "error");
+    }
+  });
+
+  investimentoForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const nome = document.querySelector("#nome").value;
+    const valor = document.querySelector("#valor").value;
+    const data = document.querySelector("#data").value;
+
+    if (nome && valor && data) {
+      const novaLinha = `
+        <tr>
+          <td>${nome}</td>
+          <td>${valor}</td>
+          <td>${data}</td>
+        </tr>
+      `;
+      investimentosTable.querySelector("tbody").insertAdjacentHTML("beforeend", novaLinha);
+      investimentoForm.reset();
     }
   });
 

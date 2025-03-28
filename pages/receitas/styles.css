@@ -13,3 +13,22 @@ body {
     box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
     border-color: #555;
 }
+
+.table-responsive {
+    overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    input, select, button {
+        font-size: 0.875rem;
+        padding: 0.5rem;
+    }
+
+    table {
+        font-size: 0.75rem;
+    }
+}

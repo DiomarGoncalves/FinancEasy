@@ -10,41 +10,66 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../css/style.css">
 </head>
-<body class="min-h-screen bg-gray-900 text-white p-4">
-    <div class="container mx-auto">
-        <a href="../../home/home.html" class="btn bg-gray-700 hover:bg-gray-600 text-white p-1 rounded-lg mb-4">🔙 Voltar</a>
-        
-        <h1 class="text-3xl font-bold text-center mb-6">📅 Histórico de Comissões Recebidas</h1>
-        
-        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg">
-            <label for="mes" class="block text-lg mb-2">🗓️ Filtrar por Mês</label>
-            <input type="month" class="form-control bg-gray-700 text-white w-full p-2 rounded-lg mb-4" id="mes">
-            
-            <div class="flex flex-col sm:flex-row gap-4">
-                <button class="bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-2xl w-full sm:w-auto" id="filtrar">🔍 Filtrar</button>
-                <button class="bg-indigo-500 hover:bg-indigo-600 text-white py-2 px-4 rounded-2xl w-full sm:w-auto" id="exportar">📄 Exportar para PDF</button>
+<body class="bg-gray-900 text-white min-h-screen flex">
+    <nav class="sidebar">
+        <a href="/pages/home/home.html"><h2 class="text-purple-300 text-xl font-bold mb-4">FinancEasy</h2></a>
+        <a href="/pages/cartao/cartoes.html">💳 Cartões</a>
+        <div class="dropdown">
+            <a href="#" class="text-white">📊 Transações</a>
+            <div class="dropdown-content">
+                <a href="/pages/despesas/despesas.html">📉 Despesas</a>
+                <a href="/pages/receitas/receitas.html">📈 Receitas</a>
             </div>
         </div>
-        
-        <div class="overflow-x-auto mt-6 bg-gray-800 p-6 rounded-2xl shadow-lg">
-            <table class="table-auto w-full text-white" id="historicoTable">
-                <thead>
-                    <tr class="bg-gray-700">
-                        <th class="p-3">NF-e</th>
-                        <th class="p-3">Pedido Nectar</th>
-                        <th class="p-3">Nota Nectar</th>
-                        <th class="p-3">Valor da Venda</th>
-                        <th class="p-3">Data</th>
-                        <th class="p-3">Comissão</th>
-                    </tr>
-                </thead>
-                <tbody id="historicoTableBody" class="divide-y divide-gray-600">
-                    <!-- Linhas serão adicionadas dinamicamente -->
-                </tbody>
-            </table>
-            <h3 id="totalRecebido" class="text-xl font-semibold mt-4">💰 Total Recebido: R$ 0,00</h3>
+        <a href="/pages/investimentos/investimentos.html">📊 Investimentos</a>
+        <a href="/pages/comissao/comissao.html">💰 Comissões</a>
+        <a href="/pages/reservas/reservas.html">🏦 Reservas</a>
+        <a href="/pages/relatorios/relatorios.html">📋 Relatórios</a>
+        <a href="/pages/configuracao/configuracao.html">⚙️ Configuração</a>
+    </nav>
+
+    <main class="main-content ml-64 p-6">
+        <h1 class="text-3xl font-bold mb-6">📜 Histórico de Comissões</h1>
+        <div class="bg-gray-800 p-6 rounded-2xl shadow-lg">
+            <h2 class="text-2xl font-bold mb-4">🔍 Filtrar Histórico</h2>
+            <form id="filtroForm" class="space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="dataInicio" class="block text-lg">📅 Data Início</label>
+                        <input type="date" id="dataInicio" class="form-input bg-gray-700 text-white w-full p-3 rounded-lg">
+                    </div>
+                    <div>
+                        <label for="dataFim" class="block text-lg">📅 Data Fim</label>
+                        <input type="date" id="dataFim" class="form-input bg-gray-700 text-white w-full p-3 rounded-lg">
+                    </div>
+                </div>
+                <button type="submit" class="btn bg-purple-600 hover:bg-purple-500 text-white p-3 rounded-lg">
+                    🔍 Filtrar
+                </button>
+            </form>
         </div>
-    </div>
+
+        <div class="mt-6 bg-gray-800 p-6 rounded-2xl shadow-lg">
+            <h2 class="text-2xl font-bold mb-4">📋 Resultados</h2>
+            <div class="overflow-x-auto">
+                <table class="table-auto w-full text-white">
+                    <thead class="bg-gray-700">
+                        <tr>
+                            <th class="p-3">NF-e</th>
+                            <th class="p-3">Pedido Nectar</th>
+                            <th class="p-3">Nota Nectar</th>
+                            <th class="p-3">Valor</th>
+                            <th class="p-3">Data</th>
+                            <th class="p-3">Comissão</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Linhas dinâmicas -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
     <script src="script.js"></script>
 </body>
 </html>

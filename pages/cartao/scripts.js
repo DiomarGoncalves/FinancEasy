@@ -146,4 +146,25 @@ document.getElementById("editCartaoForm").addEventListener("submit", async (even
 
 document.addEventListener("DOMContentLoaded", () => {
   loadCartoes();
+
+  const cartoesTable = document.querySelector("#cartoesTable");
+  const cartaoForm = document.querySelector("#cartaoForm");
+
+  // Adicionar cartão
+  cartaoForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const nome = document.querySelector("#nome").value;
+    const banco = document.querySelector("#banco").value;
+
+    if (nome && banco) {
+      const novaLinha = `
+        <tr>
+          <td>${nome}</td>
+          <td>${banco}</td>
+        </tr>
+      `;
+      cartoesTable.querySelector("tbody").insertAdjacentHTML("beforeend", novaLinha);
+      cartaoForm.reset();
+    }
+  });
 });

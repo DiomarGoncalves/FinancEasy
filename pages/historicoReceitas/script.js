@@ -24,6 +24,23 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
+document.addEventListener("DOMContentLoaded", () => {
+  const historicoTable = document.querySelector("#historicoTable");
+  const filtroForm = document.querySelector("#filtroForm");
+
+  // Filtrar histórico
+  filtroForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const dataInicio = document.querySelector("#dataInicio").value;
+    const dataFim = document.querySelector("#dataFim").value;
+
+    if (dataInicio && dataFim) {
+      console.log(`Filtrando de ${dataInicio} até ${dataFim}`);
+      // Adicione lógica de filtro aqui
+    }
+  });
+});
+
 async function fetchHistoricoReceitas() {
   try {
     const response = await fetch("/api/historico-receitas");

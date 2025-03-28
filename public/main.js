@@ -127,3 +127,18 @@ function saveConfig(config) {
   const updatedConfig = { ...currentConfig, ...config };
   fs.writeFileSync(configPath, JSON.stringify(updatedConfig));
 }
+
+// Adicionar evento DOMContentLoaded para inicialização responsiva
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("Aplicação inicializada com sucesso!");
+
+  // Exemplo de ajuste responsivo
+  const sidebarToggle = document.querySelector("#sidebarToggle");
+  const sidebar = document.querySelector(".sidebar");
+
+  if (sidebarToggle && sidebar) {
+    sidebarToggle.addEventListener("click", () => {
+      sidebar.classList.toggle("hidden");
+    });
+  }
+});

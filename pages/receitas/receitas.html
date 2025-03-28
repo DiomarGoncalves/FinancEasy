@@ -45,218 +45,228 @@
       }
     </style>
   </head>
-  <body class="bg-gray-900 text-white">
-    <div class="container mx-auto mt-4 p-4">
-      <a
-        href="../home/home.html"
-        class="btn bg-gray-700 hover:bg-gray-600 text-white p-1 mobile rounded-lg mb-3 inline-block"
-        >🔙 Voltar para o início</a
-      >
-      <a
-        href="/pages/historicoReceitas/historicoReceitas.html"
-        class="bg-purple-600 text-white p-1 mobile rounded-md mb-3 hover:bg-purple-700 inline-block"
-        >📜 Histórico de Receitas recebidas</a
-      >
-      <button
-        class="btn bg-purple-600 hover:bg-purple-500 text-white p-1 mobile rounded-lg mb-3 inline-block"
-        id="exportar"
-      >
-        📄 Exportar para PDF
-      </button>
-      <h1 class="text-3xl font-bold mb-4">📈 Adicionar Receita</h1>
-      <div class="bg-gray-800 text-white p-6 rounded-2xl shadow-lg">
-        <form id="receitaForm">
-          <div class="mb-4">
-            <label for="descricao" class="block text-lg">📝 Descrição</label>
-            <input
-              type="text"
-              class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
-              id="descricao"
-              name="descricao"
-              required
-            />
-          </div>
-          <div class="mb-4">
-            <label for="valor" class="block text-lg">💵 Valor</label>
-            <input
-              type="number"
-              class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
-              id="valor"
-              name="valor"
-              min="0"
-              step="0.01"
-              required
-            />
-          </div>
-          <div class="mb-4">
-            <label for="data" class="block text-lg"
-              >📅 Data de Recebimento</label
-            >
-            <input
-              type="date"
-              class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
-              id="data"
-              name="data"
-              required
-            />
-          </div>
-          <div class="mb-4">
-            <label for="categoria" class="block text-lg">📊 Categoria</label>
-            <select
-              class="form-select bg-gray-700 text-white w-full p-3 rounded-lg"
-              id="categoria"
-              name="categoria"
-              required
-            >
-              <option value="Salário">Salário</option>
-              <option value="Investimentos">Investimentos</option>
-              <option value="Freelance">Freelance</option>
-              <option value="Outros">Outros</option>
-            </select>
-          </div>
-          <div class="mb-4">
-            <label for="fonte" class="block text-lg">💡 Fonte da Receita</label>
-            <input
-              type="text"
-              class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
-              id="fonte"
-              name="fonte"
-              required
-            />
-          </div>
-          <div class="mb-4">
-            <label for="forma_recebimento" class="block text-lg"
-              >💳 Forma de Recebimento</label
-            >
-            <select
-              class="form-select bg-gray-700 text-white w-full p-3 rounded-lg"
-              id="forma_recebimento"
-              name="forma_recebimento"
-              required
-            >
-              <option value="Pix">Pix</option>
-              <option value="Transferência">Transferência</option>
-              <option value="Dinheiro">Dinheiro</option>
-              <option value="Cheque">Cheque</option>
-            </select>
-          </div>
-          <div class="mb-4">
-            <label for="conta_bancaria" class="block text-lg"
-              >🏦 Conta Bancária</label
-            >
-            <select
-              class="form-select bg-gray-700 text-white w-full p-3 rounded-lg"
-              id="conta_bancaria"
-              name="conta_bancaria"
-              required
-            >
-              <option value="Conta Corrente">Conta Corrente</option>
-              <option value="Poupança">Poupança</option>
-              <option value="Carteira Digital">Carteira Digital</option>
-            </select>
-          </div>
-          <div class="mb-4 flex items-center">
-            <input
-              type="checkbox"
-              class="form-checkbox bg-gray-700 text-white"
-              id="recorrente"
-              name="recorrente"
-            />
-            <label for="recorrente" class="ml-2">🔁 Receita Recorrente</label>
-          </div>
-          <div class="mb-4">
-            <label for="intervalo_recorrencia" class="block text-lg"
-              >⏳ Intervalo de Recorrência</label
-            >
-            <select
-              class="form-select bg-gray-700 text-white w-full p-3 rounded-lg"
-              id="intervalo_recorrencia"
-              name="intervalo_recorrencia"
-            >
-              <option value="Mensal">Mensal</option>
-              <option value="Semanal">Semanal</option>
-              <option value="Anual">Anual</option>
-            </select>
-          </div>
-          <button
-            type="submit"
-            class="btn bg-purple-600 hover:bg-purple-500 text-white p-1 mobile rounded-lg"
-          >
-            ➕ Adicionar Receita
-          </button>
-        </form>
-      </div>
-      <div class="mt-8 bg-gray-800 text-white p-6 rounded-2xl shadow-lg">
-        <h2 class="text-2xl font-bold mb-4">🔍 Filtrar Receitas</h2>
-        <form id="filtroForm" class="needs-validation" novalidate>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+  <body class="bg-gray-900 text-white min-h-screen flex">
+    <nav class="sidebar">
+        <a href="/pages/home/home.html"><h2 class="text-purple-300 text-xl font-bold mb-4">FinancEasy</h2></a>
+    
+        <a href="/pages/cartao/cartoes.html">💳 Cartões</a>
+        <div class="dropdown">
+        <a href="#" class="text-white">📊 Transações</a>
+        <div class="dropdown-content">
+            <a href="/pages/despesas/despesas.html">📉 Despesas</a>
+            <a href="/pages/receitas/receitas.html">📈 Receitas</a>
+        </div>
+        </div>
+        <a href="/pages/investimentos/investimentos.html">📊 Investimentos</a>
+        <a href="/pages/comissao/comissao.html">💰 Comissões</a>
+        <a href="/pages/reservas/reservas.html">🏦 Reservas</a>
+        <a href="/pages/relatorios/relatorios.html">📋 Relatórios</a>
+        <a href="/pages/configuracao/configuracao.html">⚙️ Configuração</a>
+    </nav>
+
+    <main class="main-content ml-64 p-6">
+      <div class="container mx-auto mt-4 p-4">
+        <button
+          class="btn bg-purple-600 hover:bg-purple-500 text-white p-1 mobile rounded-lg mb-3 inline-block"
+          id="exportar"
+        >
+          📄 Exportar para PDF
+        </button>
+        <h1 class="text-3xl font-bold mb-4">📈 Adicionar Receita</h1>
+        <div class="bg-gray-800 text-white p-6 rounded-2xl shadow-lg">
+          <form id="receitaForm">
             <div class="mb-4">
-              <label for="filtroDataInicio" class="block text-lg"
-                >📅 Data Início</label
-              >
+              <label for="descricao" class="block text-lg">📝 Descrição</label>
               <input
-                type="date"
-                id="filtroDataInicio"
-                name="filtroDataInicio"
+                type="text"
                 class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
+                id="descricao"
+                name="descricao"
+                required
               />
             </div>
             <div class="mb-4">
-              <label for="filtroDataFim" class="block text-lg"
-                >📅 Data Fim</label
+              <label for="valor" class="block text-lg">💵 Valor</label>
+              <input
+                type="number"
+                class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
+                id="valor"
+                name="valor"
+                min="0"
+                step="0.01"
+                required
+              />
+            </div>
+            <div class="mb-4">
+              <label for="data" class="block text-lg"
+                >📅 Data de Recebimento</label
               >
               <input
                 type="date"
-                id="filtroDataFim"
-                name="filtroDataFim"
                 class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
+                id="data"
+                name="data"
+                required
               />
             </div>
-          </div>
-          <button
-            type="submit"
-            class="btn bg-purple-600 hover:bg-purple-500 text-white p-1 mobile rounded-lg"
-          >
-            🔍 Filtrar
-          </button>
-        </form>
+            <div class="mb-4">
+              <label for="categoria" class="block text-lg">📊 Categoria</label>
+              <select
+                class="form-select bg-gray-700 text-white w-full p-3 rounded-lg"
+                id="categoria"
+                name="categoria"
+                required
+              >
+                <option value="Salário">Salário</option>
+                <option value="Investimentos">Investimentos</option>
+                <option value="Freelance">Freelance</option>
+                <option value="Outros">Outros</option>
+              </select>
+            </div>
+            <div class="mb-4">
+              <label for="fonte" class="block text-lg">💡 Fonte da Receita</label>
+              <input
+                type="text"
+                class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
+                id="fonte"
+                name="fonte"
+                required
+              />
+            </div>
+            <div class="mb-4">
+              <label for="forma_recebimento" class="block text-lg"
+                >💳 Forma de Recebimento</label
+              >
+              <select
+                class="form-select bg-gray-700 text-white w-full p-3 rounded-lg"
+                id="forma_recebimento"
+                name="forma_recebimento"
+                required
+              >
+                <option value="Pix">Pix</option>
+                <option value="Transferência">Transferência</option>
+                <option value="Dinheiro">Dinheiro</option>
+                <option value="Cheque">Cheque</option>
+              </select>
+            </div>
+            <div class="mb-4">
+              <label for="conta_bancaria" class="block text-lg"
+                >🏦 Conta Bancária</label
+              >
+              <select
+                class="form-select bg-gray-700 text-white w-full p-3 rounded-lg"
+                id="conta_bancaria"
+                name="conta_bancaria"
+                required
+              >
+                <option value="Conta Corrente">Conta Corrente</option>
+                <option value="Poupança">Poupança</option>
+                <option value="Carteira Digital">Carteira Digital</option>
+              </select>
+            </div>
+            <div class="mb-4 flex items-center">
+              <input
+                type="checkbox"
+                class="form-checkbox bg-gray-700 text-white"
+                id="recorrente"
+                name="recorrente"
+              />
+              <label for="recorrente" class="ml-2">🔁 Receita Recorrente</label>
+            </div>
+            <div class="mb-4">
+              <label for="intervalo_recorrencia" class="block text-lg"
+                >⏳ Intervalo de Recorrência</label
+              >
+              <select
+                class="form-select bg-gray-700 text-white w-full p-3 rounded-lg"
+                id="intervalo_recorrencia"
+                name="intervalo_recorrencia"
+              >
+                <option value="Mensal">Mensal</option>
+                <option value="Semanal">Semanal</option>
+                <option value="Anual">Anual</option>
+              </select>
+            </div>
+            <button
+              type="submit"
+              class="btn bg-purple-600 hover:bg-purple-500 text-white p-1 mobile rounded-lg"
+            >
+              ➕ Adicionar Receita
+            </button>
+          </form>
+        </div>
+        <div class="mt-8 bg-gray-800 text-white p-6 rounded-2xl shadow-lg">
+          <h2 class="text-2xl font-bold mb-4">🔍 Filtrar Receitas</h2>
+          <form id="filtroForm" class="needs-validation" novalidate>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="mb-4">
+                <label for="filtroDataInicio" class="block text-lg"
+                  >📅 Data Início</label
+                >
+                <input
+                  type="date"
+                  id="filtroDataInicio"
+                  name="filtroDataInicio"
+                  class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
+                />
+              </div>
+              <div class="mb-4">
+                <label for="filtroDataFim" class="block text-lg"
+                  >📅 Data Fim</label
+                >
+                <input
+                  type="date"
+                  id="filtroDataFim"
+                  name="filtroDataFim"
+                  class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
+                />
+              </div>
+            </div>
+            <button
+              type="submit"
+              class="btn bg-purple-600 hover:bg-purple-500 text-white p-1 mobile rounded-lg"
+            >
+              🔍 Filtrar
+            </button>
+          </form>
+        </div>
+        <div class="overflow-x-auto mt-6 bg-gray-800 ">
+          <table class="table-auto w-full text-white" id="receitasTable">
+            <thead>
+              <tr class="bg-gray-700">
+                <th class="p-1 mobile">
+                  <i class="fas fa-clipboard-list"></i> Descrição
+                </th>
+                <th class="p-1 mobile">
+                  <i class="fas fa-dollar-sign"></i> Valor
+                </th>
+                <th class="p-1 mobile">
+                  <i class="fas fa-calendar-alt"></i> Data
+                </th>
+                <th class="p-1 mobile">
+                  <i class="fas fa-chart-pie"></i> Categoria
+                </th>
+                <th class="p-1 mobile"><i class="fas fa-lightbulb"></i> Fonte</th>
+                <th class="p-1 mobile">
+                  <i class="fas fa-credit-card"></i> Forma de Recebimento
+                </th>
+                <th class="p-1 mobile">
+                  <i class="fas fa-university"></i> Conta Bancária
+                </th>
+                <th class="p-1 mobile">
+                  <i class="fas fa-sync-alt"></i> Recorrente
+                </th>
+                <th class="p-1 mobile">
+                  <i class="fas fa-hourglass-half"></i> Intervalo de Recorrência
+                </th>
+                <th class="p-1 mobile"><i class="fas fa-cogs"></i> Ações</th>
+              </tr>
+            </thead>
+            <tbody ></tbody>
+          </table>
+        </div>
       </div>
-      <div class="overflow-x-auto mt-6 bg-gray-800 ">
-        <table class="table-auto w-full text-white" id="receitasTable">
-          <thead>
-            <tr class="bg-gray-700">
-              <th class="p-1 mobile">
-                <i class="fas fa-clipboard-list"></i> Descrição
-              </th>
-              <th class="p-1 mobile">
-                <i class="fas fa-dollar-sign"></i> Valor
-              </th>
-              <th class="p-1 mobile">
-                <i class="fas fa-calendar-alt"></i> Data
-              </th>
-              <th class="p-1 mobile">
-                <i class="fas fa-chart-pie"></i> Categoria
-              </th>
-              <th class="p-1 mobile"><i class="fas fa-lightbulb"></i> Fonte</th>
-              <th class="p-1 mobile">
-                <i class="fas fa-credit-card"></i> Forma de Recebimento
-              </th>
-              <th class="p-1 mobile">
-                <i class="fas fa-university"></i> Conta Bancária
-              </th>
-              <th class="p-1 mobile">
-                <i class="fas fa-sync-alt"></i> Recorrente
-              </th>
-              <th class="p-1 mobile">
-                <i class="fas fa-hourglass-half"></i> Intervalo de Recorrência
-              </th>
-              <th class="p-1 mobile"><i class="fas fa-cogs"></i> Ações</th>
-            </tr>
-          </thead>
-          <tbody ></tbody>
-        </table>
-      </div>
-    </div>
+    </main>
     <script src="script.js"></script>
   </body>
 </html>

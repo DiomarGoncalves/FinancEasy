@@ -17,6 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const exportarBtn = document.getElementById('exportar-btn');
     const importarBtn = document.getElementById('importar-btn');
     const relatorioBtn = document.getElementById('relatorio-btn');
+    const reservasTable = document.querySelector("#reservasTable");
+    const reservaForm = document.querySelector("#reservaForm");
 
     async function gerarRelatorioPDF(reservas) {
         const { PDFDocument, rgb } = PDFLib;
@@ -304,6 +306,25 @@ document.addEventListener('DOMContentLoaded', () => {
             resultadoSimulacao.textContent = `Valor após ${periodo} meses: R$ ${valorFinal}`;
         } catch (error) {
             console.error('Erro ao calcular simulação:', error);
+        }
+    });
+
+    reservaForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const descricao = document.querySelector("#descricao").value;
+        const valor = document.querySelector("#valor").value;
+        const data = document.querySelector("#data").value;
+
+        if (descricao && valor && data) {
+            const novaLinha = `
+                <tr>
+                    <td>${descricao}</td>
+                    <td>${valor}</td>
+                    <td>${data}</td>
+                </tr>
+            `;
+            reservasTable.querySelector("tbody").insertAdjacentHTML("beforeend", novaLinha);
+            reservaForm.reset();
         }
     });
 

@@ -1,11 +1,57 @@
 document.addEventListener("DOMContentLoaded", async () => {
   try {
+    const mesAtual = new Date().getMonth() + 1; // Mês atual (1-12)
+    const anoAtual = new Date().getFullYear(); // Ano atual
+
+    // Buscar dados do dashboard para o mês atual
+    const response = await fetch(`/api/dashboard/mensal?mes=${mesAtual}&ano=${anoAtual}`);
+    if (!response.ok) throw new Error("Erro ao carregar dados do dashboard");
+    const dados = await response.json();
+
+    // Atualizar valores no painel
+    document.getElementById("saldoAtual").textContent = `R$ ${dados.saldoAtual.toFixed(2)}`;
+    document.getElementById("totalDespesas").textContent = `R$ ${dados.totalDespesas.toFixed(2)}`;
+    document.getElementById("totalReceitas").textContent = `R$ ${dados.totalReceitas.toFixed(2)}`;
+
+    // Configurar gráfico de desempenho mensal
+    const ctx = document.getElementById("graficoDesempenhoMensal").getContext("2d");
+    new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: dados.desempenhoMensal.meses,
+        datasets: [
+          {
+            label: "Despesas",
+            data: dados.desempenhoMensal.despesas,
+            borderColor: "rgba(255, 99, 132, 1)",
+            backgroundColor: "rgba(255, 99, 132, 0.2)",
+            fill: true,
+          },
+          {
+            label: "Receitas",
+            data: dados.desempenhoMensal.receitas,
+            borderColor: "rgba(75, 192, 192, 1)",
+            backgroundColor: "rgba(75, 192, 192, 0.2)",
+            fill: true,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: {
+            position: "top",
+          },
+        },
+      },
+    });
+
     const config = await fetchConfig();
     if (config.notificacoes === "ativadas") {
       await verificarVencimentos();
     }
   } catch (error) {
-    console.error("Erro ao carregar notificações:", error);
+    console.error("Erro ao carregar dados do dashboard:", error);
   }
 });
 

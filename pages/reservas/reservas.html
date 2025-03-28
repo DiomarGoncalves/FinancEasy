@@ -3,7 +3,6 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="../css/style.css">
     <title>Reserva de Emergência - FinancEasy</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -12,6 +11,9 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
       rel="stylesheet"
     />
+
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../relatorios/styles.css">
 
     <style>
       tr {
@@ -44,237 +46,226 @@
       }
     </style>
   </head>
-  <body class="bg-gray-900 text-white min-h-screen flex flex-col">
-    <nav class="bg-gray-800 p-4 shadow-lg">
-      <div class="container mx-auto flex justify-between items-center">
-        <a
-          href="../home/home.html"
-          class="inline-flex items-center gap-2 text-purple-400 hover:text-purple-300 transition-colors mb-6"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-6 w-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
-          <span>Voltar para o início</span>
-        </a>
-      </div>
+  <body class="bg-gray-900 text-white min-h-screen flex">
+    <nav class="sidebar">
+        <a href="/pages/home/home.html"><h2 class="text-purple-300 text-xl font-bold mb-4">FinancEasy</h2></a>
+    
+        <a href="/pages/cartao/cartoes.html">💳 Cartões</a>
+        <div class="dropdown">
+        <a href="#" class="text-white">📊 Transações</a>
+        <div class="dropdown-content">
+            <a href="/pages/despesas/despesas.html">📉 Despesas</a>
+            <a href="/pages/receitas/receitas.html">📈 Receitas</a>
+        </div>
+        </div>
+        <a href="/pages/investimentos/investimentos.html">📊 Investimentos</a>
+        <a href="/pages/comissao/comissao.html">💰 Comissões</a>
+        <a href="/pages/reservas/reservas.html">🏦 Reservas</a>
+        <a href="/pages/relatorios/relatorios.html">📋 Relatórios</a>
+        <a href="/pages/configuracao/configuracao.html">⚙️ Configuração</a>
     </nav>
 
-    <main class="container mx-auto px-4 py-10 space-y-10">
-      <header class="bg-gray-800 p-8 rounded-2xl shadow-lg text-center">
-        <h1
-          class="text-4xl font-bold text-purple-500 mb-4 flex items-center justify-center gap-2"
-        >
-          <i class="ph ph-piggy-bank"></i> Reserva de Emergência
-        </h1>
-      </header>
+    <main class="main-content ml-64 p-6">
+      <main class="container mx-auto px-4 py-10 space-y-10">
+        <header class="bg-gray-800 p-8 rounded-2xl shadow-lg text-center">
+          <h1
+            class="text-4xl font-bold text-purple-500 mb-4 flex items-center justify-center gap-2"
+          >
+            <i class="ph ph-piggy-bank"></i> Reserva de Emergência
+          </h1>
+        </header>
 
-      <section class="bg-gray-800 p-6 rounded-2xl shadow-lg space-y-6">
-        <form id="add-reserva-form" class="space-y-4">
-          <h2
-            class="text-2xl font-semibold text-purple-400 flex items-center gap-2"
-          >
-            <i class="ph ph-plus-circle"></i> Adicionar Reserva
-          </h2>
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label for="descricao" class="block text-sm mb-1"
-                >Descrição:</label
-              >
-              <input
-                type="text"
-                id="descricao"
-                name="descricao"
-                required
-                class="w-full p-2 rounded-lg bg-gray-700 text-white border border-gray-600"
-              />
-            </div>
-            <div>
-              <label for="valor" class="block text-sm mb-1">Valor:</label>
-              <input
-                type="number"
-                id="valor"
-                name="valor"
-                required
-                class="w-full p-2 rounded-lg bg-gray-700 text-white border border-gray-600"
-              />
-            </div>
-            <div>
-              <label for="data" class="block text-sm mb-1">Data:</label>
-              <input
-                type="date"
-                id="data"
-                name="data"
-                required
-                class="w-full p-2 rounded-lg bg-gray-700 text-white border border-gray-600"
-              />
-            </div>
-          </div>
-          <button
-            type="submit"
-            class="w-full bg-purple-600 hover:bg-purple-700 transition rounded-lg py-2 text-white font-semibold flex items-center justify-center gap-2"
-          >
-            <i class="ph ph-check"></i> Adicionar Reserva
-          </button>
-        </form>
-
-        <form id="set-objetivo-form" class="space-y-4">
-          <h2
-            class="text-2xl font-semibold text-purple-400 flex items-center gap-2"
-          >
-            <i class="ph ph-flag"></i> Definir Objetivo de Poupança
-          </h2>
-          <div>
-            <input
-              type="number"
-              id="objetivo"
-              name="objetivo"
-              required
-              class="w-full p-2 rounded-lg bg-gray-700 text-white border border-gray-600"
-              placeholder="Digite o valor do objetivo"
-            />
-          </div>
-          <button
-            type="submit"
-            class="w-full bg-purple-600 hover:bg-purple-700 transition rounded-lg py-2 text-white font-semibold flex items-center justify-center gap-2"
-          >
-            <i class="ph ph-target"></i> Definir Objetivo
-          </button>
-        </form>
-
-        <div class="space-y-4">
-          <h2
-            class="text-2xl font-semibold text-purple-400 flex items-center gap-2"
-          >
-            <i class="ph ph-chart-line"></i> Progresso
-          </h2>
-          <div class="w-full bg-gray-700 rounded-full h-6 overflow-hidden">
-            <div
-              id="progresso-bar"
-              class="bg-purple-500 h-full text-center text-sm font-medium text-white leading-6"
-              style="width: 0%"
+        <section class="bg-gray-800 p-6 rounded-2xl shadow-lg space-y-6">
+          <form id="add-reserva-form" class="space-y-4">
+            <h2
+              class="text-2xl font-semibold text-purple-400 flex items-center gap-2"
             >
-              0%
+              <i class="ph ph-plus-circle"></i> Adicionar Reserva
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label for="descricao" class="block text-sm mb-1"
+                  >Descrição:</label
+                >
+                <input
+                  type="text"
+                  id="descricao"
+                  name="descricao"
+                  required
+                  class="w-full p-2 rounded-lg bg-gray-700 text-white border border-gray-600"
+                />
+              </div>
+              <div>
+                <label for="valor" class="block text-sm mb-1">Valor:</label>
+                <input
+                  type="number"
+                  id="valor"
+                  name="valor"
+                  required
+                  class="w-full p-2 rounded-lg bg-gray-700 text-white border border-gray-600"
+                />
+              </div>
+              <div>
+                <label for="data" class="block text-sm mb-1">Data:</label>
+                <input
+                  type="date"
+                  id="data"
+                  name="data"
+                  required
+                  class="w-full p-2 rounded-lg bg-gray-700 text-white border border-gray-600"
+                />
+              </div>
             </div>
-          </div>
-          <div class="text-center text-lg font-semibold text-purple-400">
-            <p id="resumo-total">Total Reservado: R$ 0.00</p>
-            <p id="resumo-objetivo">Objetivo: R$ 0.00</p>
-          </div>
-        </div>
+            <button
+              type="submit"
+              class="w-full bg-purple-600 hover:bg-purple-700 transition rounded-lg py-2 text-white font-semibold flex items-center justify-center gap-2"
+            >
+              <i class="ph ph-check"></i> Adicionar Reserva
+            </button>
+          </form>
 
-        <form id="simulacao-form" class="space-y-4">
-          <h2
-            class="text-2xl font-semibold text-purple-400 flex items-center gap-2"
-          >
-            <i class="ph ph-calculator"></i> Simulação de Crescimento
-          </h2>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <form id="set-objetivo-form" class="space-y-4">
+            <h2
+              class="text-2xl font-semibold text-purple-400 flex items-center gap-2"
+            >
+              <i class="ph ph-flag"></i> Definir Objetivo de Poupança
+            </h2>
             <div>
-              <label for="taxa" class="block text-sm mb-1"
-                >Taxa de Juros Anual (%):</label
-              >
               <input
                 type="number"
-                id="taxa"
-                name="taxa"
+                id="objetivo"
+                name="objetivo"
                 required
                 class="w-full p-2 rounded-lg bg-gray-700 text-white border border-gray-600"
+                placeholder="Digite o valor do objetivo"
               />
             </div>
-            <div>
-              <label for="periodo" class="block text-sm mb-1"
-                >Período (meses):</label
+            <button
+              type="submit"
+              class="w-full bg-purple-600 hover:bg-purple-700 transition rounded-lg py-2 text-white font-semibold flex items-center justify-center gap-2"
+            >
+              <i class="ph ph-target"></i> Definir Objetivo
+            </button>
+          </form>
+
+          <div class="space-y-4">
+            <h2
+              class="text-2xl font-semibold text-purple-400 flex items-center gap-2"
+            >
+              <i class="ph ph-chart-line"></i> Progresso
+            </h2>
+            <div class="w-full bg-gray-700 rounded-full h-6 overflow-hidden">
+              <div
+                id="progresso-bar"
+                class="bg-purple-500 h-full text-center text-sm font-medium text-white leading-6"
+                style="width: 0%"
               >
-              <input
-                type="number"
-                id="periodo"
-                name="periodo"
-                required
-                class="w-full p-2 rounded-lg bg-gray-700 text-white border border-gray-600"
-              />
+                0%
+              </div>
+            </div>
+            <div class="text-center text-lg font-semibold text-purple-400">
+              <p id="resumo-total">Total Reservado: R$ 0.00</p>
+              <p id="resumo-objetivo">Objetivo: R$ 0.00</p>
             </div>
           </div>
-          <button
-            type="submit"
-            class="w-full bg-purple-600 hover:bg-purple-700 transition rounded-lg py-2 text-white font-semibold flex items-center justify-center gap-2"
+
+          <form id="simulacao-form" class="space-y-4">
+            <h2
+              class="text-2xl font-semibold text-purple-400 flex items-center gap-2"
+            >
+              <i class="ph ph-calculator"></i> Simulação de Crescimento
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label for="taxa" class="block text-sm mb-1"
+                  >Taxa de Juros Anual (%):</label
+                >
+                <input
+                  type="number"
+                  id="taxa"
+                  name="taxa"
+                  required
+                  class="w-full p-2 rounded-lg bg-gray-700 text-white border border-gray-600"
+                />
+              </div>
+              <div>
+                <label for="periodo" class="block text-sm mb-1"
+                  >Período (meses):</label
+                >
+                <input
+                  type="number"
+                  id="periodo"
+                  name="periodo"
+                  required
+                  class="w-full p-2 rounded-lg bg-gray-700 text-white border border-gray-600"
+                />
+              </div>
+            </div>
+            <button
+              type="submit"
+              class="w-full bg-purple-600 hover:bg-purple-700 transition rounded-lg py-2 text-white font-semibold flex items-center justify-center gap-2"
+            >
+              <i class="ph ph-trend-up"></i> Simular Crescimento
+            </button>
+          </form>
+
+          <div
+            id="resultado-simulacao"
+            class="bg-gray-700 p-4 rounded-lg text-center text-lg font-semibold text-purple-400"
+          ></div>
+
+          <ul
+            id="reservas-list"
+            class="space-y-2 bg-gray-700 p-4 rounded-lg"
+          ></ul>
+
+          <table id="reserveTable" class="table-auto w-full text-white">
+            <thead>
+              <tr class="bg-gray-700">
+                <th class="p-1 mobile">Descrição</th>
+                <th class="p-1 mobile">Valor</th>
+                <th class="p-1 mobile">Data</th>
+                <th class="p-1 mobile">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Reservas serão exibidas aqui -->
+            </tbody>
+          </table>
+
+          <div
+            id="alertMessage"
+            class="alert bg-yellow-500 text-black text-center p-4 mt-4 rounded-lg"
+            style="display: none"
           >
-            <i class="ph ph-trend-up"></i> Simular Crescimento
-          </button>
-        </form>
+            Nenhuma reserva cadastrada.
+          </div>
 
-        <div
-          id="resultado-simulacao"
-          class="bg-gray-700 p-4 rounded-lg text-center text-lg font-semibold text-purple-400"
-        ></div>
-
-        <ul
-          id="reservas-list"
-          class="space-y-2 bg-gray-700 p-4 rounded-lg"
-        ></ul>
-
-        <table id="reserveTable" class="table-auto w-full text-white">
-          <thead>
-            <tr class="bg-gray-700">
-              <th class="p-1 mobile">Descrição</th>
-              <th class="p-1 mobile">Valor</th>
-              <th class="p-1 mobile">Data</th>
-              <th class="p-1 mobile">Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Reservas serão exibidas aqui -->
-          </tbody>
-        </table>
-
-        <div
-          id="alertMessage"
-          class="alert bg-yellow-500 text-black text-center p-4 mt-4 rounded-lg"
-          style="display: none"
-        >
-          Nenhuma reserva cadastrada.
-        </div>
-
-        <div class="flex justify-between items-center mt-6">
-          <button
-            id="exportar-btn"
-            class="bg-blue-500 hover:bg-blue-600 transition rounded-lg py-2 px-4 text-white font-semibold flex items-center justify-center gap-2"
-          >
-            <i class="ph ph-upload-simple"></i> Exportar Reservas
-          </button>
-          <button
-            id="importar-btn"
-            class="bg-green-500 hover:bg-green-600 transition rounded-lg py-2 px-4 text-white font-semibold flex items-center justify-center gap-2"
-          >
-            <i class="ph ph-download-simple"></i> Importar Reservas
-          </button>
-          <button
-            id="relatorio-btn"
-            class="bg-yellow-500 hover:bg-yellow-600 transition rounded-lg py-2 px-4 text-white font-semibold flex items-center justify-center gap-2"
-          >
-            <i class="ph ph-file-text"></i> Gerar Relatório
-          </button>
-        </div>
-      </section>
+          <div class="flex justify-between items-center mt-6">
+            <button
+              id="exportar-btn"
+              class="bg-blue-500 hover:bg-blue-600 transition rounded-lg py-2 px-4 text-white font-semibold flex items-center justify-center gap-2"
+            >
+              <i class="ph ph-upload-simple"></i> Exportar Reservas
+            </button>
+            <button
+              id="importar-btn"
+              class="bg-green-500 hover:bg-green-600 transition rounded-lg py-2 px-4 text-white font-semibold flex items-center justify-center gap-2"
+            >
+              <i class="ph ph-download-simple"></i> Importar Reservas
+            </button>
+            <button
+              id="relatorio-btn"
+              class="bg-yellow-500 hover:bg-yellow-600 transition rounded-lg py-2 px-4 text-white font-semibold flex items-center justify-center gap-2"
+            >
+              <i class="ph ph-file-text"></i> Gerar Relatório
+            </button>
+          </div>
+        </section>
+      </main>
     </main>
 
-    <footer class="bg-gray-800 py-6 text-center shadow-lg">
-      <p class="text-gray-400 flex items-center justify-center gap-2">
-        <i class="ph ph-copyright"></i> 2025 FinancEasy. Todos os direitos
-        reservados.
-      </p>
-    </footer>
-
+  
     <div
       id="notificacao"
       class="fixed top-4 right-4 p-4 rounded-lg text-white"

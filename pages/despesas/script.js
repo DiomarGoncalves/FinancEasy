@@ -298,3 +298,28 @@ function exportarPDF() {
   });
   doc.save("Relatorio de despesas.pdf");
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const despesasTable = document.querySelector("#despesasTable");
+  const despesaForm = document.querySelector("#despesaForm");
+
+  // Adicionar despesa
+  despesaForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const estabelecimento = document.querySelector("#estabelecimento").value;
+    const valor = document.querySelector("#valor").value;
+    const data = document.querySelector("#data").value;
+
+    if (estabelecimento && valor && data) {
+      const novaLinha = `
+        <tr>
+          <td>${estabelecimento}</td>
+          <td>${valor}</td>
+          <td>${data}</td>
+        </tr>
+      `;
+      despesasTable.querySelector("tbody").insertAdjacentHTML("beforeend", novaLinha);
+      despesaForm.reset();
+    }
+  });
+});

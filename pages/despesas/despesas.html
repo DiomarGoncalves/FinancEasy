@@ -39,133 +39,151 @@
     </style>
     <title>Controle de Despesas</title>
   </head>
-  <body class="bg-gray-900 text-white">
-    <div class="container mx-auto mt-4">
-      <a href="../home/home.html" class="bg-purple-600 text-white p-1 mobile rounded-md mb-3 hover:bg-purple-700 inline-block">🏠 Voltar para o início</a>
-      <a href="/pages/historicoDespesas/historicoDespesas.html" class="bg-purple-600 text-white p-1 mobile rounded-md mb-3 hover:bg-purple-700 inline-block">📜 Histórico de Despesas Pagas</a>
-      <button class="bg-gray-600 text-white p-1 mobile rounded-md mb-3 hover:bg-gray-700" id="exportar">📑 Exportar para PDF</button>
+  <body class="bg-gray-900 text-white min-h-screen flex">
+    <nav class="sidebar">
+        <a href="/pages/home/home.html"><h2 class="text-purple-300 text-xl font-bold mb-4">FinancEasy</h2></a>
+    
+        <a href="/pages/cartao/cartoes.html">💳 Cartões</a>
+        <div class="dropdown">
+        <a href="#" class="text-white">📊 Transações</a>
+        <div class="dropdown-content">
+            <a href="/pages/despesas/despesas.html">📉 Despesas</a>
+            <a href="/pages/receitas/receitas.html">📈 Receitas</a>
+        </div>
+        </div>
+        <a href="/pages/investimentos/investimentos.html">📊 Investimentos</a>
+        <a href="/pages/comissao/comissao.html">💰 Comissões</a>
+        <a href="/pages/reservas/reservas.html">🏦 Reservas</a>
+        <a href="/pages/relatorios/relatorios.html">📋 Relatórios</a>
+        <a href="/pages/configuracao/configuracao.html">⚙️ Configuração</a>
+    </nav>
 
-      <h1 class="text-center text-4xl font-bold mb-4">Controle de Despesas 💸</h1>
+    <main class="main-content ml-64 p-6">
+      <div class="container mx-auto mt-4">
+        <button class="bg-gray-600 text-white p-1 mobile rounded-md mb-3 hover:bg-gray-700" id="exportar">📑 Exportar para PDF</button>
 
-      <div class="bg-gray-800 text-white p-6 rounded-lg shadow-lg">
-        <h2 class="text-2xl font-semibold mb-4">💰 Adicionar Despesa</h2>
-        <div id="errorMessage" class="hidden mb-4 p-4 bg-red-600 rounded-md"></div>
-        <form id="despesaForm" class="space-y-6" novalidate>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label for="estabelecimento" class="block text-lg">🏪 Estabelecimento</label>
-              <input type="text" id="estabelecimento" name="estabelecimento" class="bg-gray-700 text-white p-2 rounded-md w-full" placeholder="Nome do estabelecimento" required />
-            </div>
-            <div>
-              <label for="data" class="block text-lg">📅 Data</label>
-              <input type="date" id="data" name="data" class="bg-gray-700 text-white p-2 rounded-md w-full" required />
-            </div>
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label for="valor" class="block text-lg">💲 Valor</label>
-              <input type="number" id="valor" name="valor" class="bg-gray-700 text-white p-2 rounded-md w-full" placeholder="Valor da despesa" required />
-            </div>
-            <div>
-              <label for="forma_pagamento" class="block text-lg">💳 Forma de Pagamento</label>
-              <select id="forma_pagamento" name="forma_pagamento" class="bg-gray-700 text-white p-2 rounded-md w-full" required>
-                <option value="Pix">Pix 💸</option>
-                <option value="Cartão de Crédito">Cartão de Crédito 💳</option>
-                <option value="Cartão de Débito">Cartão de Débito 💳</option>
-                <option value="Dinheiro">Dinheiro 💵</option>
-              </select>
-            </div>
-          </div>
-          <div id="cartaoCreditoOptions" class="hidden mt-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label for="numero_parcelas" class="block text-lg">📦 Número de Parcelas</label>
-                <input type="number" id="numero_parcelas" name="numero_parcelas" class="bg-gray-700 text-white p-2 rounded-md w-full" placeholder="Número de parcelas" />
-              </div>
-              <div>
-                <label for="valor_parcela" class="block text-lg">💵 Valor da Parcela</label>
-                <input type="number" id="valor_parcela" name="valor_parcela" class="bg-gray-700 text-white p-2 rounded-md w-full" placeholder="Valor da parcela" />
-              </div>
-              <div>
-                <label for="cartao" class="block text-lg">💳 Cartão</label>
-                <select id="cartao" name="cartao" class="bg-gray-700 text-white p-2 rounded-md w-full"></select>
-              </div>
-            </div>
-          </div>
-          <button type="submit" class="bg-purple-600 text-white px-6 py-2 rounded-md hover:bg-purple-700">✅ Adicionar Despesa</button>
-        </form>
-      </div>
+        <h1 class="text-center text-4xl font-bold mb-4">Controle de Despesas 💸</h1>
 
-      <div class="mt-6">
-        <h2 class="text-2xl font-semibold mb-4">📊 Lista de Despesas</h2>
         <div class="bg-gray-800 text-white p-6 rounded-lg shadow-lg">
-          <h2 class="text-xl font-semibold mb-4">🔍 Filtrar Despesas</h2>
-          <form id="filtroForm" class="space-y-6" novalidate>
+          <h2 class="text-2xl font-semibold mb-4">💰 Adicionar Despesa</h2>
+          <div id="errorMessage" class="hidden mb-4 p-4 bg-red-600 rounded-md"></div>
+          <form id="despesaForm" class="space-y-6" novalidate>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label for="filtroDataInicio" class="block text-lg">📆 Data Início</label>
-                <input type="date" id="filtroDataInicio" name="filtroDataInicio" class="bg-gray-700 text-white p-2 rounded-md w-full" />
+                <label for="estabelecimento" class="block text-lg">🏪 Estabelecimento</label>
+                <input type="text" id="estabelecimento" name="estabelecimento" class="bg-gray-700 text-white p-2 rounded-md w-full" placeholder="Nome do estabelecimento" required />
               </div>
               <div>
-                <label for="filtroDataFim" class="block text-lg">📅 Data Fim</label>
-                <input type="date" id="filtroDataFim" name="filtroDataFim" class="bg-gray-700 text-white p-2 rounded-md w-full" />
+                <label for="data" class="block text-lg">📅 Data</label>
+                <input type="date" id="data" name="data" class="bg-gray-700 text-white p-2 rounded-md w-full" required />
               </div>
             </div>
-            <div>
-              <label for="filtroNome" class="block text-lg">🏪 Nome do Estabelecimento</label>
-              <input type="text" id="filtroNome" name="filtroNome" class="bg-gray-700 text-white p-2 rounded-md w-full" placeholder="Digite o nome do estabelecimento" />
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label for="valor" class="block text-lg">💲 Valor</label>
+                <input type="number" id="valor" name="valor" class="bg-gray-700 text-white p-2 rounded-md w-full" placeholder="Valor da despesa" required />
+              </div>
+              <div>
+                <label for="forma_pagamento" class="block text-lg">💳 Forma de Pagamento</label>
+                <select id="forma_pagamento" name="forma_pagamento" class="bg-gray-700 text-white p-2 rounded-md w-full" required>
+                  <option value="Pix">Pix 💸</option>
+                  <option value="Cartão de Crédito">Cartão de Crédito 💳</option>
+                  <option value="Cartão de Débito">Cartão de Débito 💳</option>
+                  <option value="Dinheiro">Dinheiro 💵</option>
+                </select>
+              </div>
             </div>
-            <div>
-              <label for="filtroBanco" class="block text-lg">🏦 Banco</label>
-              <select id="filtroBanco" name="filtroBanco" class="bg-gray-700 text-white p-2 rounded-md w-full">
-                <option value="">Todos os Bancos</option>
-                <!-- Opções serão preenchidas dinamicamente -->
-              </select>
+            <div id="cartaoCreditoOptions" class="hidden mt-6">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label for="numero_parcelas" class="block text-lg">📦 Número de Parcelas</label>
+                  <input type="number" id="numero_parcelas" name="numero_parcelas" class="bg-gray-700 text-white p-2 rounded-md w-full" placeholder="Número de parcelas" />
+                </div>
+                <div>
+                  <label for="valor_parcela" class="block text-lg">💵 Valor da Parcela</label>
+                  <input type="number" id="valor_parcela" name="valor_parcela" class="bg-gray-700 text-white p-2 rounded-md w-full" placeholder="Valor da parcela" />
+                </div>
+                <div>
+                  <label for="cartao" class="block text-lg">💳 Cartão</label>
+                  <select id="cartao" name="cartao" class="bg-gray-700 text-white p-2 rounded-md w-full"></select>
+                </div>
+              </div>
             </div>
-            <button type="submit" class="bg-purple-600 text-white px-6 py-2 rounded-md hover:bg-purple-700">🔎 Filtrar</button>
+            <button type="submit" class="bg-purple-600 text-white px-6 py-2 rounded-md hover:bg-purple-700">✅ Adicionar Despesa</button>
           </form>
         </div>
 
-        <div class="overflow-x-auto mt-6">
-          <table class="table-auto w-full bg-gray-800 text-white rounded-md shadow-lg" id="despesasTable">
-              <thead class="bg-gray-700">
-                  <tr>
-                      <th class="p-1 mobile">
-                          <i class="fas fa-store icon"></i> Estabelecimento
-                      </th>
-                      <th class="p-1 mobile">
-                          <i class="fas fa-calendar-day icon"></i> Data
-                      </th>
-                      <th class="p-1 mobile">
-                          <i class="fas fa-dollar-sign icon"></i> Valor
-                      </th>
-                      <th class="p-1 mobile">
-                          <i class="fas fa-credit-card icon"></i> Forma de Pagamento
-                      </th>
-                      <th class="p-1 mobile">
-                          <i class="fas fa-box icon"></i> Parcelas
-                      </th>
-                      <th class="p-1 mobile">
-                          <i class="fas fa-hourglass-half icon"></i> Parcelas Restantes
-                      </th>
-                      <th class="p-1 mobile">
-                          <i class="fas fa-dollar-sign icon"></i> Valor da Parcela
-                      </th>
-                      <th class="p-1 mobile">
-                          <i class="fas fa-credit-card icon"></i> Cartão
-                      </th>
-                      <th class="p-1 mobile">
-                          <i class="fas fa-cogs icon"></i> Ações
-                      </th>
-                  </tr>
-              </thead>
-              <tbody>
-              </tbody>
-          </table>
+        <div class="mt-6">
+          <h2 class="text-2xl font-semibold mb-4">📊 Lista de Despesas</h2>
+          <div class="bg-gray-800 text-white p-6 rounded-lg shadow-lg">
+            <h2 class="text-xl font-semibold mb-4">🔍 Filtrar Despesas</h2>
+            <form id="filtroForm" class="space-y-6" novalidate>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label for="filtroDataInicio" class="block text-lg">📆 Data Início</label>
+                  <input type="date" id="filtroDataInicio" name="filtroDataInicio" class="bg-gray-700 text-white p-2 rounded-md w-full" />
+                </div>
+                <div>
+                  <label for="filtroDataFim" class="block text-lg">📅 Data Fim</label>
+                  <input type="date" id="filtroDataFim" name="filtroDataFim" class="bg-gray-700 text-white p-2 rounded-md w-full" />
+                </div>
+              </div>
+              <div>
+                <label for="filtroNome" class="block text-lg">🏪 Nome do Estabelecimento</label>
+                <input type="text" id="filtroNome" name="filtroNome" class="bg-gray-700 text-white p-2 rounded-md w-full" placeholder="Digite o nome do estabelecimento" />
+              </div>
+              <div>
+                <label for="filtroBanco" class="block text-lg">🏦 Banco</label>
+                <select id="filtroBanco" name="filtroBanco" class="bg-gray-700 text-white p-2 rounded-md w-full">
+                  <option value="">Todos os Bancos</option>
+                  <!-- Opções serão preenchidas dinamicamente -->
+                </select>
+              </div>
+              <button type="submit" class="bg-purple-600 text-white px-6 py-2 rounded-md hover:bg-purple-700">🔎 Filtrar</button>
+            </form>
+          </div>
+
+          <div class="overflow-x-auto mt-6">
+            <table class="table-auto w-full bg-gray-800 text-white rounded-md shadow-lg" id="despesasTable">
+                <thead class="bg-gray-700">
+                    <tr>
+                        <th class="p-1 mobile">
+                            <i class="fas fa-store icon"></i> Estabelecimento
+                        </th>
+                        <th class="p-1 mobile">
+                            <i class="fas fa-calendar-day icon"></i> Data
+                        </th>
+                        <th class="p-1 mobile">
+                            <i class="fas fa-dollar-sign icon"></i> Valor
+                        </th>
+                        <th class="p-1 mobile">
+                            <i class="fas fa-credit-card icon"></i> Forma de Pagamento
+                        </th>
+                        <th class="p-1 mobile">
+                            <i class="fas fa-box icon"></i> Parcelas
+                        </th>
+                        <th class="p-1 mobile">
+                            <i class="fas fa-hourglass-half icon"></i> Parcelas Restantes
+                        </th>
+                        <th class="p-1 mobile">
+                            <i class="fas fa-dollar-sign icon"></i> Valor da Parcela
+                        </th>
+                        <th class="p-1 mobile">
+                            <i class="fas fa-credit-card icon"></i> Cartão
+                        </th>
+                        <th class="p-1 mobile">
+                            <i class="fas fa-cogs icon"></i> Ações
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        
+        </div>
       </div>
-      
-      </div>
-    </div>
+    </main>
     <script src="script.js"></script>
   </body>
 </html>
