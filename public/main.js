@@ -131,26 +131,4 @@ function saveConfig(config) {
   const currentConfig = loadConfig();
   const updatedConfig = { ...currentConfig, ...config };
   fs.writeFileSync(configPath, JSON.stringify(updatedConfig));
-<<<<<<< Updated upstream
-}
-
-// Verifique se o código está sendo executado no processo de renderização
-if (typeof window !== 'undefined' && typeof document !== 'undefined') {
-  document.addEventListener("DOMContentLoaded", () => {
-    console.log("Aplicação inicializada com sucesso!");
-
-    // Exemplo de ajuste responsivo
-    const sidebarToggle = document.querySelector("#sidebarToggle");
-    const sidebar = document.querySelector(".sidebar");
-
-    if (sidebarToggle && sidebar) {
-      sidebarToggle.addEventListener("click", () => {
-        sidebar.classList.toggle("hidden");
-      });
-    }
-  });
-} else {
-  console.log('Este código está sendo executado no processo principal ou fora do navegador.');
-=======
->>>>>>> Stashed changes
 }
