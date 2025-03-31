@@ -128,17 +128,21 @@ function saveConfig(config) {
   fs.writeFileSync(configPath, JSON.stringify(updatedConfig));
 }
 
-// Adicionar evento DOMContentLoaded para inicialização responsiva
-document.addEventListener("DOMContentLoaded", () => {
-  console.log("Aplicação inicializada com sucesso!");
+// Verifique se o código está sendo executado no processo de renderização
+if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+  document.addEventListener("DOMContentLoaded", () => {
+    console.log("Aplicação inicializada com sucesso!");
 
-  // Exemplo de ajuste responsivo
-  const sidebarToggle = document.querySelector("#sidebarToggle");
-  const sidebar = document.querySelector(".sidebar");
+    // Exemplo de ajuste responsivo
+    const sidebarToggle = document.querySelector("#sidebarToggle");
+    const sidebar = document.querySelector(".sidebar");
 
-  if (sidebarToggle && sidebar) {
-    sidebarToggle.addEventListener("click", () => {
-      sidebar.classList.toggle("hidden");
-    });
-  }
-});
+    if (sidebarToggle && sidebar) {
+      sidebarToggle.addEventListener("click", () => {
+        sidebar.classList.toggle("hidden");
+      });
+    }
+  });
+} else {
+  console.log('Este código está sendo executado no processo principal ou fora do navegador.');
+}

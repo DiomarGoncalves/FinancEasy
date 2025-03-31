@@ -6,22 +6,11 @@ const fs = require("fs");
 const os = require("os"); // Adicionar importação do módulo 'os'
 
 // Configuração do banco de dados
-const db = new sqlite3.Database(path.join(__dirname, "database.db"));
-
-// Promisify para suportar métodos assíncronos
-db.getAsync = promisify(db.get);
-db.allAsync = promisify(db.all);
-db.runAsync = promisify(db.run);
-
-// Variável para configurar o IP da máquina
-
-// Definir o caminho da configuração do aplicativo
+// Carregar o caminho do banco de dados do arquivo de configuração
 const localAppDataPathConfig =
   process.env.LOCALAPPDATA || path.join(os.homedir(), ".local", "share");
 const appFolderConfig = path.join(localAppDataPathConfig, "FinancEasyV2");
 const configPath = path.join(appFolderConfig, "config.json");
-
-const app = express();
 
 function loadConfig() {
   try {
@@ -36,8 +25,27 @@ function loadConfig() {
 }
 
 const config = loadConfig();
+const dbPath = config.dbPath ? path.resolve(config.dbPath, "database.db") : path.join(__dirname, "database.db");
+
+// Verificar se o arquivo do banco de dados existe
+if (!fs.existsSync(dbPath)) {
+  console.error(`Erro: O arquivo do banco de dados não foi encontrado em: ${dbPath}`);
+  process.exit(1); // Finalizar o processo com erro
+}
+
+console.log(`Usando o banco de dados em: ${dbPath}`); // Log para depuração
+const db = new sqlite3.Database(dbPath);
+
+// Promisify para suportar métodos assíncronos
+db.getAsync = promisify(db.get);
+db.allAsync = promisify(db.all);
+db.runAsync = promisify(db.run);
+
+// Variável para configurar o IP da máquina
 const IP_MAQUINA = config.ipServidor || "127.0.0.1";
 const PORT = config.portaServidor || 3050;
+
+const app = express();
 
 // Função para criar tabelas no banco de dados, se não existirem
 function initializeDatabase() {
