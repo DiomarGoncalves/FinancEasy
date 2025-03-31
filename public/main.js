@@ -3,11 +3,16 @@ const path = require("path");
 const fs = require("fs");
 const os = require("os");
 const server = require('./server'); // Importar o servidor Express
+const db = require("./database/db");
 
 const localAppDataPathConfig =
   process.env.LOCALAPPDATA || path.join(os.homedir(), ".local", "share");
 const appFolderConfig = path.join(localAppDataPathConfig, "FinancEasyV2");
 const configPath = path.join(appFolderConfig, "config.json");
+
+console.log("Caminho do arquivo de configuração:", configPath);
+console.log("Caminho do diretório de configuração:", appFolderConfig);
+console.log(db)
 
 let serverInstance;
 
@@ -126,6 +131,7 @@ function saveConfig(config) {
   const currentConfig = loadConfig();
   const updatedConfig = { ...currentConfig, ...config };
   fs.writeFileSync(configPath, JSON.stringify(updatedConfig));
+<<<<<<< Updated upstream
 }
 
 // Verifique se o código está sendo executado no processo de renderização
@@ -145,4 +151,6 @@ if (typeof window !== 'undefined' && typeof document !== 'undefined') {
   });
 } else {
   console.log('Este código está sendo executado no processo principal ou fora do navegador.');
+=======
+>>>>>>> Stashed changes
 }
