@@ -3,6 +3,7 @@ const sqlite3 = require("sqlite3").verbose();
 const { promisify } = require("util");
 const path = require("path");
 const fs = require("fs");
+const db = require("./database/db.js"); // Importar o módulo do banco de dados
 const os = require("os"); // Adicionar importação do módulo 'os'
 
 // Configuração do banco de dados
@@ -25,16 +26,6 @@ function loadConfig() {
 }
 
 const config = loadConfig();
-const dbPath = config.dbPath ? path.resolve(config.dbPath, "database.db") : path.join(__dirname, "database.db");
-
-// Verificar se o arquivo do banco de dados existe
-if (!fs.existsSync(dbPath)) {
-  console.error(`Erro: O arquivo do banco de dados não foi encontrado em: ${dbPath}`);
-  process.exit(1); // Finalizar o processo com erro
-}
-
-console.log(`Usando o banco de dados em: ${dbPath}`); // Log para depuração
-const db = new sqlite3.Database(dbPath);
 
 // Promisify para suportar métodos assíncronos
 db.getAsync = promisify(db.get);
