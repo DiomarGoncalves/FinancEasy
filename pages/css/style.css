@@ -2,10 +2,12 @@
 
 body {
   display: flex;
-  flex-direction: row; /* Sidebar no lado esquerdo */
+  flex-direction: column; /* Flexível para suportar diferentes layouts */
   min-height: 100vh;
   background-color: #1a202c;
   color: white;
+  margin: 0;
+  font-family: Arial, sans-serif;
 }
 
 .sidebar {
@@ -15,7 +17,10 @@ body {
   position: fixed;
   height: 100%;
   overflow-y: auto;
-  left: 0; /* Garantir que o sidebar fique no lado esquerdo */
+  left: 0;
+  top: 0;
+  transition: transform 0.3s ease;
+  z-index: 1000;
 }
 
 .sidebar a {
@@ -45,9 +50,10 @@ body {
 }
 
 .main-content {
-  margin-left: 16rem; /* Espaço para o sidebar */
+  margin-left: 16rem;
   padding: 1.5rem;
   flex-grow: 1;
+  transition: margin-left 0.3s ease;
 }
 
 .dashboard-grid {
@@ -79,300 +85,51 @@ body {
   padding: 20px;
   border-radius: 10px;
 }
-body.dark-mode {
-    background-color: #1a1a1a;
-    color: #e0e0e0;
-  }
-  
-  .navbar {
-    display: flex;
-    justify-content: space-between;
-    padding: 10px;
-  }
-  
-  .navbar ul {
-    list-style: none;
-    display: flex;
-    gap: 20px;
-  }
-  
-  .navbar a {
-    color: white;
-    text-decoration: none;
-    font-weight: bold;
-  }
-  
-  .sales-area {
-    padding: 20px;
-  }
-  
-  .search-bar input {
-    margin-right: 10px;
-    padding: 10px;
-    background-color: #444;
-    color: white;
-    border: none;
-    border-radius: 5px;
-  }
-  
-  .order-summary {
-    margin-top: 20px;
-  }
-  
-  #order-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  #order-table th, #order-table td {
-    padding: 10px;
-    text-align: center;
-    border: 1px solid #ccc;
-  }
-  
-  .payment-methods {
-    margin-top: 20px;
-  }
-  
-  #payment-method {
-    padding: 10px;
-    background-color: #444;
-    color: white;
-    border: none;
-    border-radius: 5px;
-  }
-  
-  button {
-    padding: 10px 20px;
-    background-color: #6a0dad;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  button:hover {
-    background-color: #8e44ad;
-  }
-  
-  /* Responsividade */
-  @media (max-width: 768px) {
-    .mobile {
-      padding: 0,1rem;
-      font-size: 8px;
-    }
-    .navbar ul {
-      display: none;
-      flex-direction: column;
-      background-color: #333;
-      gap: 10px;
-      position: absolute;
-      top: 60px;
-      right: 10px;
-      padding: 10px;
-      border-radius: 5px;
-    }
-  
-    .navbar ul.active {
-      display: flex;
-    }
-  
-    .menu-toggle {
-      display: block;
-      cursor: pointer;
-    }
-  
-    .menu-toggle span {
-      display: block;
-      width: 25px;
-      height: 3px;
-      background-color: white;
-      margin: 5px 0;
-    }
-  
-    .search-bar, .order-summary, .payment-methods {
-      flex-direction: column;
-    }
-  
-    .search-bar input, .payment-methods select, .payment-methods button {
-      width: 100%;
-      margin-bottom: 10px;
-    }
-  
-    .order-summary {
-      margin-top: 10px;
-    }
-  
-    #order-table th, #order-table td {
-      padding: 5px;
-    }
 
-    .container {
-      padding: 1rem;
-    }
-  
-    h1, h2, h3 {
-      font-size: 1.5rem;
-      text-align: center;
-    }
-  
-    .btn {
-      font-size: 0.875rem;
-      padding: 0.5rem 1rem;
-    }
-  
-    table {
-      font-size: 0.75rem;
-    }
-  
-    table th, table td {
-      padding: 0.5rem;
-    }
-  
-    .form-group {
-      margin-bottom: 1rem;
-    }
-  
-    input, select, textarea, button {
-      font-size: 0.875rem;
-      padding: 0.5rem;
-    }
-  
-    .mobile {
-      font-size: 50px;
-      padding: 0.25rem;
-    }
-  
-    .navbar ul {
-      flex-direction: column;
-      gap: 0.5rem;
-    }
-  
-    .navbar a {
-      font-size: 0.875rem;
-    }
+/* Botão toggle para menu responsivo */
+.menu-toggle {
+  display: none;
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  background: #2d3748;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  font-size: 20px;
+  cursor: pointer;
+  z-index: 1100;
+}
 
-    /* Ajustes para tabelas em dispositivos móveis */
-    table {
-      font-size: 0.75rem;
-      width: 100%;
-    }
-
-    table th, table td {
-      padding: 0.5rem;
-      text-align: left;
-    }
-
-    table thead {
-      display: none; /* Esconde o cabeçalho da tabela */
-    }
-
-    table tr {
-      display: block;
-      margin-bottom: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      padding: 0.5rem;
-    }
-
-    table td {
-      display: flex;
-      justify-content: space-between;
-      padding: 0.5rem 0;
-    }
-
-    table td::before {
-      content: attr(data-label);
-      font-weight: bold;
-      color: #ccc;
-      margin-right: 0.5rem;
-    }
-
-    .sidebar {
-      width: 100%; /* Sidebar ocupa toda a largura em telas menores */
-      position: relative;
-      height: auto;
-      padding: 1rem;
-    }
-
-    .main-content {
-      margin-left: 0; /* Remove o espaço reservado para o sidebar */
-      padding: 1rem;
-    }
-
-    .dashboard-grid {
-      grid-template-columns: 1fr; /* Uma coluna em telas menores */
-    }
-
-    .card {
-      margin-bottom: 1rem; /* Espaçamento entre os cards */
-    }
-
-    .navbar ul {
-      flex-direction: column; /* Menu em coluna */
-      gap: 0.5rem;
-    }
-
-    table {
-      font-size: 0.875rem; /* Reduz o tamanho da fonte */
-    }
-
-    table th, table td {
-      padding: 0.5rem;
-    }
-
-    .btn {
-      font-size: 0.875rem;
-      padding: 0.5rem 1rem;
-    }
+/* Responsividade */
+@media (max-width: 768px) {
+  .menu-toggle {
+    display: block;
   }
 
-  @media (max-width: 480px) {
-    h1, h2, h3 {
-      font-size: 1.25rem; /* Reduz o tamanho dos títulos */
-    }
-
-    .btn {
-      font-size: 0.75rem;
-      padding: 0.5rem;
-    }
-
-    input, select, textarea, button {
-      font-size: 0.75rem;
-      padding: 0.5rem;
-    }
-
-    .mobile {
-      font-size: 0.75rem;
-      padding: 0.25rem;
-    }
+  .sidebar {
+    transform: translateX(-100%);
   }
 
-  /* Ajustes para telas muito pequenas (ex.: smartphones) */
-  @media (max-width: 980px) {
-    .container {
-      padding: 0.5rem;
-    }
-  
-    h1, h2, h3 {
-      font-size: 1.25rem;
-    }
-  
-    .btn {
-      font-size: 0.75rem;
-      padding: 0.5rem;
-    }
-  
-    table {
-      font-size: 0.625rem;
-    }
-  
-    input, select, textarea, button {
-      font-size: 0.75rem;
-      padding: 0.25rem;
-    }
-  
-    .mobile, td {
-      font-size: 0.99rem;
-      padding: 0.25rem;
-    }
+  .sidebar.active {
+    transform: translateX(0);
   }
+
+  .main-content {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 15px;
+  }
+
+  .chart-container {
+    padding: 15px;
+  }
+
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}

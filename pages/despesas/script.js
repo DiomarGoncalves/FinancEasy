@@ -15,7 +15,7 @@ function showMessage(message, type) {
     toastContainer.style.gap = "10px";
     document.body.appendChild(toastContainer);
   }
-  
+
   const toast = document.createElement("div");
   toast.className = `toast-message alert alert-${type}`;
   toast.textContent = message;
@@ -32,17 +32,17 @@ function showMessage(message, type) {
     success: "#4CAF50",
     error: "#F44336",
     warning: "#FFC107",
-    info: "#2196F3"
+    info: "#2196F3",
   };
   toast.style.backgroundColor = colors[type] || "#333";
-  
+
   toastContainer.appendChild(toast);
 
   setTimeout(() => {
     toast.style.opacity = "1";
     toast.style.transform = "translateY(0)";
   }, 100);
-  
+
   setTimeout(() => {
     toast.style.opacity = "0";
     toast.style.transform = "translateY(-20px)";
@@ -108,88 +108,137 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
     });
 
-  document.getElementById("numero_parcelas").addEventListener("input", (event) => {
-    const valor = parseFloat(document.getElementById("valor").value) || 0;
-    const numeroParcelas = parseInt(event.target.value) || 1;
-  
-    if (numeroParcelas > 0) {
-      const valorParcela = valor / numeroParcelas;
-      document.getElementById("valor_parcela").value = valorParcela.toFixed(2);
-    } else {
-      document.getElementById("valor_parcela").value = "0.00";
-    }
-  });
+  document
+    .getElementById("numero_parcelas")
+    .addEventListener("input", (event) => {
+      const valor = parseFloat(document.getElementById("valor").value) || 0;
+      const numeroParcelas = parseInt(event.target.value) || 1;
 
-  document.getElementById("despesaForm").addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const estabelecimento = document.getElementById("estabelecimento").value;
-    const data = document.getElementById("data").value;
-    const valor = parseFloat(document.getElementById("valor").value);
-    let formaPagamento = document.getElementById("forma_pagamento").value;
-
-    // Validação do campo forma_pagamento
-    const formasPermitidas = ["Crédito", "Débito", "Dinheiro", "Pix"];
-    if (!formasPermitidas.includes(formaPagamento)) {
-      showMessage("Forma de pagamento inválida!", "error");
-      return;
-    }
-
-    const numeroParcelas = formaPagamento === "Crédito" 
-      ? parseInt(document.getElementById("numero_parcelas").value) || 1 
-      : 1;
-    const valorParcela = formaPagamento === "Crédito" 
-      ? parseFloat(document.getElementById("valor_parcela").value) || valor 
-      : valor;
-    const cartaoId = formaPagamento === "Crédito" 
-      ? parseInt(document.getElementById("cartao").value) 
-      : null;
-  
-    const parcelas = [];
-    let dataParcela = new Date(data);
-  
-    for (let i = 0; i < numeroParcelas; i++) {
-      parcelas.push({
-        estabelecimento,
-        data: dataParcela.toISOString().split("T")[0],
-        valor: valorParcela,
-        forma_pagamento: formaPagamento,
-        numero_parcelas: numeroParcelas,
-        parcelas_restantes: numeroParcelas - i,
-        valor_parcela: valorParcela,
-        cartao_id: cartaoId,
-      });
-      dataParcela.setMonth(dataParcela.getMonth() + 1); // Avançar para o próximo mês
-    }
-  
-    try {
-      const response = await fetch("/api/despesas/parceladas", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(parcelas),
-      });
-      if (response.ok) {
-        showMessage("Despesa parcelada registrada com sucesso!", "success");
-        loadDespesas();
+      if (numeroParcelas > 0) {
+        const valorParcela = valor / numeroParcelas;
+        document.getElementById("valor_parcela").value =
+          valorParcela.toFixed(2);
       } else {
-        throw new Error("Erro ao registrar despesa parcelada");
+        document.getElementById("valor_parcela").value = "0.00";
       }
-    } catch (error) {
-      showMessage(`Erro ao registrar despesa parcelada: ${error.message}`, "danger");
-    }
-  
-    resetFormAndUnlockInputs(event.target);
-  });
+    });
 
-  document.getElementById("filtroForm").addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const filtros = {
-      dataInicio: document.getElementById("filtroDataInicio").value,
-      dataFim: document.getElementById("filtroDataFim").value,
-      nome: document.getElementById("filtroNome").value,
-      banco: filtroBanco.value,
-    };
-    await filtrarDespesas(filtros);
-  });
+  document
+    .getElementById("despesaForm")
+    .addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const dataInput = document.getElementById("date");
+      const estabelecimentoInput = document.getElementById("estabelecimento");
+      const valorInput = document.getElementById("valor");
+      const formaPagamentoInput = document.getElementById("forma_pagamento");
+
+      if (!dataInput || !estabelecimentoInput || !valorInput || !formaPagamentoInput) {
+        console.error("Um ou mais elementos obrigatórios não foram encontrados.");
+        showMessage("Erro interno: elementos obrigatórios não encontrados.", "error");
+        return;
+      }
+
+      const data = dataInput.value.trim();
+      const estabelecimento = estabelecimentoInput.value.trim();
+      const valor = parseFloat(valorInput.value);
+      const formaPagamento = formaPagamentoInput.value.trim();
+
+      if (!data || !estabelecimento || isNaN(valor) || valor <= 0) {
+        showMessage("Por favor, preencha todos os campos obrigatórios corretamente.", "error");
+        console.error("Dados inválidos:", { data, estabelecimento, valor });
+        return;
+      }
+
+      // Normalizar o valor de forma_pagamento
+      const formasPagamentoValidas = ["Crédito", "Débito", "Dinheiro", "Pix"];
+      const formaPagamentoNormalizada = formaPagamento
+        .replace("Cartão de Crédito", "Crédito")
+        .replace("Cartão de Débito", "Débito");
+
+      if (!formasPagamentoValidas.includes(formaPagamentoNormalizada)) {
+        showMessage("Forma de pagamento inválida.", "error");
+        console.error("Forma de pagamento inválida:", formaPagamentoNormalizada);
+        return;
+      }
+
+      const numeroParcelasInput = document.getElementById("numero_parcelas");
+      const valorParcelaInput = document.getElementById("valor_parcela");
+      const cartaoInput = document.getElementById("cartao");
+
+      const numeroParcelas =
+        formaPagamentoNormalizada === "Crédito"
+          ? parseInt(numeroParcelasInput?.value) || 1
+          : 1;
+      const valorParcela =
+        formaPagamentoNormalizada === "Crédito"
+          ? parseFloat(valorParcelaInput?.value) || valor
+          : valor;
+      const cartaoId =
+        formaPagamentoNormalizada === "Crédito"
+          ? parseInt(cartaoInput?.value)
+          : null;
+
+      const parcelas = [];
+      let dataParcela = new Date(data);
+
+      for (let i = 0; i < numeroParcelas; i++) {
+        if (isNaN(dataParcela.getTime())) {
+          showMessage("Erro ao processar a data da parcela. Data inválida.", "error");
+          console.error("Data inválida ao gerar parcelas:", dataParcela);
+          return;
+        }
+
+        parcelas.push({
+          estabelecimento,
+          data: dataParcela.toISOString().split("T")[0],
+          valor: valorParcela,
+          forma_pagamento: formaPagamentoNormalizada,
+          numero_parcelas: numeroParcelas,
+          parcelas_restantes: numeroParcelas - i,
+          valor_parcela: valorParcela,
+          cartao_id: cartaoId,
+        });
+        dataParcela.setMonth(dataParcela.getMonth() + 1);
+      }
+
+      console.log("Dados enviados ao servidor:", parcelas);
+
+      try {
+        const response = await fetch("/api/despesas/parceladas", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(parcelas),
+        });
+
+        if (response.ok) {
+          showMessage("Despesa parcelada registrada com sucesso!", "success");
+          loadDespesas();
+        } else {
+          const errorData = await response.json();
+          console.error("Erro do servidor:", errorData);
+          showMessage(`Erro ao registrar despesa: ${errorData.error || "Erro desconhecido"}`, "error");
+        }
+      } catch (error) {
+        console.error("Erro ao registrar despesa parcelada:", error);
+        showMessage(`Erro ao registrar despesa parcelada: ${error.message}`, "danger");
+      }
+
+      resetFormAndUnlockInputs(event.target);
+    });
+
+  document
+    .getElementById("filtroForm")
+    .addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const filtros = {
+        dataInicio: document.getElementById("filtroDataInicio").value,
+        dataFim: document.getElementById("filtroDataFim").value,
+        nome: document.getElementById("filtroNome").value,
+        banco: filtroBanco.value,
+      };
+      await filtrarDespesas(filtros);
+    });
 
   await loadBancos();
   loadDespesas();
@@ -222,10 +271,14 @@ function renderDespesas(despesas) {
       <td>R$ ${despesa.valor_parcela}</td>
       <td>${despesa.cartao_nome || "-"}</td>
       <td colspan="1" class="text-center">
-          <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md mr-2" onclick="payDespesa(${despesa.id})">
+          <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md mr-2" onclick="payDespesa(${
+            despesa.id
+          })">
               <i class="fas fa-dollar-sign icon"></i> Pagar
           </button>
-          <button class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md" onclick="deleteDespesa(${despesa.id})">
+          <button class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md" onclick="deleteDespesa(${
+            despesa.id
+          })">
               <i class="fas fa-trash-alt icon"></i> Excluir
           </button>
       </td>
@@ -237,7 +290,9 @@ function renderDespesas(despesas) {
 
 async function payDespesa(id) {
   try {
-    const response = await fetch(`/api/despesas/${id}/pagar`, { method: "POST" });
+    const response = await fetch(`/api/despesas/${id}/pagar`, {
+      method: "POST",
+    });
     if (response.ok) {
       loadDespesas(); // Atualizar a lista de despesas
       showMessage("Despesa paga com sucesso!", "success");
@@ -298,28 +353,3 @@ function exportarPDF() {
   });
   doc.save("Relatorio de despesas.pdf");
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-  const despesasTable = document.querySelector("#despesasTable");
-  const despesaForm = document.querySelector("#despesaForm");
-
-  // Adicionar despesa
-  despesaForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const estabelecimento = document.querySelector("#estabelecimento").value;
-    const valor = document.querySelector("#valor").value;
-    const data = document.querySelector("#data").value;
-
-    if (estabelecimento && valor && data) {
-      const novaLinha = `
-        <tr>
-          <td>${estabelecimento}</td>
-          <td>${valor}</td>
-          <td>${data}</td>
-        </tr>
-      `;
-      despesasTable.querySelector("tbody").insertAdjacentHTML("beforeend", novaLinha);
-      despesaForm.reset();
-    }
-  });
-});

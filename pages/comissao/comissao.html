@@ -8,26 +8,37 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.13/jspdf.plugin.autotable.min.js"></script>
     <title>Comissões</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/pages/css/style.css">
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body class="bg-gray-900 text-white min-h-screen flex">
-    <nav class="sidebar">
-        <a href="/pages/home/home.html"><h2 class="text-purple-300 text-xl font-bold mb-4">FinancEasy</h2></a>
+    <header>
+        <nav class="sidebar" id="sidebar">
+            <a href="/pages/home/home.html"><h2 class="text-purple-300 text-xl font-bold mb-4">FinancEasy</h2></a>
+            <a href="/pages/cartao/cartoes.html">💳 Cartões</a>
+            <div class="dropdown">
+            <a href="#" class="text-white">📊 Transações</a>
+            <div class="dropdown-content">
+                <a href="/pages/despesas/despesas.html">📉 Despesas</a>
+                <a href="/pages/receitas/receitas.html">📈 Receitas</a>
+            </div>
+            </div>
+            <div class="dropdown">
+            <a href="#" class="text-white">📊 Históricos</a>
+            <div class="dropdown-content">
+                <a href="/pages/historicoComissões/historicoComissões.html">📉Historico de Comissões</a>
+                <a href="/pages/historicoDespesas/historicoDespesas.html">📈 Historico de Despesas</a>
+                <a href="/pages/historicoReceitas/historicoReceitas.html">📈 Historico de Receitas</a>
+            </div>
+            </div>
+            <a href="/pages/investimentos/investimentos.html">📊 Investimentos</a>
+            <a href="/pages/comissao/comissao.html">💰 Comissões</a>
+            <a href="/pages/reservas/reservas.html">🏦 Reservas</a>
+            <a href="/pages/relatorios/relatorios.html">📋 Relatórios</a>
+            <a href="/pages/loginC/loginConfig.html">⚙️ Configuração</a>
+        </nav>
     
-        <a href="/pages/cartao/cartoes.html">💳 Cartões</a>
-        <div class="dropdown">
-        <a href="#" class="text-white">📊 Transações</a>
-        <div class="dropdown-content">
-            <a href="/pages/despesas/despesas.html">📉 Despesas</a>
-            <a href="/pages/receitas/receitas.html">📈 Receitas</a>
-        </div>
-        </div>
-        <a href="/pages/investimentos/investimentos.html">📊 Investimentos</a>
-        <a href="/pages/comissao/comissao.html">💰 Comissões</a>
-        <a href="/pages/reservas/reservas.html">🏦 Reservas</a>
-        <a href="/pages/relatorios/relatorios.html">📋 Relatórios</a>
-        <a href="/pages/configuracao/configuracao.html">⚙️ Configuração</a>
-    </nav>
+      <button class="menu-toggle" id="menuToggle">☰</button>    
+    </header>
 
     <main class="main-content ml-64 p-6">
         <button class="bg-gray-600 text-white p-1 mobile rounded-md mb-3 hover:bg-gray-700" id="exportar">📑 Exportar para PDF</button>
@@ -43,7 +54,6 @@
                 </div>
                 <button type="submit" class="mt-4 bg-green-500 p-2 rounded">Cadastrar Venda</button>
             </form>
-            
             <h2 class="text-2xl font-bold mt-6">Comissões Pendentes</h2>
             <table class="w-full mt-4 bg-gray-800 rounded-lg" id="tabelaComissoesPendentes">
                 <thead>
@@ -64,5 +74,6 @@
         </div>
     </main>
     <script src="script.js"></script>
+    <script src="../js/script.js"></script>
 </body>
 </html>

@@ -3,73 +3,46 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="../css/style.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
       rel="stylesheet"
     />
     <title>Controle de Investimentos</title>
-    <link rel="stylesheet" href="styles.css" />
-
-    <style>
-      tr {
-        border-bottom: 1px solid #333;
-      }
-
-      /* Estilizando a scrollbar para navegadores baseados em WebKit */
-      ::-webkit-scrollbar {
-        width: 12px; /* Largura da scrollbar */
-      }
-
-      ::-webkit-scrollbar-track {
-        background: #2d3748; /* Cor do fundo da scrollbar */
-      }
-
-      ::-webkit-scrollbar-thumb {
-        background-color: #4a5568; /* Cor da barra de rolagem */
-        border-radius: 10px; /* Arredondamento da barra de rolagem */
-        border: 3px solid #2d3748; /* Espaço ao redor da barra de rolagem */
-      }
-
-      ::-webkit-scrollbar-thumb:hover {
-        background-color: #718096; /* Cor da barra de rolagem ao passar o mouse */
-      }
-
-      /* Aplicando estilos para o corpo da página */
-      body {
-        scrollbar-width: thin;
-        scrollbar-color: #4a5568 #2d3748;
-      }
-    </style>
+    <link rel="stylesheet" href="../css/style.css" />
   </head>
   <body class="bg-gray-900 text-white min-h-screen flex">
-    <nav class="sidebar">
-      <a href="/pages/home/home.html"><h2 class="text-purple-300 text-xl font-bold mb-4">FinancEasy</h2></a>
+    <header>
+      <nav class="sidebar" id="sidebar">
+          <a href="/pages/home/home.html"><h2 class="text-purple-300 text-xl font-bold mb-4">FinancEasy</h2></a>
+          <a href="/pages/cartao/cartoes.html">💳 Cartões</a>
+          <div class="dropdown">
+          <a href="#" class="text-white">📊 Transações</a>
+          <div class="dropdown-content">
+              <a href="/pages/despesas/despesas.html">📉 Despesas</a>
+              <a href="/pages/receitas/receitas.html">📈 Receitas</a>
+          </div>
+          </div>
+          <div class="dropdown">
+          <a href="#" class="text-white">📊 Históricos</a>
+          <div class="dropdown-content">
+              <a href="/pages/historicoComissões/historicoComissões.html">📉Historico de Comissões</a>
+              <a href="/pages/historicoDespesas/historicoDespesas.html">📈 Historico de Despesas</a>
+              <a href="/pages/historicoReceitas/historicoReceitas.html">📈 Historico de Receitas</a>
+          </div>
+          </div>
+          <a href="/pages/investimentos/investimentos.html">📊 Investimentos</a>
+          <a href="/pages/comissao/comissao.html">💰 Comissões</a>
+          <a href="/pages/reservas/reservas.html">🏦 Reservas</a>
+          <a href="/pages/relatorios/relatorios.html">📋 Relatórios</a>
+          <a href="/pages/loginC/loginConfig.html">⚙️ Configuração</a>
+      </nav>
   
-      <a href="/pages/cartao/cartoes.html">💳 Cartões</a>
-      <div class="dropdown">
-        <a href="#" class="text-white">📊 Transações</a>
-        <div class="dropdown-content">
-          <a href="/pages/despesas/despesas.html">📉 Despesas</a>
-          <a href="/pages/receitas/receitas.html">📈 Receitas</a>
-        </div>
-      </div>
-      <a href="/pages/investimentos/investimentos.html">📊 Investimentos</a>
-      <a href="/pages/comissao/comissao.html">💰 Comissões</a>
-      <a href="/pages/reservas/reservas.html">🏦 Reservas</a>
-      <a href="/pages/relatorios/relatorios.html">📋 Relatórios</a>
-      <a href="/pages/configuracao/configuracao.html">⚙️ Configuração</a>
-    </nav>
+    <button class="menu-toggle" id="menuToggle">☰</button>
+  </header>
 
-    <main class="main-content ml-64 p-6">
+    <main class="main-content p-6">
       <div class="container mx-auto mt-4 p-4">
-        <a
-          href="../home/home.html"
-          class="btn bg-purple-600 hover:bg-purple-500 text-white p-1 mobile rounded-lg mb-3 inline-block"
-        >
-          <i class="fas fa-home"></i> Voltar para a Home
-        </a>
         <h1 class="text-3xl font-bold mb-4">📈 Controle de Investimentos</h1>
 
         <div class="bg-gray-800 p-6 rounded-2xl shadow-lg mb-8">
@@ -157,8 +130,12 @@
           <table id="investmentTable" class="table-auto w-full text-white">
             <thead>
               <tr class="bg-gray-700">
-                <th class="p-1 mobile"><i class="fas fa-briefcase"></i> Ativo</th>
-                <th class="p-1 mobile"><i class="fas fa-cogs"></i> Quantidade</th>
+                <th class="p-1 mobile">
+                  <i class="fas fa-briefcase"></i> Ativo
+                </th>
+                <th class="p-1 mobile">
+                  <i class="fas fa-cogs"></i> Quantidade
+                </th>
                 <th class="p-1 mobile">
                   <i class="fas fa-dollar-sign"></i> Valor Investido
                 </th>
@@ -190,5 +167,6 @@
     </main>
 
     <script src="script.js"></script>
+    <script src="../js/script.js"></script>
   </body>
 </html>

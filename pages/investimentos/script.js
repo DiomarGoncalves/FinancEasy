@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const investmentTableBody = document.querySelector("#investmentTable tbody");
   const alertMessage = document.getElementById("alertMessage");
   const investimentosTable = document.querySelector("#investimentosTable");
-  const investimentoForm = document.querySelector("#investimentoForm");
+  const investimentoForm = document.querySelector("#investmentForm");
 
   investmentForm.addEventListener("submit", async (event) => {
     event.preventDefault();

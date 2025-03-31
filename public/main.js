@@ -10,9 +10,6 @@ const localAppDataPathConfig =
 const appFolderConfig = path.join(localAppDataPathConfig, "FinancEasyV2");
 const configPath = path.join(appFolderConfig, "config.json");
 
-console.log("Caminho do arquivo de configuração:", configPath);
-console.log("Caminho do diretório de configuração:", appFolderConfig);
-console.log(db)
 
 let serverInstance;
 
@@ -79,6 +76,7 @@ app.whenReady().then(() => {
       ipServidor:"127.0.0.1",
       portaServidor:3050,
       novaSenha:"",
+      dbPath: "C:\\databases",
     };
     fs.writeFileSync(configPath, JSON.stringify(defaultConfig));
   }
@@ -98,6 +96,7 @@ function loadConfig() {
       ipServidor:"127.0.0.1",
       portaServidor:3050,
       novaSenha:"",
+      dbPath: "C:\\databases",
     }; // Configurações padrão
   }
 }

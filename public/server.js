@@ -135,7 +135,7 @@ app.use("/public", express.static(path.join(__dirname)));
 
 // Rota inicial para teste
 app.get("/", (req, res) => {
-  res.redirect("/home/home.html"); // Redirecionar para a página inicial
+  res.redirect("/pages/home/home.html"); // Redirecionar para a página inicial
 });
 
 // Rota para listar receitas
@@ -1106,15 +1106,31 @@ app.post("/api/despesas/parceladas", (req, res) => {
   `;
 
   const db = require("./database/db");
-  const promises = despesas.map((despesa) =>
-    new Promise((resolve, reject) => {
+  const promises = despesas.map((despesa) => {
+    // Validar e normalizar os dados recebidos
+    const formasPagamentoValidas = ["Crédito", "Débito", "Dinheiro", "Pix"];
+    const formaPagamentoNormalizada = despesa.forma_pagamento
+      .replace("Cartão de Crédito", "Crédito")
+      .replace("Cartão de Débito", "Débito");
+
+    if (
+      !despesa.estabelecimento ||
+      !despesa.data ||
+      !despesa.valor ||
+      !formasPagamentoValidas.includes(formaPagamentoNormalizada)
+    ) {
+      console.error("Dados inválidos recebidos:", despesa);
+      return Promise.reject(new Error("Dados inválidos para despesa."));
+    }
+
+    return new Promise((resolve, reject) => {
       db.run(
         sql,
         [
           despesa.estabelecimento,
           despesa.data,
           despesa.valor,
-          despesa.forma_pagamento,
+          formaPagamentoNormalizada,
           despesa.numero_parcelas,
           despesa.parcelas_restantes,
           despesa.valor_parcela,
@@ -1125,8 +1141,8 @@ app.post("/api/despesas/parceladas", (req, res) => {
           else resolve();
         }
       );
-    })
-  );
+    });
+  });
 
   Promise.all(promises)
     .then(() => res.status(201).json({ message: "Despesas parceladas registradas com sucesso!" }))

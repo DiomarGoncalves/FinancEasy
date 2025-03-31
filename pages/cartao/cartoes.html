@@ -2,62 +2,43 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="../css/style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lista de Cartões</title>
   <link rel="stylesheet" href="styles.css">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <style>
-    tr {
-      border-bottom: 1px solid #333;
-    }
-
-    /* Estilizando a scrollbar para navegadores baseados em WebKit */
-    ::-webkit-scrollbar {
-      width: 12px; /* Largura da scrollbar */
-    }
-
-    ::-webkit-scrollbar-track {
-      background: #2d3748; /* Cor do fundo da scrollbar */
-    }
-
-    ::-webkit-scrollbar-thumb {
-      background-color: #4a5568; /* Cor da barra de rolagem */
-      border-radius: 10px; /* Arredondamento da barra de rolagem */
-      border: 3px solid #2d3748; /* Espaço ao redor da barra de rolagem */
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-      background-color: #718096; /* Cor da barra de rolagem ao passar o mouse */
-    }
-
-    /* Aplicando estilos para o corpo da página */
-    body {
-      scrollbar-width: thin;
-      scrollbar-color: #4a5568 #2d3748;
-    }
-  </style>
+  <link rel="stylesheet" href="../css/style.css">
 </head>
 
 <body class="bg-gray-900 text-white min-h-screen flex flex-col md:flex-row">
-  <nav class="sidebar w-full md:w-64">
-    <a href="/pages/home/home.html"><h2 class="text-purple-300 text-xl font-bold mb-4">FinancEasy</h2></a>
+    <header>
+      <nav class="sidebar" id="sidebar">
+                      <a href="/pages/home/home.html"><h2 class="text-purple-300 text-xl font-bold mb-4">FinancEasy</h2></a>
+          <a href="/pages/cartao/cartoes.html">💳 Cartões</a>
+          <div class="dropdown">
+          <a href="#" class="text-white">📊 Transações</a>
+          <div class="dropdown-content">
+              <a href="/pages/despesas/despesas.html">📉 Despesas</a>
+              <a href="/pages/receitas/receitas.html">📈 Receitas</a>
+          </div>
+          </div>
+          <div class="dropdown">
+          <a href="#" class="text-white">📊 Históricos</a>
+          <div class="dropdown-content">
+              <a href="/pages/historicoComissões/historicoComissões.html">📉Historico de Comissões</a>
+              <a href="/pages/historicoDespesas/historicoDespesas.html">📈 Historico de Despesas</a>
+              <a href="/pages/historicoReceitas/historicoReceitas.html">📈 Historico de Receitas</a>
+          </div>
+          </div>
+          <a href="/pages/investimentos/investimentos.html">📊 Investimentos</a>
+          <a href="/pages/comissao/comissao.html">💰 Comissões</a>
+          <a href="/pages/reservas/reservas.html">🏦 Reservas</a>
+          <a href="/pages/relatorios/relatorios.html">📋 Relatórios</a>
+          <a href="/pages/loginC/loginConfig.html">⚙️ Configuração</a>
+      </nav>
 
-    <a href="/pages/cartao/cartoes.html">💳 Cartões</a>
-    <div class="dropdown">
-      <a href="#" class="text-white">📊 Transações</a>
-      <div class="dropdown-content">
-        <a href="/pages/despesas/despesas.html">📉 Despesas</a>
-        <a href="/pages/receitas/receitas.html">📈 Receitas</a>
-      </div>
-    </div>
-    <a href="/pages/investimentos/investimentos.html">📊 Investimentos</a>
-    <a href="/pages/comissao/comissao.html">💰 Comissões</a>
-    <a href="/pages/reservas/reservas.html">🏦 Reservas</a>
-    <a href="/pages/relatorios/relatorios.html">📋 Relatórios</a>
-    <a href="/pages/configuracao/configuracao.html">⚙️ Configuração</a>
-  </nav>
+    <button class="menu-toggle" id="menuToggle">☰</button>    
+  </header>
+
 
   <main class="main-content flex-grow p-4">
     <div class="container mx-auto">
@@ -127,5 +108,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
   <script src="scripts.js"></script>
+  <script src="../js/script.js"></script>
 </body>
 </html>
