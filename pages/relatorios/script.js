@@ -508,11 +508,11 @@ async function submitMesFormHistorico() {
     const dataInicio = `${ano}-${mes.padStart(2, "0")}-01`;
     const dataFim = new Date(ano, mes, 0).toISOString().split("T")[0]; // Último dia do mês
 
-    const despesas = await window.controle.getHistoricoDespesasFiltradas({
+    const despesas = await fetchData("/api/historico-despesas/filtrar", {
       dataInicio,
       dataFim,
     });
-    const receitas = await window.controle.getHistoricoReceitasFiltradas({
+    const receitas = await fetchData("/api/historico-receitas/filtrar", {
       dataInicio,
       dataFim,
     });
@@ -630,31 +630,35 @@ document.addEventListener("DOMContentLoaded", () => {
   const exportarBtn = document.querySelector("#exportar");
   const relatorioTable = document.querySelector("#relatorioTable");
 
-  // Exportar para PDF
-  exportarBtn.addEventListener("click", () => {
-    const doc = new jsPDF();
-    doc.autoTable({ html: relatorioTable });
-    doc.save("relatorio.pdf");
-  });
+  // Verificar se o botão de exportar existe antes de adicionar o evento
+  if (exportarBtn) {
+    exportarBtn.addEventListener("click", () => {
+      const doc = new jsPDF();
+      doc.autoTable({ html: relatorioTable });
+      doc.save("relatorio.pdf");
+    });
+  }
 
   // Exemplo de gráfico
-  const ctx = document.getElementById("graficoRelatorio").getContext("2d");
-  new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: ["Janeiro", "Fevereiro", "Março"],
-      datasets: [
-        {
-          label: "Despesas",
-          data: [500, 300, 400],
-          backgroundColor: "rgba(255, 99, 132, 0.5)",
-        },
-        {
-          label: "Receitas",
-          data: [700, 800, 600],
-          backgroundColor: "rgba(54, 162, 235, 0.5)",
-        },
-      ],
-    },
-  });
+  const ctx = document.getElementById("graficoRelatorio")?.getContext("2d");
+  if (ctx) {
+    new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels: ["Janeiro", "Fevereiro", "Março"],
+        datasets: [
+          {
+            label: "Despesas",
+            data: [500, 300, 400],
+            backgroundColor: "rgba(255, 99, 132, 0.5)",
+          },
+          {
+            label: "Receitas",
+            data: [700, 800, 600],
+            backgroundColor: "rgba(54, 162, 235, 0.5)",
+          },
+        ],
+      },
+    });
+  }
 });

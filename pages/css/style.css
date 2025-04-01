@@ -101,10 +101,23 @@ body {
   z-index: 1100;
 }
 
+.relatories {
+  display: flex;
+}
+.modal{
+  top: 30%;
+}
+
 /* Responsividade */
 @media (max-width: 768px) {
+  *{
+    font-size: 9px;
+  }
   .menu-toggle {
     display: block;
+    background-color: #f0f8ff00;
+    left: -5px;
+    top: -5px;
   }
 
   .sidebar {
@@ -116,7 +129,12 @@ body {
   }
 
   .main-content {
+    margin-top: 30px;
     margin-left: 0;
+  }
+  .relatories {
+    display: flex;
+    flex-direction: column;
   }
 }
 

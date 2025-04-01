@@ -11,7 +11,24 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="../css/style.css">
+     <!-- pwa -->
+     <link rel="android-chrome" sizes="512x512" href="../pwa/android-chrome-512x512.png">
+     <link rel="apple-touch-icon" sizes="180x180" href="../pwa/apple-touch-icon.png">
+     <link rel="icon" type="image/png" sizes="32x32" href="../pwa/favicon-32x32.png">
+     <link rel="icon" type="image/png" sizes="16x16" href="../pwa/favicon-16x16.png">
+     <link rel="shortcut icon" href="../pwa/favicon.ico" type="image/x-icon">
+     <link rel="manifest" href="/pages/pwa/manifest.json">
+     <meta name="theme-color" content="#4CAF50">
+     <link rel="icon" href="/assets/icons/icon-192x192.png">
+     <script>
+       if ("serviceWorker" in navigator) {
+         navigator.serviceWorker.register("/pages/pwa/service-worker.js")
+           .then(() => console.log("Service Worker registrado com sucesso."))
+           .catch((error) => console.error("Erro ao registrar o Service Worker:", error));
+       }
+     </script>
+     <link rel="stylesheet" href="../css/style.css">
+     <!-- pwa -->
   </head>
   <body class="bg-gray-900 text-white min-h-screen flex">
     <header>
@@ -43,7 +60,7 @@
     <button class="menu-toggle" id="menuToggle">☰</button>    
   </header>
 
-    <main class="main-content ml-64 p-6">
+    <main class="main-content">
       <div class="container mx-auto mt-4 p-4">
         <button
           class="btn bg-purple-600 hover:bg-purple-500 text-white p-1 mobile rounded-lg mb-3 inline-block"

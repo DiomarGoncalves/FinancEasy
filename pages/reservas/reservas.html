@@ -11,37 +11,24 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="../css/style.css">
-    <style>
-      tr {
-        border-bottom: 1px solid #333;
-      }
-
-      /* Estilizando a scrollbar para navegadores baseados em WebKit */
-      ::-webkit-scrollbar {
-        width: 12px; /* Largura da scrollbar */
-      }
-
-      ::-webkit-scrollbar-track {
-        background: #2d3748; /* Cor do fundo da scrollbar */
-      }
-
-      ::-webkit-scrollbar-thumb {
-        background-color: #4a5568; /* Cor da barra de rolagem */
-        border-radius: 10px; /* Arredondamento da barra de rolagem */
-        border: 3px solid #2d3748; /* Espaço ao redor da barra de rolagem */
-      }
-
-      ::-webkit-scrollbar-thumb:hover {
-        background-color: #718096; /* Cor da barra de rolagem ao passar o mouse */
-      }
-
-      /* Aplicando estilos para o corpo da página */
-      body {
-        scrollbar-width: thin;
-        scrollbar-color: #4a5568 #2d3748;
-      }
-    </style>
+     <!-- pwa -->
+     <link rel="android-chrome" sizes="512x512" href="../pwa/android-chrome-512x512.png">
+     <link rel="apple-touch-icon" sizes="180x180" href="../pwa/apple-touch-icon.png">
+     <link rel="icon" type="image/png" sizes="32x32" href="../pwa/favicon-32x32.png">
+     <link rel="icon" type="image/png" sizes="16x16" href="../pwa/favicon-16x16.png">
+     <link rel="shortcut icon" href="../pwa/favicon.ico" type="image/x-icon">
+     <link rel="manifest" href="/pages/pwa/manifest.json">
+     <meta name="theme-color" content="#4CAF50">
+     <link rel="icon" href="/assets/icons/icon-192x192.png">
+     <script>
+       if ("serviceWorker" in navigator) {
+         navigator.serviceWorker.register("/pages/pwa/service-worker.js")
+           .then(() => console.log("Service Worker registrado com sucesso."))
+           .catch((error) => console.error("Erro ao registrar o Service Worker:", error));
+       }
+     </script>
+     <link rel="stylesheet" href="../css/style.css">
+     <!-- pwa -->
   </head>
   <body class="bg-gray-900 text-white min-h-screen flex">
     <header>
@@ -74,7 +61,7 @@
   </header>
 
 
-    <main class="main-content ml-64 p-6">
+    <main class="main-content">
       <main class="container mx-auto px-4 py-10 space-y-10">
         <header class="bg-gray-800 p-8 rounded-2xl shadow-lg text-center">
           <h1
