@@ -227,18 +227,35 @@ document.addEventListener("DOMContentLoaded", async () => {
       resetFormAndUnlockInputs(event.target);
     });
 
-  document
-    .getElementById("filtroForm")
-    .addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const filtros = {
-        dataInicio: document.getElementById("filtroDataInicio").value,
-        dataFim: document.getElementById("filtroDataFim").value,
-        nome: document.getElementById("filtroNome").value,
-        banco: filtroBanco.value,
-      };
-      await filtrarDespesas(filtros);
-    });
+  document.getElementById("filtroForm").addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const filtros = {
+      dataInicio: document.getElementById("filtroDataInicio").value,
+      dataFim: document.getElementById("filtroDataFim").value,
+      nome: document.getElementById("filtroNome").value,
+      banco: document.getElementById("filtroBanco").value,
+    };
+
+    try {
+      const response = await fetch("/api/despesas/filtrar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(filtros),
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao filtrar despesas");
+      }
+
+      const despesas = await response.json();
+      renderDespesas(despesas); // Atualizar a tabela com os dados filtrados
+      showMessage("Filtro aplicado com sucesso!", "success");
+    } catch (error) {
+      console.error("Erro ao filtrar despesas:", error);
+      showMessage(`Erro ao filtrar despesas: ${error.message}`, "error");
+    }
+  });
 
   await loadBancos();
   loadDespesas();
@@ -264,28 +281,26 @@ function renderDespesas(despesas) {
     row.innerHTML = `
       <td>${despesa.estabelecimento}</td>
       <td>${despesa.data}</td>
-      <td>R$ ${despesa.valor}</td>
+      <td>R$ ${despesa.valor.toFixed(2)}</td>
       <td>${despesa.forma_pagamento}</td>
       <td>${despesa.numero_parcelas}</td>
       <td>${despesa.parcelas_restantes}</td>
-      <td>R$ ${despesa.valor_parcela}</td>
+      <td>R$ ${despesa.valor_parcela.toFixed(2)}</td>
       <td>${despesa.cartao_nome || "-"}</td>
       <td colspan="1" class="text-center">
-          <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md mr-2" onclick="payDespesa(${
-            despesa.id
-          })">
-              <i class="fas fa-dollar-sign icon"></i> Pagar
-          </button>
-          <button class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md" onclick="deleteDespesa(${
-            despesa.id
-          })">
-              <i class="fas fa-trash-alt icon"></i> Excluir
-          </button>
+        <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md mr-2" onclick="payDespesa(${despesa.id})">
+          <i class="fas fa-dollar-sign icon"></i> Pagar
+        </button>
+        <button class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-md" onclick="deleteDespesa(${despesa.id})">
+          <i class="fas fa-trash-alt icon"></i> Excluir
+        </button>
       </td>
     `;
     tableBody.appendChild(row); // Adicionar linha à tabela
     totalGasto += despesa.valor;
   });
+
+  showMessage(`Total de despesas: R$ ${totalGasto.toFixed(2)}`, "info");
 }
 
 async function payDespesa(id) {

@@ -271,6 +271,8 @@ app.delete("/api/despesas/:id", (req, res) => {
 // Rota para filtrar despesas
 app.post("/api/despesas/filtrar", (req, res) => {
   const { dataInicio, dataFim, nome, banco } = req.body;
+  console.log("Recebendo filtros para despesas:", { dataInicio, dataFim, nome, banco }); // Log dos filtros recebidos
+
   let sql = `
     SELECT d.*, c.nome AS cartao_nome, c.banco AS banco_nome 
     FROM despesas d 
@@ -296,11 +298,15 @@ app.post("/api/despesas/filtrar", (req, res) => {
     params.push(banco);
   }
 
+  console.log("Consulta SQL para despesas:", sql); // Log da consulta SQL gerada
+  console.log("Parâmetros da consulta:", params); // Log dos parâmetros da consulta
+
   db.all(sql, params, (err, rows) => {
     if (err) {
       console.error("Erro ao filtrar despesas:", err.message);
       res.status(500).json({ error: "Erro ao filtrar despesas" });
     } else {
+      console.log("Resultados do filtro de despesas:", rows); // Log dos resultados retornados
       res.json(rows);
     }
   });
@@ -309,15 +315,17 @@ app.post("/api/despesas/filtrar", (req, res) => {
 // Rota para filtrar histórico de despesas
 app.post("/api/historico-despesas/filtrar", (req, res) => {
   const { dataInicio, dataFim, nome } = req.body;
+  console.log("Recebendo filtros para histórico de despesas:", { dataInicio, dataFim, nome }); // Log dos filtros recebidos
+
   let sql = `SELECT * FROM historico_despesas WHERE 1=1`;
   const params = [];
 
   if (dataInicio) {
-    sql += ` AND data >= ?`;
+    sql += ` AND data_pagamento >= ?`; // Alterado para filtrar por data_pagamento
     params.push(dataInicio);
   }
   if (dataFim) {
-    sql += ` AND data <= ?`;
+    sql += ` AND data_pagamento <= ?`; // Alterado para filtrar por data_pagamento
     params.push(dataFim);
   }
   if (nome) {
@@ -325,11 +333,28 @@ app.post("/api/historico-despesas/filtrar", (req, res) => {
     params.push(`%${nome}%`);
   }
 
+  console.log("Consulta SQL para histórico de despesas:", sql); // Log da consulta SQL gerada
+  console.log("Parâmetros da consulta:", params); // Log dos parâmetros da consulta
+
   db.all(sql, params, (err, rows) => {
     if (err) {
-      console.error("Erro ao filtrar histórico de despesas:", err);
+      console.error("Erro ao filtrar histórico de despesas:", err.message);
       res.status(500).json({ error: "Erro ao filtrar histórico de despesas" });
     } else {
+      console.log("Resultados do filtro de histórico de despesas:", rows); // Log dos resultados retornados
+
+      if (rows.length === 0) {
+        console.warn("Nenhum resultado encontrado. Verifique os dados no banco de dados e os filtros aplicados.");
+        // Adicionar log para verificar os dados no banco
+        db.all("SELECT * FROM historico_despesas", [], (err, allRows) => {
+          if (err) {
+            console.error("Erro ao buscar todos os dados do histórico de despesas:", err.message);
+          } else {
+            console.log("Todos os dados do histórico de despesas:", allRows);
+          }
+        });
+      }
+
       res.json(rows);
     }
   });
@@ -338,6 +363,8 @@ app.post("/api/historico-despesas/filtrar", (req, res) => {
 // Rota para filtrar receitas
 app.post("/api/receitas/filtrar", (req, res) => {
   const { dataInicio, dataFim } = req.body;
+  console.log("Recebendo filtros para receitas:", { dataInicio, dataFim }); // Log dos filtros recebidos
+
   let sql = `SELECT * FROM receitas WHERE 1=1`;
   const params = [];
 
@@ -350,11 +377,15 @@ app.post("/api/receitas/filtrar", (req, res) => {
     params.push(dataFim);
   }
 
+  console.log("Consulta SQL para receitas:", sql); // Log da consulta SQL gerada
+  console.log("Parâmetros da consulta:", params); // Log dos parâmetros da consulta
+
   db.all(sql, params, (err, rows) => {
     if (err) {
-      console.error("Erro ao filtrar receitas:", err);
+      console.error("Erro ao filtrar receitas:", err.message);
       res.status(500).json({ error: "Erro ao filtrar receitas" });
     } else {
+      console.log("Resultados do filtro de receitas:", rows); // Log dos resultados retornados
       res.json(rows);
     }
   });
@@ -467,6 +498,41 @@ app.post("/api/receitas", (req, res) => {
       }
     }
   );
+});
+
+// Rota para filtrar histórico de receitas
+app.post("/api/historico-receitas/filtrar", (req, res) => {
+  const { dataInicio, dataFim, nome } = req.body;
+  console.log("Recebendo filtros para histórico de receitas:", { dataInicio, dataFim, nome }); // Log dos filtros recebidos
+
+  let sql = `SELECT * FROM historico_receitas WHERE 1=1`;
+  const params = [];
+
+  if (dataInicio) {
+    sql += ` AND data_recebimento >= ?`;
+    params.push(dataInicio);
+  }
+  if (dataFim) {
+    sql += ` AND data_recebimento <= ?`;
+    params.push(dataFim);
+  }
+  if (nome) {
+    sql += ` AND descricao LIKE ?`;
+    params.push(`%${nome}%`);
+  }
+
+  console.log("Consulta SQL para histórico de receitas:", sql); // Log da consulta SQL gerada
+  console.log("Parâmetros da consulta:", params); // Log dos parâmetros da consulta
+
+  db.all(sql, params, (err, rows) => {
+    if (err) {
+      console.error("Erro ao filtrar histórico de receitas:", err);
+      res.status(500).json({ error: "Erro ao filtrar histórico de receitas" });
+    } else {
+      console.log("Resultados do filtro de histórico de receitas:", rows); // Log dos resultados retornados
+      res.json(rows);
+    }
+  });
 });
 
 // Rotas para cartões
@@ -681,35 +747,6 @@ app.get("/api/historico-despesas", (req, res) => {
   });
 });
 
-// Rota para filtrar o histórico de despesas
-app.post("/api/historico-despesas/filtrar", (req, res) => {
-  const { dataInicio, dataFim, nome } = req.body;
-  let sql = `SELECT * FROM historico_despesas WHERE 1=1`;
-  const params = [];
-
-  if (dataInicio) {
-    sql += ` AND data_pagamento >= ?`;
-    params.push(dataInicio);
-  }
-  if (dataFim) {
-    sql += ` AND data_pagamento <= ?`;
-    params.push(dataFim);
-  }
-  if (nome) {
-    sql += ` AND estabelecimento LIKE ?`;
-    params.push(`%${nome}%`);
-  }
-
-  db.all(sql, params, (err, rows) => {
-    if (err) {
-      console.error("Erro ao filtrar histórico de despesas:", err);
-      res.status(500).json({ error: "Erro ao filtrar histórico de despesas" });
-    } else {
-      res.json(rows);
-    }
-  });
-});
-
 // Rota para obter histórico de receitas
 app.get("/api/historico-receitas", (req, res) => {
   const sql = `SELECT * FROM historico_receitas`;
@@ -717,34 +754,6 @@ app.get("/api/historico-receitas", (req, res) => {
     if (err) {
       console.error("Erro ao buscar histórico de receitas:", err);
       res.status(500).json({ error: "Erro ao buscar histórico de receitas" });
-    } else {
-      res.json(rows);
-    }
-  });
-});
-// Rota para filtrar o histórico de receitas
-app.post("/api/historico-receitas/filtrar", (req, res) => {
-  const { dataInicio, dataFim, nome } = req.body;
-  let sql = `SELECT * FROM historico_receitas WHERE 1=1`;
-  const params = [];
-
-  if (dataInicio) {
-    sql += ` AND data_recebimento >= ?`; // Substituído data_pagamento por data_recebimento
-    params.push(dataInicio);
-  }
-  if (dataFim) {
-    sql += ` AND data_recebimento <= ?`; // Substituído data_pagamento por data_recebimento
-    params.push(dataFim);
-  }
-  if (nome) {
-    sql += ` AND descricao LIKE ?`;
-    params.push(`%${nome}%`);
-  }
-
-  db.all(sql, params, (err, rows) => {
-    if (err) {
-      console.error("Erro ao filtrar histórico de receitas:", err);
-      res.status(500).json({ error: "Erro ao filtrar histórico de receitas" });
     } else {
       res.json(rows);
     }
@@ -1268,15 +1277,42 @@ app.get("/api/comissoes/historico", (req, res) => {
 // Rota para filtrar o histórico de comissões por mês
 app.post("/api/comissoes/historico/filtrar", (req, res) => {
   const { mes } = req.body;
+
+  if (!mes) {
+    console.warn("Parâmetro 'mes' ausente na requisição.");
+    return res.status(400).json({ error: "O parâmetro 'mes' é obrigatório." });
+  }
+
+  console.log("Recebendo filtros para histórico de comissões:", { mes }); // Log dos filtros recebidos
+
   const sql = `
     SELECT * FROM historico_comissoes 
     WHERE strftime('%Y-%m', dataRecebimento) = ?
   `;
-  db.all(sql, [mes], (err, rows) => {
+  const params = [mes];
+
+  console.log("Consulta SQL para histórico de comissões:", sql); // Log da consulta SQL gerada
+  console.log("Parâmetros da consulta:", params); // Log dos parâmetros da consulta
+
+  db.all(sql, params, (err, rows) => {
     if (err) {
-      console.error("Erro ao filtrar histórico de comissões:", err);
+      console.error("Erro ao filtrar histórico de comissões:", err.message);
       res.status(500).json({ error: "Erro ao filtrar histórico de comissões" });
     } else {
+      console.log("Resultados do filtro de histórico de comissões:", rows); // Log dos resultados retornados
+
+      if (rows.length === 0) {
+        console.warn("Nenhum resultado encontrado. Verifique os dados no banco de dados e os filtros aplicados.");
+        // Adicionar log para verificar os dados no banco
+        db.all("SELECT * FROM historico_comissoes", [], (err, allRows) => {
+          if (err) {
+            console.error("Erro ao buscar todos os dados do histórico de comissões:", err.message);
+          } else {
+            console.log("Todos os dados do histórico de comissões:", allRows);
+          }
+        });
+      }
+
       res.json(rows);
     }
   });
@@ -1297,35 +1333,6 @@ app.delete("/api/comissoes/:id", (req, res) => {
   });
 });
 
-// Rota para listar o histórico de comissões recebidas
-app.get("/api/comissoes/historico", (req, res) => {
-  const sql = `SELECT * FROM comissoes WHERE recebido = 1`;
-  db.all(sql, [], (err, rows) => {
-    if (err) {
-      console.error("Erro ao buscar histórico de comissões:", err);
-      res.status(500).json({ error: "Erro ao buscar histórico de comissões" });
-    } else {
-      res.json(rows);
-    }
-  });
-});
-
-// Rota para filtrar o histórico de comissões por mês
-app.post("/api/comissoes/historico/filtrar", (req, res) => {
-  const { mes } = req.body;
-  const sql = `
-    SELECT * FROM comissoes 
-    WHERE recebido = 1 AND strftime('%Y-%m', dataVenda) = ?
-  `;
-  db.all(sql, [mes], (err, rows) => {
-    if (err) {
-      console.error("Erro ao filtrar histórico de comissões:", err);
-      res.status(500).json({ error: "Erro ao filtrar histórico de comissões" });
-    } else {
-      res.json(rows);
-    }
-  });
-});
 
 // Rota para servir qualquer página HTML dentro da pasta "pages"
 app.get("/pages/:folder/:file", (req, res) => {

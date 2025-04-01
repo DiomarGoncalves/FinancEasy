@@ -57,6 +57,12 @@
 
     <main class="main-content">
         <h1 class="text-3xl font-bold mb-6">📜 Histórico de Despesas</h1>
+        <button
+        class="btn bg-purple-600 hover:bg-purple-500 text-white p-1 mobile rounded-lg mb-3 inline-block"
+        id="exportar"
+        >
+            📄 Exportar para PDF
+        </button>
         <div class="bg-gray-800 p-6 rounded-2xl shadow-lg">
             <h2 class="text-2xl font-bold mb-4">🔍 Filtrar Histórico</h2>
             <form id="filtroForm" class="space-y-4">
@@ -79,16 +85,20 @@
         <div class="mt-6 bg-gray-800 p-6 rounded-2xl shadow-lg">
             <h2 class="text-2xl font-bold mb-4">📋 Resultados</h2>
             <div class="overflow-x-auto">
-                <table class="table-auto w-full text-white">
+                <table class="table-auto w-full text-white" id="historicoTable">
                     <thead class="bg-gray-700">
                         <tr>
-                            <th class="p-3">Estabelecimento</th>
-                            <th class="p-3">Data</th>
-                            <th class="p-3">Valor</th>
-                            <th class="p-3">Forma de Pagamento</th>
+                            <th class="p-2">Estabelecimento</th>
+                            <th class="p-2">Data</th>
+                            <th class="p-2">Valor</th>
+                            <th class="p-2">Forma de Pagamento</th>
+                            <th class="p-2">numero_parcelas</th>
+                            <th class="p-2">parcelas_restantes</th>
+                            <th class="p-2">data_pagamento</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="historicoTableBody">
+                        <h1 id="totalGasto"></h1>
                         <!-- Linhas dinâmicas -->
                     </tbody>
                 </table>

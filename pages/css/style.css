@@ -107,7 +107,10 @@ body {
 .modal{
   top: 30%;
 }
-
+td{
+  text-align: center;
+  border-bottom: 1px solid #ccc;
+}
 /* Responsividade */
 @media (max-width: 768px) {
   *{

@@ -7,8 +7,8 @@ const urlsToCache = [
   "/pages/relatorios/relatorios.html",
   "/css/style.css",
   "/js/script.js",
-  "pages/pwa/android-chrome-192x192.png",
-  "pages/pwa/android-chrome-512x512.png"
+  "/pages/pwa/android-chrome-192x192.png",
+  "/pages/pwa/android-chrome-512x512.png"
 ];
 
 self.addEventListener("install", (event) => {

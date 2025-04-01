@@ -1,38 +1,57 @@
 let totalGasto = 0;
 
 document.addEventListener("DOMContentLoaded", async () => {
+  const filtroForm = document.querySelector("#filtroForm");
+  const exportarButton = document.querySelector("#exportar");
+  const historicoTable = document.querySelector("#historicoTableBody");
+
+  // Verificar se os elementos necessários existem
+  if (!filtroForm) {
+    console.error("Elemento 'filtroForm' não encontrado.");
+    return;
+  }
+  if (!exportarButton) {
+    console.error("Elemento 'exportar' não encontrado.");
+    return;
+  }
+  if (!historicoTable) {
+    console.error("Elemento 'historicoTableBody' não encontrado.");
+    return;
+  }
+
   try {
     const historico = await fetchHistoricoDespesas();
     renderHistorico(historico);
 
-    document.getElementById("filtrar").addEventListener("click", async () => {
-      const mes = document.getElementById("mes").value;
-      const filtros = { dataInicio: `${mes}-01`, dataFim: `${mes}-31` };
+    filtroForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const dataInicioInput = document.querySelector("#dataInicio");
+      const dataFimInput = document.querySelector("#dataFim");
+      const mesInput = document.querySelector("#mes");
+
+      // Verificar se os elementos de entrada existem
+      if (!dataInicioInput || !dataFimInput || !mesInput) {
+        console.error("Um ou mais elementos obrigatórios não foram encontrados.");
+        showMessage("Erro interno: elementos obrigatórios não encontrados.", "error");
+        return;
+      }
+
+      const dataInicio = dataInicioInput.value;
+      const dataFim = dataFimInput.value;
+      const mes = mesInput.value;
+
+      const filtros = { dataInicio, dataFim, mes };
       const historicoFiltrado = await fetchHistoricoDespesasFiltradas(filtros);
       renderHistorico(historicoFiltrado);
     });
 
-    document.getElementById("exportar").addEventListener("click", () => {
+    exportarButton.addEventListener("click", () => {
       exportarPDF();
     });
   } catch (error) {
     console.error(`Erro ao carregar histórico de despesas: ${error.message}`);
   }
-
-  const historicoTable = document.querySelector("#historicoTable");
-  const filtroForm = document.querySelector("#filtroForm");
-
-  // Filtrar histórico
-  filtroForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const dataInicio = document.querySelector("#dataInicio").value;
-    const dataFim = document.querySelector("#dataFim").value;
-
-    if (dataInicio && dataFim) {
-      console.log(`Filtrando de ${dataInicio} até ${dataFim}`);
-      // Adicione lógica de filtro aqui
-    }
-  });
 });
 
 async function fetchHistoricoDespesas() {
@@ -47,6 +66,12 @@ async function fetchHistoricoDespesas() {
 }
 
 async function fetchHistoricoDespesasFiltradas(filtros) {
+  if (!filtros.mes) {
+    console.error("Parâmetro 'mes' ausente na requisição.");
+    showMessage("Por favor, selecione um mês para filtrar.", "warning");
+    return [];
+  }
+
   try {
     const response = await fetch("/api/historico-despesas/filtrar", {
       method: "POST",
@@ -69,13 +94,13 @@ function renderHistorico(historico) {
   historico.forEach((despesa) => {
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td>${despesa.data_pagamento}</td>
-      <td>${despesa.data}</td>
       <td>${despesa.estabelecimento}</td>
+      <td>${despesa.data}</td>
       <td>R$ ${despesa.valor.toFixed(2)}</td>
       <td>${despesa.forma_pagamento}</td>
       <td>${despesa.numero_parcelas}</td>
       <td>${despesa.parcelas_restantes}</td>
+      <td>${despesa.data_pagamento}</td>
     `;
     tableBody.appendChild(row); // Adicionar linha à tabela
     totalGasto += despesa.valor;
