@@ -314,43 +314,39 @@ app.post("/api/despesas/filtrar", (req, res) => {
 
 // Rota para filtrar histórico de despesas
 app.post("/api/historico-despesas/filtrar", (req, res) => {
-  const { dataInicio, dataFim, nome } = req.body;
-  console.log("Recebendo filtros para histórico de despesas:", { dataInicio, dataFim, nome }); // Log dos filtros recebidos
+  const { mes } = req.body;
 
-  let sql = `SELECT * FROM historico_despesas WHERE 1=1`;
-  const params = [];
-
-  if (dataInicio) {
-    sql += ` AND data_pagamento >= ?`; // Alterado para filtrar por data_pagamento
-    params.push(dataInicio);
-  }
-  if (dataFim) {
-    sql += ` AND data_pagamento <= ?`; // Alterado para filtrar por data_pagamento
-    params.push(dataFim);
-  }
-  if (nome) {
-    sql += ` AND estabelecimento LIKE ?`;
-    params.push(`%${nome}%`);
+  if (!mes) {
+    console.warn("Parâmetro 'mes' ausente na requisição.");
+    return res.status(400).json({ error: "O parâmetro 'mes' é obrigatório." });
   }
 
-  console.log("Consulta SQL para histórico de despesas:", sql); // Log da consulta SQL gerada
+  console.log("Recebendo filtros para histórico de comissões:", { mes }); // Log dos filtros recebidos
+
+  const sql = `
+    SELECT * FROM historico_despesas
+    WHERE strftime('%Y-%m', data_pagamento) = ?
+  `;
+  const params = [mes];
+
+  console.log("Consulta SQL para histórico de comissões:", sql); // Log da consulta SQL gerada
   console.log("Parâmetros da consulta:", params); // Log dos parâmetros da consulta
 
   db.all(sql, params, (err, rows) => {
     if (err) {
-      console.error("Erro ao filtrar histórico de despesas:", err.message);
-      res.status(500).json({ error: "Erro ao filtrar histórico de despesas" });
+      console.error("Erro ao filtrar histórico de comissões:", err.message);
+      res.status(500).json({ error: "Erro ao filtrar histórico de comissões" });
     } else {
-      console.log("Resultados do filtro de histórico de despesas:", rows); // Log dos resultados retornados
+      console.log("Resultados do filtro de histórico de comissões:", rows); // Log dos resultados retornados
 
       if (rows.length === 0) {
         console.warn("Nenhum resultado encontrado. Verifique os dados no banco de dados e os filtros aplicados.");
         // Adicionar log para verificar os dados no banco
-        db.all("SELECT * FROM historico_despesas", [], (err, allRows) => {
+        db.all("SELECT * FROM historico_comissoes", [], (err, allRows) => {
           if (err) {
-            console.error("Erro ao buscar todos os dados do histórico de despesas:", err.message);
+            console.error("Erro ao buscar todos os dados do histórico de comissões:", err.message);
           } else {
-            console.log("Todos os dados do histórico de despesas:", allRows);
+            console.log("Todos os dados do histórico de comissões:", allRows);
           }
         });
       }
@@ -359,6 +355,7 @@ app.post("/api/historico-despesas/filtrar", (req, res) => {
     }
   });
 });
+
 
 // Rota para filtrar receitas
 app.post("/api/receitas/filtrar", (req, res) => {
@@ -975,6 +972,19 @@ app.post("/api/investimentos", (req, res) => {
     observacoes,
   } = req.body;
 
+  // Validar os dados recebidos
+  if (
+    !nome_ativo ||
+    isNaN(quantidade) ||
+    isNaN(valor_investido) ||
+    !data_aquisicao ||
+    !tipo_investimento ||
+    !conta_origem
+  ) {
+    console.error("Dados inválidos recebidos:", req.body);
+    return res.status(400).json({ error: "Dados inválidos. Campos obrigatórios ausentes ou incorretos." });
+  }
+
   const sql = `INSERT INTO investimentos (nome_ativo, quantidade, valor_investido, data_aquisicao, tipo_investimento, conta_origem, observacoes)
                VALUES (?, ?, ?, ?, ?, ?, ?)`;
 
@@ -987,7 +997,7 @@ app.post("/api/investimentos", (req, res) => {
       data_aquisicao,
       tipo_investimento,
       conta_origem,
-      observacoes,
+      observacoes || "",
     ],
     function (err) {
       if (err) {

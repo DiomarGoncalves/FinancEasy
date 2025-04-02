@@ -5,38 +5,51 @@ document.addEventListener("DOMContentLoaded", async () => {
   const investimentosTable = document.querySelector("#investimentosTable");
   const investimentoForm = document.querySelector("#investmentForm");
 
+  // Adicionar logs para verificar elementos
+  console.log("Verificando elementos DOM...");
+  console.log("investmentForm:", investmentForm);
+  console.log("investmentTableBody:", investmentTableBody);
+  console.log("alertMessage:", alertMessage);
+  console.log("investimentosTable:", investimentosTable);
+  console.log("investimentoForm:", investimentoForm);
+
+  if (!investmentForm) {
+    console.error("Elemento 'investmentForm' não encontrado.");
+    return;
+  }
+
   investmentForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-    const investment = getFormData();
-    if (!investment) return;
+
+    const id = investmentForm.dataset.id; // Obter o ID do investimento (se existir)
+    const investment = {
+      nome_ativo: document.getElementById("nomeAtivo").value.trim(),
+      quantidade: parseFloat(document.getElementById("quantidade").value),
+      valor_investido: parseFloat(document.getElementById("valorInvestido").value),
+      data_aquisicao: document.getElementById("dataAquisicao").value,
+      tipo_investimento: document.getElementById("tipoInvestimento").value.trim(),
+      conta_origem: document.getElementById("contaOrigem").value.trim(),
+      observacoes: document.getElementById("observacoes").value.trim() || "",
+    };
 
     try {
-      await saveInvestment(investment);
-      showMessage("Investimento adicionado com sucesso!", "success");
-      await loadInvestments();
-      investmentForm.reset();
+      if (id) {
+        // Atualizar investimento existente
+        investment.id = id;
+        await updateInvestment(investment);
+        showMessage("Investimento atualizado com sucesso!", "success");
+        delete investmentForm.dataset.id; // Remover o ID após a edição
+      } else {
+        // Adicionar novo investimento
+        await saveInvestment(investment);
+        showMessage("Investimento salvo com sucesso!", "success");
+      }
+
+      investmentForm.reset(); // Limpar o formulário
+      await loadInvestments(); // Recarregar a lista de investimentos
     } catch (error) {
       console.error("Erro ao salvar investimento:", error);
-      showMessage("Erro ao salvar investimento.", "error");
-    }
-  });
-
-  investimentoForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const nome = document.querySelector("#nome").value;
-    const valor = document.querySelector("#valor").value;
-    const data = document.querySelector("#data").value;
-
-    if (nome && valor && data) {
-      const novaLinha = `
-        <tr>
-          <td>${nome}</td>
-          <td>${valor}</td>
-          <td>${data}</td>
-        </tr>
-      `;
-      investimentosTable.querySelector("tbody").insertAdjacentHTML("beforeend", novaLinha);
-      investimentoForm.reset();
+      showMessage(`Erro ao salvar investimento: ${error.message}`, "error");
     }
   });
 
@@ -73,20 +86,75 @@ document.addEventListener("DOMContentLoaded", async () => {
         <td>${investment.conta_origem}</td>
         <td>${investment.observacoes || "-"}</td>
         <td>
+          <button class="editar-investimento bg-blue-500 text-white px-3 py-1 rounded" data-id="${investment.id}">Editar</button>
           <button class="bg-red-500 text-white px-3 py-1 rounded" onclick="deleteInvestment(${investment.id})">Excluir</button>
         </td>
       `;
       investmentTableBody.appendChild(row);
     });
+
+    // Adicionar eventos aos botões de editar
+    document.querySelectorAll(".editar-investimento").forEach((button) => {
+      button.addEventListener("click", async (event) => {
+        const id = event.target.dataset.id;
+        try {
+          const response = await fetch(`/api/investimentos/${id}`);
+          if (!response.ok) throw new Error("Erro ao carregar investimento");
+          const investment = await response.json();
+
+          // Preencher o formulário com os dados do investimento
+          document.getElementById("nomeAtivo").value = investment.nome_ativo;
+          document.getElementById("quantidade").value = investment.quantidade;
+          document.getElementById("valorInvestido").value = investment.valor_investido;
+          document.getElementById("dataAquisicao").value = investment.data_aquisicao;
+          document.getElementById("tipoInvestimento").value = investment.tipo_investimento;
+          document.getElementById("contaOrigem").value = investment.conta_origem;
+          document.getElementById("observacoes").value = investment.observacoes || "";
+
+          // Armazenar o ID do investimento no formulário para edição
+          investmentForm.dataset.id = id;
+        } catch (error) {
+          console.error("Erro ao carregar investimento:", error);
+          showMessage("Erro ao carregar investimento.", "error");
+        }
+      });
+    });
   }
 
   async function saveInvestment(investment) {
-    const response = await fetch("/api/investimentos", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(investment),
-    });
-    if (!response.ok) throw new Error("Erro ao salvar investimento");
+    try {
+      const response = await fetch("/api/investimentos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(investment),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Erro ao salvar investimento");
+      }
+    } catch (error) {
+      console.error("Erro ao salvar investimento:", error);
+      throw error;
+    }
+  }
+
+  async function updateInvestment(investment) {
+    try {
+      const response = await fetch(`/api/investimentos/${investment.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(investment),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Erro ao atualizar investimento");
+      }
+    } catch (error) {
+      console.error("Erro ao atualizar investimento:", error);
+      throw error;
+    }
   }
 
   // Tornar deleteInvestment acessível globalmente
@@ -102,22 +170,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       showMessage("Erro ao excluir investimento.", "error");
     }
   };
-
-  function getFormData() {
-    const nome_ativo = document.getElementById("assetName").value;
-    const quantidade = parseFloat(document.getElementById("quantity").value);
-    const valor_investido = parseFloat(document.getElementById("investmentValue").value);
-    const data_aquisicao = document.getElementById("acquisitionDate").value;
-    const conta_origem = document.getElementById("account").value;
-    const observacoes = document.getElementById("observations").value;
-
-    if (!nome_ativo || isNaN(quantidade) || isNaN(valor_investido) || !data_aquisicao || !conta_origem) {
-      showMessage("Por favor, preencha todos os campos obrigatórios.", "warning");
-      return null;
-    }
-
-    return { nome_ativo, quantidade, valor_investido, data_aquisicao, conta_origem, observacoes };
-  }
 
   function showMessage(message, type) {
     let toastContainer = document.getElementById("toast-container");

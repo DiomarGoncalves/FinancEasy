@@ -243,3 +243,70 @@ async function deleteReceita(id) {
         showMessage(`Erro ao excluir receita: ${error.message}`, 'danger');
     }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    const addTestDataButton = document.getElementById("addTestData");
+    const addYearDataButton = document.getElementById("addYearData");
+
+    if (!addTestDataButton || !addYearDataButton) {
+        console.error("Botões de configuração não encontrados.");
+        return;
+    }
+
+    addTestDataButton.addEventListener("click", async () => {
+        try {
+            const response = await window.ipcRenderer.invoke("add-test-data");
+            if (response.status === "success") {
+                showMessage("Dados de teste adicionados com sucesso!", "success");
+            } else {
+                showMessage("Erro ao adicionar dados de teste.", "error");
+            }
+        } catch (error) {
+            console.error("Erro ao adicionar dados de teste:", error);
+            showMessage("Erro ao adicionar dados de teste.", "error");
+        }
+    });
+
+    addYearDataButton.addEventListener("click", async () => {
+        try {
+            const response = await window.ipcRenderer.invoke("add-year-data");
+            if (response.status === "success") {
+                showMessage("Dados do ano completo adicionados com sucesso!", "success");
+            } else {
+                showMessage("Erro ao adicionar dados do ano completo.", "error");
+            }
+        } catch (error) {
+            console.error("Erro ao adicionar dados do ano completo:", error);
+            showMessage("Erro ao adicionar dados do ano completo.", "error");
+        }
+    });
+
+    function showMessage(message, type) {
+        const toastContainer = document.getElementById("toast-container") || createToastContainer();
+        const toast = document.createElement("div");
+        toast.className = `toast-message alert alert-${type}`;
+        toast.textContent = message;
+        toast.style.padding = "15px 20px";
+        toast.style.borderRadius = "8px";
+        toast.style.marginTop = "10px";
+        toast.style.color = "#fff";
+        toast.style.backgroundColor = type === "success" ? "#4CAF50" : "#F44336";
+
+        toastContainer.appendChild(toast);
+
+        setTimeout(() => {
+            toast.remove();
+        }, 3000);
+    }
+
+    function createToastContainer() {
+        const container = document.createElement("div");
+        container.id = "toast-container";
+        container.style.position = "fixed";
+        container.style.top = "20px";
+        container.style.right = "20px";
+        container.style.zIndex = "9999";
+        document.body.appendChild(container);
+        return container;
+    }
+});

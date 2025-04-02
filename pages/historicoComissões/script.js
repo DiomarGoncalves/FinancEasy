@@ -30,13 +30,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     filtroForm.addEventListener("submit", async (event) => {
       event.preventDefault();
-      const dataInicio = document.getElementById("dataInicio").value;
-      const dataFim = document.getElementById("dataFim").value;
       const mesInput = document.getElementById("mes"); // Campo 'mes'
 
       const mes = mesInput ? mesInput.value : null; // Obter valor do campo 'mes'
 
-      const filtros = { dataInicio, dataFim, mes };
+      const filtros = { mes };
       const historicoFiltrado = await fetchHistoricoComissaoFiltradas(filtros);
       renderHistorico(historicoFiltrado);
     });

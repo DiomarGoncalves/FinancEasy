@@ -45,3 +45,7 @@ contextBridge.exposeInMainWorld('controle', {
     setObjetivo: (objetivo) => ipcRenderer.invoke('set-objetivo', objetivo).catch(error => { console.error(error.message); }),
     executarAtualizacaoSql: () => ipcRenderer.invoke('executar-atualizacao-sql').catch(error => { console.error(error.message); })
 });
+
+contextBridge.exposeInMainWorld("ipcRenderer", {
+    invoke: (channel, args) => ipcRenderer.invoke(channel, args),
+});

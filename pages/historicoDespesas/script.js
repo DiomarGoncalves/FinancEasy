@@ -25,23 +25,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     filtroForm.addEventListener("submit", async (event) => {
       event.preventDefault();
+      const mesInput = document.getElementById("mes"); // Campo 'mes'
 
-      const dataInicioInput = document.querySelector("#dataInicio");
-      const dataFimInput = document.querySelector("#dataFim");
-      const mesInput = document.querySelector("#mes");
+      const mes = mesInput ? mesInput.value : null; // Obter valor do campo 'mes'
 
-      // Verificar se os elementos de entrada existem
-      if (!dataInicioInput || !dataFimInput || !mesInput) {
-        console.error("Um ou mais elementos obrigatórios não foram encontrados.");
-        showMessage("Erro interno: elementos obrigatórios não encontrados.", "error");
-        return;
-      }
-
-      const dataInicio = dataInicioInput.value;
-      const dataFim = dataFimInput.value;
-      const mes = mesInput.value;
-
-      const filtros = { dataInicio, dataFim, mes };
+      const filtros = { mes };
       const historicoFiltrado = await fetchHistoricoDespesasFiltradas(filtros);
       renderHistorico(historicoFiltrado);
     });

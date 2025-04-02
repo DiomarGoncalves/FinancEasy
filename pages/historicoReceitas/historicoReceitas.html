@@ -56,20 +56,22 @@
     </header>
     <main class="main-content">
         <h1 class="text-3xl font-bold mb-6">📜 Histórico de Receitas</h1>
+        <button
+          class="btn bg-purple-600 hover:bg-purple-500 text-white p-1 mobile rounded-lg mb-3 inline-block"
+          id="exportar"
+        >
+          📄 Exportar para PDF
+        </button>
         <div class="bg-gray-800 p-6 rounded-2xl shadow-lg">
             <h2 class="text-2xl font-bold mb-4">🔍 Filtrar Histórico</h2>
             <form id="filtroForm" class="space-y-4">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label for="dataInicio" class="block text-lg">📅 Data Início</label>
-                        <input type="date" id="dataInicio" class="form-input bg-gray-700 text-white w-full p-3 rounded-lg">
-                    </div>
-                    <div>
-                        <label for="dataFim" class="block text-lg">📅 Data Fim</label>
-                        <input type="date" id="dataFim" class="form-input bg-gray-700 text-white w-full p-3 rounded-lg">
+                        <label for="mes" class="block text-lg">📅 mes</label>
+                        <input type="month" id="mes" class="form-input bg-gray-700 text-white w-full p-3 rounded-lg">
                     </div>
                 </div>
-                <button type="submit" class="btn bg-purple-600 hover:bg-purple-500 text-white p-3 rounded-lg">
+                <button type="submit" id="filtrar" class="btn bg-purple-600 hover:bg-purple-500 text-white p-3 rounded-lg">
                     🔍 Filtrar
                 </button>
             </form>
@@ -78,7 +80,7 @@
         <div class="mt-6 bg-gray-800 p-6 rounded-2xl shadow-lg">
             <h2 class="text-2xl font-bold mb-4">📋 Resultados</h2>
             <div class="overflow-x-auto">
-                <table class="table-auto w-full text-white">
+                <table class="table-auto w-full text-white" id="historicoTable">
                     <thead class="bg-gray-700">
                         <tr>
                             <th class="p-3">Descrição</th>
@@ -88,7 +90,8 @@
                             <th class="p-3">Fonte</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="historicoTableBody">
+                        <h1 id="totalRecebido"></h1>
                         <!-- Linhas dinâmicas -->
                     </tbody>
                 </table>

@@ -131,3 +131,48 @@ function saveConfig(config) {
   const updatedConfig = { ...currentConfig, ...config };
   fs.writeFileSync(configPath, JSON.stringify(updatedConfig));
 }
+
+// IPC Handlers para inserir dados de teste e dados do ano completo
+ipcMain.handle("add-test-data", async () => {
+    try {
+        const sqls = [
+            `INSERT INTO receitas (descricao, valor, data, categoria, fonte) VALUES ('Salário', 3000.00, '2023-01-15', 'Salário', 'Empresa X');`,
+            `INSERT INTO despesas (estabelecimento, valor, data, forma_pagamento) VALUES ('Supermercado', 150.00, '2023-01-10', 'Crédito');`,
+            `INSERT INTO cartoes (nome, banco, limite, vencimento) VALUES ('Cartão A', 'Banco A', 1000.00, '2023-12-10');`,
+            `INSERT INTO reservas (descricao, valor, data) VALUES ('Reserva de Emergência', 500.00, '2023-01-01');`,
+            `INSERT INTO investimentos (nome_ativo, quantidade, valor_investido, data_aquisicao, tipo_investimento, conta_origem) VALUES ('Ação XYZ', 10, 1000.00, '2023-01-05', 'Ação', 'Conta Corrente');`
+        ];
+
+        for (const sql of sqls) {
+            await db.runAsync(sql);
+        }
+
+        return { status: "success" };
+    } catch (error) {
+        console.error("Erro ao adicionar dados de teste:", error);
+        return { status: "error", message: error.message };
+    }
+});
+
+ipcMain.handle("add-year-data", async () => {
+    try {
+        const sqls = [];
+        for (let month = 1; month <= 12; month++) {
+            const monthStr = month.toString().padStart(2, "0");
+            sqls.push(
+                `INSERT INTO receitas (descricao, valor, data, categoria, fonte) VALUES ('Salário ${monthStr}', 3000.00, '2023-${monthStr}-15', 'Salário', 'Empresa X');`,
+                `INSERT INTO despesas (estabelecimento, valor, data, forma_pagamento) VALUES ('Supermercado ${monthStr}', 150.00, '2023-${monthStr}-10', 'Crédito');`,
+                `INSERT INTO reservas (descricao, valor, data) VALUES ('Reserva ${monthStr}', 500.00, '2023-${monthStr}-01');`
+            );
+        }
+
+        for (const sql of sqls) {
+            await db.runAsync(sql);
+        }
+
+        return { status: "success" };
+    } catch (error) {
+        console.error("Erro ao adicionar dados do ano completo:", error);
+        return { status: "error", message: error.message };
+    }
+});

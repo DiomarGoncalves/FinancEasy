@@ -66,11 +66,55 @@
           <h2 class="text-2xl font-bold mb-4">➕ Adicionar Investimento</h2>
           <form id="investmentForm">
             <div class="mb-4">
-              <label for="assetName" class="block text-lg"
+              <label for="nomeAtivo" class="block text-lg"
                 >🧑‍💼 Nome do Ativo</label
               >
+              <input
+                type="text"
+                id="nomeAtivo"
+                class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
+                required
+              />
+            </div>
+            <div class="mb-4">
+              <label for="quantidade" class="block text-lg"
+                >🔢 Quantidade Adquirida</label
+              >
+              <input
+                type="number"
+                id="quantidade"
+                class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
+                required
+              />
+            </div>
+            <div class="mb-4">
+              <label for="valorInvestido" class="block text-lg"
+                >💸 Valor Investido</label
+              >
+              <input
+                type="number"
+                id="valorInvestido"
+                class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
+                required
+              />
+            </div>
+            <div class="mb-4">
+              <label for="dataAquisicao" class="block text-lg"
+                >📅 Data de Aquisição</label
+              >
+              <input
+                type="date"
+                id="dataAquisicao"
+                class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
+                required
+              />
+            </div>
+            <div class="mb-4">
+              <label for="tipoInvestimento" class="block text-lg"
+                >🏦 Tipo de Investimento</label
+              >
               <select
-                id="assetName"
+                id="tipoInvestimento"
                 class="form-select bg-gray-700 text-white w-full p-3 rounded-lg"
                 required
               >
@@ -80,55 +124,22 @@
               </select>
             </div>
             <div class="mb-4">
-              <label for="quantity" class="block text-lg"
-                >🔢 Quantidade Adquirida</label
-              >
-              <input
-                type="number"
-                id="quantity"
-                class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
-                required
-              />
-            </div>
-            <div class="mb-4">
-              <label for="investmentValue" class="block text-lg"
-                >💸 Valor Investido</label
-              >
-              <input
-                type="number"
-                id="investmentValue"
-                class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
-                required
-              />
-            </div>
-            <div class="mb-4">
-              <label for="acquisitionDate" class="block text-lg"
-                >📅 Data de Aquisição</label
-              >
-              <input
-                type="date"
-                id="acquisitionDate"
-                class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
-                required
-              />
-            </div>
-            <div class="mb-4">
-              <label for="account" class="block text-lg"
+              <label for="contaOrigem" class="block text-lg"
                 >🏦 Conta de Origem</label
               >
               <input
                 type="text"
-                id="account"
+                id="contaOrigem"
                 class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
                 required
               />
             </div>
             <div class="mb-4">
-              <label for="observations" class="block text-lg"
+              <label for="observacoes" class="block text-lg"
                 >💬 Observações (opcional)</label
               >
               <textarea
-                id="observations"
+                id="observacoes"
                 class="form-input bg-gray-700 text-white w-full p-3 rounded-lg"
                 rows="3"
               ></textarea>
@@ -148,7 +159,7 @@
             <thead>
               <tr class="bg-gray-700">
                 <th class="p-1 mobile">
-                  <i class="fas fa-briefcase"></i> Ativo
+                  <i class="fas fa-briefcase"></i> Nome do Ativo
                 </th>
                 <th class="p-1 mobile">
                   <i class="fas fa-cogs"></i> Quantidade

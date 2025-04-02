@@ -1,22 +1,55 @@
 let totalRecebido = 0;
 
 document.addEventListener("DOMContentLoaded", async () => {
+  const tableBody = document.getElementById("historicoTableBody");
+  const totalRecebidoElement = document.getElementById("totalRecebido");
+  const filtrarButton = document.getElementById("filtrar");
+  const exportarButton = document.getElementById("exportar");
+
+  // Verificar se os elementos necessários existem
+  if (!tableBody) {
+    console.error("Elemento 'historicoTableBody' não encontrado.");
+    return;
+  }
+  if (!totalRecebidoElement) {
+    console.error("Elemento 'totalRecebido' não encontrado.");
+    return;
+  }
+  if (!filtrarButton) {
+    console.error("Elemento 'filtrar' não encontrado.");
+    return;
+  }
+  if (!exportarButton) {
+    console.error("Elemento 'exportar' não encontrado.");
+    return;
+  }
+
   try {
     const historico = await fetchHistoricoReceitas();
     renderHistorico(historico);
 
-    document.getElementById("filtrar").addEventListener("click", async () => {
-      const mes = document.getElementById("mes").value;
+    filtrarButton.addEventListener("click", async () => {
+      const mesInput = document.getElementById("mes");
+
+      // Verificar se o elemento 'mes' existe
+      if (!mesInput) {
+        console.error("Elemento 'mes' não encontrado.");
+        showMessage("Erro interno: elemento 'mes' não encontrado.", "error");
+        return;
+      }
+
+      const mes = mesInput.value;
       if (!mes) {
         alert("Por favor, selecione um mês para filtrar.");
         return;
       }
+
       const filtros = { dataInicio: `${mes}-01`, dataFim: `${mes}-31` };
       const historicoFiltrado = await fetchHistoricoReceitasFiltradas(filtros);
       renderHistorico(historicoFiltrado);
     });
 
-    document.getElementById("exportar").addEventListener("click", () => {
+    exportarButton.addEventListener("click", () => {
       exportarPDF();
     });
   } catch (error) {
@@ -29,15 +62,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const filtroForm = document.querySelector("#filtroForm");
 
   // Filtrar histórico
-  filtroForm.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const dataInicio = document.querySelector("#dataInicio").value;
-    const dataFim = document.querySelector("#dataFim").value;
+  filtroForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const mesInput = document.getElementById("mes"); // Campo 'mes'
 
-    if (dataInicio && dataFim) {
-      console.log(`Filtrando de ${dataInicio} até ${dataFim}`);
-      // Adicione lógica de filtro aqui
-    }
+    const mes = mesInput ? mesInput.value : null; // Obter valor do campo 'mes'
+
+    const filtros = { mes };
+    const historicoFiltrado = await fetchHistoricoComissaoFiltradas(filtros);
+    renderHistorico(historicoFiltrado);
   });
 });
 
@@ -69,12 +102,24 @@ async function fetchHistoricoReceitasFiltradas(filtros) {
 
 function renderHistorico(historico) {
   const tableBody = document.getElementById("historicoTableBody");
+  const totalRecebidoElement = document.getElementById("totalRecebido");
+
+  // Verificar se os elementos necessários existem
+  if (!tableBody) {
+    console.error("Elemento 'historicoTableBody' não encontrado.");
+    return;
+  }
+  if (!totalRecebidoElement) {
+    console.error("Elemento 'totalRecebido' não encontrado.");
+    return;
+  }
+
   tableBody.innerHTML = ""; // Limpar tabela
   totalRecebido = 0;
 
   if (historico.length === 0) {
     tableBody.innerHTML = `<tr><td colspan="7" class="text-center">Nenhuma receita encontrada.</td></tr>`;
-    document.getElementById("totalRecebido").innerText = `Total Recebido: R$ 0,00`;
+    totalRecebidoElement.innerText = `Total Recebido: R$ 0,00`;
     return;
   }
 
@@ -93,9 +138,7 @@ function renderHistorico(historico) {
     totalRecebido += receita.valor;
   });
 
-  document.getElementById(
-    "totalRecebido"
-  ).innerText = `Total Recebido: R$ ${totalRecebido.toFixed(2)}`;
+  totalRecebidoElement.innerText = `Total Recebido: R$ ${totalRecebido.toFixed(2)}`;
 }
 
 function exportarPDF() {

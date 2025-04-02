@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+    loadReservas();
+    const exportarButton = document.querySelector("#exportar");
+    const reserveTable = document.querySelector("#reserveTable");
     const reservasList = document.getElementById('reservas-list');
     const addReservaForm = document.getElementById('add-reserva-form');
     const descricaoInput = document.getElementById('descricao');
@@ -19,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const relatorioBtn = document.getElementById('relatorio-btn');
     const reservasTable = document.querySelector("#reservasTable");
     const reservaForm = document.querySelector("#reservaForm");
+    
 
     async function gerarRelatorioPDF(reservas) {
         const { PDFDocument, rgb } = PDFLib;
@@ -59,23 +63,33 @@ document.addEventListener('DOMContentLoaded', () => {
             const response = await fetch('/api/reservas');
             if (!response.ok) throw new Error('Erro ao carregar reservas');
             const reservas = await response.json();
-            reservasList.innerHTML = '';
+
+            const reservasTableBody = document.querySelector('#reservasTableBody');
+            if (!reservasTableBody) {
+                console.error("Elemento 'reservasTableBody' não encontrado.");
+                return;
+            }
+
+            reservasTableBody.innerHTML = ''; // Limpar tabela
             let totalReservas = 0;
+
             reservas.forEach(reserva => {
-                const li = document.createElement('li');
-                li.className = 'flex justify-between items-center bg-gray-800 p-4 rounded-lg';
-                li.innerHTML = `
-                    <span>${reserva.descricao} - R$ ${reserva.valor} - ${reserva.data}</span>
-                    <div class="flex gap-2">
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${reserva.descricao}</td>
+                    <td>R$ ${reserva.valor.toFixed(2)}</td>
+                    <td>${reserva.data}</td>
+                    <td>
                         <button class="editar-reserva bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-lg" data-id="${reserva.id}">Editar</button>
                         <button class="excluir-reserva bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg" data-id="${reserva.id}">Excluir</button>
-                    </div>
+                    </td>
                 `;
-                reservasList.appendChild(li);
+                reservasTableBody.appendChild(tr);
                 totalReservas += reserva.valor;
             });
+
             updateProgresso(totalReservas);
-            addEventListeners();
+            addEventListeners(); // Adicionar eventos aos botões após renderizar a tabela
         } catch (error) {
             console.error('Erro ao carregar reservas:', error);
         }
@@ -196,6 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function addEventListeners() {
+        // Adicionar evento para os botões de editar
         document.querySelectorAll('.editar-reserva').forEach(button => {
             button.addEventListener('click', async (event) => {
                 const id = event.target.dataset.id;
@@ -206,19 +221,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     descricaoInput.value = reserva.descricao;
                     valorInput.value = reserva.valor;
                     dataInput.value = reserva.data;
-                    addReservaForm.dataset.id = id;
+                    addReservaForm.dataset.id = id; // Armazenar o ID no formulário
                 } catch (error) {
                     console.error('Erro ao carregar reserva:', error);
                 }
             });
         });
 
+        // Adicionar evento para os botões de excluir
         document.querySelectorAll('.excluir-reserva').forEach(button => {
             button.addEventListener('click', async (event) => {
                 const id = event.target.dataset.id;
                 try {
                     await deleteReserva(id);
-                    loadReservas();
+                    loadReservas(); // Recarregar a tabela após excluir
                     showMessage('Reserva excluída com sucesso!', 'success');
                 } catch (error) {
                     console.error('Erro ao excluir reserva:', error);
@@ -327,6 +343,26 @@ document.addEventListener('DOMContentLoaded', () => {
             reservaForm.reset();
         }
     });
+
+    exportarButton.addEventListener("click", () => {
+        exportarPDF();
+    });
+
+    function exportarPDF() {
+        console.log(totalGasto);
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        doc.text("Histórico de Despesas Pagas", 10, 10);
+        doc.autoTable({
+          html: "#reserveTable",
+          didDrawPage: (data) => {
+            // Adicionar o total gasto no final da página
+            const pageHeight = doc.internal.pageSize.height;
+            doc.text(`Total Gasto: R$ ${totalGasto.toFixed(2)}`, 10, pageHeight - 10);
+          },
+        });
+        doc.save("historico_despesas.pdf");
+      }
 
     loadReservas();
 });
