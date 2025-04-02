@@ -4,7 +4,7 @@
   "description": "Gerencie suas finanças de forma fácil e eficiente.",
   "start_url": "/pages/home/home.html",
   "display": "standalone",
-  "background_color": "#121212",
+  "background_color": "#2d3748",
   "theme_color": "#2d3748",
   "icons": [
     {
