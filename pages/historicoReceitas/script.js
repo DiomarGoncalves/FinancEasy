@@ -135,9 +135,9 @@ function renderHistorico(historico) {
       <td>${receita.data || "-"}</td>
       <td>${receita.descricao}</td>
       <td>R$ ${receita.valor.toFixed(2)}</td>
-      <td>${receita.categoria || "-"}</td>
-      <td>${receita.conta_bancaria || "-"}</td>
-      <td>${receita.forma_recebimento || "-"}</td>
+      <td class="hide-mobile">${receita.categoria || "-"}</td>
+      <td class="hide-mobile">${receita.conta_bancaria || "-"}</td>
+      <td class="hide-mobile">${receita.forma_recebimento || "-"}</td>
     `;
     tableBody.appendChild(row);
     totalRecebido += receita.valor;

@@ -66,25 +66,26 @@ document.addEventListener("DOMContentLoaded", () => {
     const senha = document.getElementById("senha").value.trim();
 
     try {
-      console.log("Verificando senha...");
-      const response = await fetch("/api/config/verificar-senha", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ senha }),
-      });
-
+      console.log("Verificando senha fornecida...");
+      const response = await fetch("/api/config/senha");
       if (!response.ok) {
-        throw new Error(`Erro ao verificar senha: ${response.statusText}`);
+        throw new Error(`Erro ao buscar senha: ${response.statusText}`);
+      }
+
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("Resposta da API não é um JSON válido.");
       }
 
       const data = await response.json();
-      if (data.autenticado) {
-        window.location.href = "/pages/configuracoes/configuracoes.html";
+      if (data.senha === senha) {
+        window.location.href = "/pages/configuracao/configuracao.html";
       } else {
-        alert("Senha incorreta. Tente novamente.");
+        showMessage("Senha incorreta. Tente novamente.", "error");
       }
     } catch (error) {
       console.error("Erro ao verificar senha:", error.message);
+      showMessage("Erro ao verificar senha. Por favor, tente novamente mais tarde.", "error");
     }
   });
 });

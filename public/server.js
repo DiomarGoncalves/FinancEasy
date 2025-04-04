@@ -60,6 +60,7 @@ const testeRouter = require("./routers/teste.js");
 const dashboardRouter = require("./routers/dashboard.js");
 const investimentosRouter = require("./routers/investimentos.js");
 const homeRouter = require("./routers/home.js");
+const configRouter = require("./routers/config");
 
 // Usar rotas
 app.use("/api/receitas", receitasRouter);
@@ -75,6 +76,7 @@ app.use("/api/teste", testeRouter);
 app.use("/api/dashboard", dashboardRouter);
 app.use("/api/investimentos", investimentosRouter); // Adicionada a rota de investimentos
 app.use("/api/home", homeRouter);
+app.use("/api/config", configRouter);
 
 // Rota para servir qualquer página HTML dentro da pasta "pages"
 app.get("/pages/:folder/:file", (req, res) => {

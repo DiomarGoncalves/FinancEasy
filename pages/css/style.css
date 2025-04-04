@@ -112,10 +112,26 @@ td{
   text-align: center;
   border-bottom: 1px solid #ccc;
 }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  text-align: left;
+  padding: 8px;
+  border-bottom: 1px solid #ccc;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
 /* Responsividade */
 @media (max-width: 768px) {
   *{
-    font-size: 11px;
+    font-size: 15px;
   }
   .menu-toggle {
     display: block;
@@ -143,6 +159,23 @@ td{
   .mobile{
     max-width: 50px;
   }
+
+  table {
+    font-size: 0.875rem;
+  }
+
+  th, td {
+    padding: 6px;
+  }
+
+  .table-responsive {
+    margin-bottom: 1rem;
+  }
+
+  /* Ocultar colunas menos importantes */
+  .hide-mobile {
+    display: none;
+  }
 }
 
 @media (max-width: 480px) {
@@ -156,5 +189,13 @@ td{
 
   .dashboard-grid {
     grid-template-columns: 1fr;
+  }
+
+  table {
+    font-size: 0.75rem;
+  }
+
+  th, td {
+    padding: 4px;
   }
 }

@@ -108,10 +108,10 @@ function renderHistorico(historico) {
     row.innerHTML = `
       <td>${comissao.nf || "N/A"}</td>
       <td>${comissao.pedidoNectar || "N/A"}</td>
-      <td>${comissao.notaNectar || "N/A"}</td>
+      <td class="hide-mobile">${comissao.notaNectar || "N/A"}</td>
       <td>R$ ${valorVenda.toFixed(2)}</td>
       <td>${comissao.dataVenda || "N/A"}</td>
-      <td>R$ ${valorComissao.toFixed(2)}</td>
+      <td class="hide-mobile">R$ ${valorComissao.toFixed(2)}</td>
       <td>${comissao.dataRecebimento || "N/A"}</td>
     `;
     tableBody.appendChild(row);

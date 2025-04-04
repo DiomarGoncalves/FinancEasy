@@ -72,22 +72,24 @@
                 <button type="submit" class="mt-4 bg-green-500 p-2 rounded">Cadastrar Venda</button>
             </form>
             <h2 class="text-2xl font-bold mt-6">Comissões Pendentes</h2>
-            <table class="w-full mt-4 bg-gray-800 rounded-lg" id="tabelaComissoesPendentes">
-                <thead>
-                    <tr class="bg-gray-700">
-                        <th class="p-2">NF-e</th>
-                        <th>Pedido Nectar</th>
-                        <th>Nota Nectar</th>
-                        <th>Valor</th>
-                        <th>Data</th>
-                        <th>Comissão</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody id="tabelaComissoes">
-                    <!-- Vendas serão adicionadas dinamicamente -->
-                </tbody>
-            </table>
+            <div class="table-responsive">
+                <table class="w-full mt-4 bg-gray-800 rounded-lg" id="tabelaComissoesPendentes">
+                    <thead>
+                        <tr class="bg-gray-700">
+                            <th class="p-2">NF-e</th>
+                            <th>Pedido Nectar</th>
+                            <th>Nota Nectar</th>
+                            <th>Valor</th>
+                            <th>Data</th>
+                            <th>Comissão</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaComissoes">
+                        <!-- Vendas serão adicionadas dinamicamente -->
+                    </tbody>
+                </table>
+            </div>
         </div>
     </main>
     <script src="script.js"></script>

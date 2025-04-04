@@ -16,6 +16,14 @@ function showMessage(message, type) {
     document.body.appendChild(toastContainer);
   }
 
+  // Verificar se a mensagem já está sendo exibida
+  const existingToast = Array.from(toastContainer.children).find(
+    (toast) => toast.textContent === message
+  );
+  if (existingToast) {
+    return; // Não adicionar a mensagem novamente
+  }
+
   const toast = document.createElement("div");
   toast.className = `toast-message alert alert-${type}`;
   toast.textContent = message;
@@ -128,25 +136,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     .addEventListener("submit", async (event) => {
       event.preventDefault();
 
-      const dataInput = document.getElementById("date");
-      const estabelecimentoInput = document.getElementById("estabelecimento");
-      const valorInput = document.getElementById("valor");
-      const formaPagamentoInput = document.getElementById("forma_pagamento");
+      const estabelecimento = document.getElementById("estabelecimento").value.trim();
+      const data = document.getElementById("date").value.trim();
+      const valor = parseFloat(document.getElementById("valor").value);
+      const formaPagamento = document.getElementById("forma_pagamento").value.trim();
+      const numeroParcelas = parseInt(document.getElementById("numero_parcelas").value) || 1;
+      const valorParcela = parseFloat(document.getElementById("valor_parcela").value) || valor;
+      const cartaoId = document.getElementById("cartao").value || null;
 
-      if (!dataInput || !estabelecimentoInput || !valorInput || !formaPagamentoInput) {
-        console.error("Um ou mais elementos obrigatórios não foram encontrados.");
-        showMessage("Erro interno: elementos obrigatórios não encontrados.", "error");
-        return;
-      }
-
-      const data = dataInput.value.trim();
-      const estabelecimento = estabelecimentoInput.value.trim();
-      const valor = parseFloat(valorInput.value);
-      const formaPagamento = formaPagamentoInput.value.trim();
-
-      if (!data || !estabelecimento || isNaN(valor) || valor <= 0) {
+      if (!estabelecimento || !data || isNaN(valor) || valor <= 0) {
         showMessage("Por favor, preencha todos os campos obrigatórios corretamente.", "error");
-        console.error("Dados inválidos:", { data, estabelecimento, valor });
         return;
       }
 
@@ -158,70 +157,56 @@ document.addEventListener("DOMContentLoaded", async () => {
 
       if (!formasPagamentoValidas.includes(formaPagamentoNormalizada)) {
         showMessage("Forma de pagamento inválida.", "error");
-        console.error("Forma de pagamento inválida:", formaPagamentoNormalizada);
         return;
       }
 
-      const numeroParcelasInput = document.getElementById("numero_parcelas");
-      const valorParcelaInput = document.getElementById("valor_parcela");
-      const cartaoInput = document.getElementById("cartao");
-
-      const numeroParcelas =
-        formaPagamentoNormalizada === "Crédito"
-          ? parseInt(numeroParcelasInput?.value) || 1
-          : 1;
-      const valorParcela =
-        formaPagamentoNormalizada === "Crédito"
-          ? parseFloat(valorParcelaInput?.value) || valor
-          : valor;
-      const cartaoId =
-        formaPagamentoNormalizada === "Crédito"
-          ? parseInt(cartaoInput?.value)
-          : null;
-
-      const parcelas = [];
-      let dataParcela = new Date(data);
-
-      for (let i = 0; i < numeroParcelas; i++) {
-        if (isNaN(dataParcela.getTime())) {
-          showMessage("Erro ao processar a data da parcela. Data inválida.", "error");
-          console.error("Data inválida ao gerar parcelas:", dataParcela);
-          return;
-        }
-
-        parcelas.push({
+      if (formaPagamentoNormalizada === "Crédito" && numeroParcelas > 1) {
+        const despesaParcelada = {
           estabelecimento,
-          data: dataParcela.toISOString().split("T")[0],
-          valor: valorParcela,
-          forma_pagamento: formaPagamentoNormalizada,
+          data,
+          valor,
           numero_parcelas: numeroParcelas,
-          parcelas_restantes: numeroParcelas - i,
-          valor_parcela: valorParcela,
+          forma_pagamento: formaPagamentoNormalizada,
           cartao_id: cartaoId,
-        });
-        dataParcela.setMonth(dataParcela.getMonth() + 1);
-      }
+        };
 
-      console.log("Dados enviados ao servidor:", parcelas);
-
-      try {
-        const response = await fetch("/api/despesas/parceladas", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(parcelas),
-        });
-
-        if (response.ok) {
+        try {
+          await registrarDespesaParcelada(despesaParcelada);
           showMessage("Despesa parcelada registrada com sucesso!", "success");
           loadDespesas();
-        } else {
-          const errorData = await response.json();
-          console.error("Erro do servidor:", errorData);
-          showMessage(`Erro ao registrar despesa: ${errorData.error || "Erro desconhecido"}`, "error");
+        } catch (error) {
+          console.error("Erro ao registrar despesa parcelada:", error.message);
+          showMessage("Erro ao registrar despesa parcelada. Por favor, tente novamente.", "error");
         }
-      } catch (error) {
-        console.error("Erro ao registrar despesa parcelada:", error);
-        showMessage(`Erro ao registrar despesa parcelada: ${error.message}`, "danger");
+      } else {
+        const despesaNormal = {
+          estabelecimento,
+          data,
+          valor,
+          forma_pagamento: formaPagamentoNormalizada,
+          numero_parcelas: 1,
+          parcelas_restantes: 1,
+          valor_parcela: valor,
+          cartao_id: cartaoId,
+        };
+
+        try {
+          const response = await fetch("/api/despesas", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(despesaNormal),
+          });
+
+          if (!response.ok) {
+            throw new Error("Erro ao registrar despesa.");
+          }
+
+          showMessage("Despesa registrada com sucesso!", "success");
+          loadDespesas();
+        } catch (error) {
+          console.error("Erro ao registrar despesa:", error.message);
+          showMessage("Erro ao registrar despesa. Por favor, tente novamente.", "error");
+        }
       }
 
       resetFormAndUnlockInputs(event.target);
@@ -249,7 +234,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       }
 
       const despesas = await response.json();
-      renderDespesas(despesas); // Atualizar a tabela com os dados filtrados
+      renderDespesas(despesas);
       showMessage("Filtro aplicado com sucesso!", "success");
     } catch (error) {
       console.error("Erro ao filtrar despesas:", error);
@@ -274,7 +259,6 @@ async function loadDespesas() {
 function renderDespesas(despesas) {
   const tableBody = document.querySelector("#despesasTable tbody");
   tableBody.innerHTML = ""; // Limpar tabela
-  totalGasto = 0;
 
   despesas.forEach((despesa) => {
     const row = document.createElement("tr");
@@ -282,11 +266,11 @@ function renderDespesas(despesas) {
       <td>${despesa.estabelecimento}</td>
       <td>${despesa.data}</td>
       <td>R$ ${despesa.valor.toFixed(2)}</td>
-      <td>${despesa.forma_pagamento}</td>
-      <td>${despesa.numero_parcelas}</td>
-      <td>${despesa.parcelas_restantes}</td>
-      <td>R$ ${despesa.valor_parcela.toFixed(2)}</td>
-      <td>${despesa.cartao_nome || "-"}</td>
+      <td class="hide-mobile">${despesa.forma_pagamento}</td>
+      <td class="hide-mobile">${despesa.numero_parcelas || "-"}</td>
+      <td class="hide-mobile">${despesa.parcelas_restantes || "-"}</td>
+      <td class="hide-mobile">R$ ${despesa.valor_parcela.toFixed(2) || "-"}</td>
+      <td class="hide-mobile">${despesa.cartao || "-"}</td>
       <td colspan="1" class="text-center">
         <button class="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-md mr-2" onclick="payDespesa(${despesa.id})">
           <i class="fas fa-dollar-sign icon"></i> Pagar
@@ -296,9 +280,9 @@ function renderDespesas(despesas) {
         </button>
       </td>
     `;
-    tableBody.appendChild(row); // Adicionar linha à tabela
-    totalGasto += despesa.valor;
+    tableBody.appendChild(row);
   });
+
 
   showMessage(`Total de despesas: R$ ${totalGasto.toFixed(2)}`, "info");
 }
@@ -308,30 +292,36 @@ async function payDespesa(id) {
     const response = await fetch(`/api/despesas/${id}/pagar`, {
       method: "POST",
     });
-    if (response.ok) {
-      loadDespesas(); // Atualizar a lista de despesas
-      showMessage("Despesa paga com sucesso!", "success");
-    } else {
-      throw new Error("Erro ao pagar despesa");
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Erro do servidor ao pagar despesa:", errorData);
+      throw new Error(errorData.error || "Erro ao pagar despesa.");
     }
+
+    showMessage("Despesa paga com sucesso!", "success");
+    loadDespesas(); // Atualizar a lista de despesas
   } catch (error) {
     console.error(`Erro ao pagar despesa: ${error.message}`);
-    showMessage(`Erro ao pagar despesa: ${error.message}`, "danger");
+    showMessage(`Erro ao pagar despesa: ${error.message}`, "error");
   }
 }
 
 async function deleteDespesa(id) {
   try {
     const response = await fetch(`/api/despesas/${id}`, { method: "DELETE" });
-    if (response.ok) {
-      loadDespesas(); // Atualizar a lista de despesas
-      showMessage("Despesa excluída com sucesso!", "error");
-    } else {
-      throw new Error("Erro ao excluir despesa");
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Erro do servidor ao excluir despesa:", errorData);
+      throw new Error(errorData.error || "Erro ao excluir despesa.");
     }
+
+    showMessage("Despesa excluída com sucesso!", "success");
+    loadDespesas(); // Atualizar a lista de despesas
   } catch (error) {
     console.error(`Erro ao excluir despesa: ${error.message}`);
-    showMessage(`Erro ao excluir despesa: ${error.message}`, "danger");
+    showMessage(`Erro ao excluir despesa: ${error.message}`, "error");
   }
 }
 
@@ -368,3 +358,43 @@ function exportarPDF() {
   });
   doc.save("Relatorio de despesas.pdf");
 }
+
+async function registrarDespesaParcelada(despesa) {
+  try {
+    const response = await fetch("/api/despesas/parceladas", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(despesa),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error("Erro do servidor ao registrar despesa parcelada:", errorData);
+      throw new Error(errorData.error || "Erro ao registrar despesa parcelada.");
+    }
+
+    const data = await response.json();
+    console.log("Despesa parcelada registrada com sucesso:", data);
+    showMessage("Despesa parcelada registrada com sucesso!", "success");
+    loadDespesas();
+  } catch (error) {
+    console.error("Erro ao registrar despesa parcelada:", error.message);
+    showMessage("Erro ao registrar despesa parcelada. Por favor, tente novamente.", "error");
+  }
+}
+
+// Exemplo de uso
+document.getElementById("despesaForm").addEventListener("submit", async (event) => {
+  event.preventDefault();
+
+  const despesa = {
+    estabelecimento: document.getElementById("estabelecimento").value,
+    data: document.getElementById("date").value,
+    valor: parseFloat(document.getElementById("valor").value),
+    numero_parcelas: parseInt(document.getElementById("numero_parcelas").value),
+    forma_pagamento: document.getElementById("forma_pagamento").value,
+    cartao_id: document.getElementById("cartao").value || null,
+  };
+
+  await registrarDespesaParcelada(despesa);
+});

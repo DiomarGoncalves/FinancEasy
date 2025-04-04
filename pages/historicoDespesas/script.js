@@ -116,9 +116,9 @@ function renderHistorico(historico) {
       <td>${despesa.estabelecimento}</td>
       <td>${despesa.data}</td>
       <td>R$ ${despesa.valor.toFixed(2)}</td>
-      <td>${despesa.forma_pagamento}</td>
-      <td>${despesa.numero_parcelas}</td>
-      <td>${despesa.parcelas_restantes}</td>
+      <td class="hide-mobile">${despesa.forma_pagamento}</td>
+      <td class="hide-mobile">${despesa.numero_parcelas}</td>
+      <td class="hide-mobile">${despesa.parcelas_restantes}</td>
       <td>${despesa.data_pagamento}</td>
     `;
     tableBody.appendChild(row); // Adicionar linha à tabela
