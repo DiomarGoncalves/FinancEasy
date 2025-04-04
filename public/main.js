@@ -25,7 +25,7 @@ function startServer() {
   }
 
   serverInstance = server.listen(port, ip, () => {
-    console.log(`Servidor rodando em http://${ip}:${port}`);
+    console.log(`Servidor rodando em http://${ip}:${port}/pages/home/home.html`);
   });
 }
 

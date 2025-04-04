@@ -27,34 +27,38 @@
     <!-- pwa -->
   </head>
   <body>
-      <nav class="sidebar" id="sidebar">
-        <a href="">            <a href="/pages/home/home.html"><h2 class="text-purple-300 text-xl font-bold mb-4">FinancEasy</h2></a></a>
-    <a href="/pages/cartao/cartoes.html">💳 Cartões</a>
-    <div class="dropdown">
-      <a href="#" class="text-white">📊 Transações</a>
-      <div class="dropdown-content">
-        <a href="/pages/despesas/despesas.html">📉 Despesas</a>
-        <a href="/pages/receitas/receitas.html">📈 Receitas</a>
+    <nav class="sidebar" id="sidebar">
+      <a href="/pages/home/home.html">
+        <h2 class="text-purple-300 text-xl font-bold mb-4">FinancEasy</h2>
+      </a>
+      <a href="/pages/cartao/cartoes.html">💳 Cartões</a>
+      <div class="dropdown">
+        <a href="#" class="text-white">📊 Transações</a>
+        <div class="dropdown-content">
+          <a href="/pages/despesas/despesas.html">📉 Despesas</a>
+          <a href="/pages/receitas/receitas.html">📈 Receitas</a>
+        </div>
       </div>
-    </div>
-    <div class="dropdown">
-      <a href="#" class="text-white">📊 Históricos</a>
-      <div class="dropdown-content">
-        <a href="/pages/historicoComissões/historicoComissões.html">📉Historico de Comissões</a>
-        <a href="/pages/historicoDespesas/historicoDespesas.html">📈 Historico de Despesas</a>
-        <a href="/pages/historicoReceitas/historicoReceitas.html">📈 Historico de Receitas</a>
+      <div class="dropdown">
+        <a href="#" class="text-white">📊 Históricos</a>
+        <div class="dropdown-content">
+          <a href="/pages/historicoComissões/historicoComissões.html">📉Historico de Comissões</a>
+          <a href="/pages/historicoDespesas/historicoDespesas.html">📈 Historico de Despesas</a>
+          <a href="/pages/historicoReceitas/historicoReceitas.html">📈 Historico de Receitas</a>
+        </div>
       </div>
-    </div>
-    <a href="/pages/investimentos/investimentos.html">📊 Investimentos</a>
-    <a href="/pages/comissao/comissao.html">💰 Comissões</a>
-    <a href="/pages/reservas/reservas.html">🏦 Reservas</a>
-    <a href="/pages/relatorios/relatorios.html">📋 Relatórios</a>
-    <a href="/pages/loginC/loginConfig.html">⚙️ Configuração</a>
-  </nav>
+      <a href="/pages/investimentos/investimentos.html">📊 Investimentos</a>
+      <a href="/pages/comissao/comissao.html">💰 Comissões</a>
+      <a href="/pages/reservas/reservas.html">🏦 Reservas</a>
+      <a href="/pages/relatorios/relatorios.html">📋 Relatórios</a>
+      <a href="/pages/loginC/loginConfig.html">⚙️ Configuração</a>
+    </nav>
 
-  <button class="menu-toggle" id="menuToggle">☰</button>
-  
+    <button class="menu-toggle" id="menuToggle">☰</button>
+
     <main class="main-content">
+      <h2 class="text-2xl font-bold mb-6" id="saudacao">Seja Bem Vindo!</h2>
+
       <div class="dashboard-grid">
         <div class="card">
           <h3 class="text-xl font-bold mb-2">💰 Saldo Atual</h3>
@@ -75,6 +79,41 @@
         <div class="card">
           <h3 class="text-xl font-bold mb-2">💵 Comissões Recebidas</h3>
           <p class="text-2xl font-semibold" id="comissoesRecebidas">Carregando...</p>
+        </div>
+        <div class="card">
+          <h3 class="text-xl font-bold mb-2">📊 Comparativo com mês anterior</h3>
+          <p id="comparativoMes" class="text-sm">Carregando...</p>
+        </div>
+        <div class="card">
+          <h3 class="text-xl font-bold mb-2">🎯 Meta de Economia</h3>
+          <progress max="100" value="0" id="progressoMeta" class="w-full h-4 rounded bg-gray-200"></progress>
+          <p class="text-sm mt-1" id="textoMeta">Carregando...</p>
+        </div>
+
+        <!-- Novos cards adicionados -->
+        <div class="card bg-red-100 text-red-800" id="avisoGastos" style="display: none;">
+          <h3 class="text-xl font-bold mb-2">⚠️ Atenção</h3>
+          <p>Seus gastos estão acima da média mensal!</p>
+        </div>
+
+        <div class="card bg-yellow-50 text-yellow-800">
+          <h3 class="text-xl font-bold mb-2">📌 Resumo do Mês</h3>
+          <ul class="text-sm space-y-1" id="resumoMes">
+            <li>Carregando resumo...</li>
+          </ul>
+        </div>
+
+        <div class="card text-center bg-green-50 text-green-800">
+          <h3 class="text-xl font-bold mb-2">😄 Seu humor financeiro</h3>
+          <div id="iconeHumor" class="text-4xl mb-2">😐</div>
+          <p class="text-sm" id="descricaoHumor">Carregando avaliação...</p>
+        </div>
+
+        <div class="card bg-blue-50 text-blue-800">
+          <h3 class="text-xl font-bold mb-2">🔔 Notificações</h3>
+          <ul id="notificacoesRapidas" class="text-sm space-y-1">
+            <li>Carregando notificações...</li>
+          </ul>
         </div>
       </div>
 

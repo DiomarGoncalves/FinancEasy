@@ -44,7 +44,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
       }
 
-      const filtros = { dataInicio: `${mes}-01`, dataFim: `${mes}-31` };
+      const filtros = { mes };
       const historicoFiltrado = await fetchHistoricoReceitasFiltradas(filtros);
       renderHistorico(historicoFiltrado);
     });
@@ -76,7 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 async function fetchHistoricoReceitas() {
   try {
-    const response = await fetch("/api/historico-receitas");
+    const response = await fetch("/api/historico/receitas");
     if (!response.ok) throw new Error("Erro ao buscar histórico de receitas");
     return await response.json();
   } catch (error) {
@@ -86,8 +86,13 @@ async function fetchHistoricoReceitas() {
 }
 
 async function fetchHistoricoReceitasFiltradas(filtros) {
+  if (!filtros.mes) {
+    console.error("Parâmetro 'mes' ausente na requisição.");
+    return [];
+  }
+
   try {
-    const response = await fetch("/api/historico-receitas/filtrar", {
+    const response = await fetch("/api/historico/receitas/filtrar", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(filtros),

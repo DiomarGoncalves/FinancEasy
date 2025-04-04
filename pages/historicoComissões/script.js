@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   try {
     const historico = await fetchHistoricoComissao();
+    console.log(historico);
     renderHistorico(historico);
 
     filtroForm.addEventListener("submit", async (event) => {
@@ -49,11 +50,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 async function fetchHistoricoComissao() {
   try {
-    const response = await fetch("/api/comissoes/historico");
-    if (!response.ok) throw new Error("Erro ao buscar histórico de comissao");
-    return await response.json();
+    const response = await fetch("/api/historico/comissoes");
+    if (!response.ok) {
+      throw new Error(`Erro na requisição: ${response.statusText}`);
+    }
+    const data = await response.json();
+    console.log("Histórico de comissões:", data);
+    return data;
   } catch (error) {
-    console.error(`Erro ao buscar histórico de comissao: ${error.message}`);
+    console.error("Erro ao buscar histórico de comissões:", error.message);
     return [];
   }
 }
@@ -66,7 +71,7 @@ async function fetchHistoricoComissaoFiltradas(filtros) {
   }
 
   try {
-    const response = await fetch("/api/comissoes/historico/filtrar", {
+    const response = await fetch("/api/historico/comissoes/filtrar", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(filtros),
@@ -119,13 +124,25 @@ function renderHistorico(historico) {
 function exportarPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
-  doc.text("Histórico de comissao Pagas", 10, 10);
+
+  // Adicionar título
+  doc.setFontSize(16);
+  doc.text("Histórico de Comissões Pagas", 10, 10);
+
+  // Adicionar tabela
   doc.autoTable({
     html: "#historicoTable",
+    startY: 20, // Começar abaixo do título
+    theme: "grid",
+    headStyles: { fillColor: [41, 128, 185] }, // Cor do cabeçalho
     didDrawPage: (data) => {
+      // Adicionar o total ganho no final da página
       const pageHeight = doc.internal.pageSize.height;
-      doc.text(`Total Gasto: R$ ${totalGasto.toFixed(2)}`, 10, pageHeight - 10);
+      doc.setFontSize(12);
+      doc.text(`Total Ganho: R$ ${totalGasto.toFixed(2)}`, 10, pageHeight - 10);
     },
   });
-  doc.save("historico_comissao.pdf");
+
+  // Salvar o PDF
+  doc.save("historico_comissoes.pdf");
 }

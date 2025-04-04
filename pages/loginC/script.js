@@ -52,29 +52,39 @@ function resetFormAndUnlockInputs(form) {
     form.querySelectorAll('input').forEach(input => input.disabled = false); // Desbloquear inputs
 }
 
-document.getElementById('loginForm').addEventListener('submit', async (event) => {
-  event.preventDefault();
-  const senha = document.getElementById('senha').value;
+document.addEventListener("DOMContentLoaded", () => {
+  const loginForm = document.getElementById("loginForm");
 
-  try {
-    const response = await fetch("/api/verificar-senha", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ senha }),
-    });
-
-    if (response.ok) {
-      const result = await response.json();
-      if (result.success) {
-        window.location.href = '/pages/configuracao/configuracao.html';
-      } else {
-        showMessage("Senha incorreta!!", "error");
-      }
-    } else {
-      throw new Error("Erro ao verificar senha");
-    }
-  } catch (error) {
-    console.error(`Erro ao verificar senha: ${error.message}`);
-    showMessage(`Erro ao verificar senha: ${error.message}`, "error");
+  if (!loginForm) {
+    console.error("Elemento 'loginForm' não encontrado.");
+    return;
   }
+
+  loginForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const senha = document.getElementById("senha").value.trim();
+
+    try {
+      console.log("Verificando senha...");
+      const response = await fetch("/api/config/verificar-senha", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ senha }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Erro ao verificar senha: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      if (data.autenticado) {
+        window.location.href = "/pages/configuracoes/configuracoes.html";
+      } else {
+        alert("Senha incorreta. Tente novamente.");
+      }
+    } catch (error) {
+      console.error("Erro ao verificar senha:", error.message);
+    }
+  });
 });

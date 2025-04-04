@@ -30,11 +30,11 @@ async function gerarGraficos() {
       dataFim,
     });
     const historicoDespesas = await fetchData(
-      "/api/historico-despesas/filtrar",
+      "/api/historico/despesas/filtrar",
       { dataInicio, dataFim }
     );
     const historicoReceitas = await fetchData(
-      "/api/historico-receitas/filtrar",
+      "/api/historico/receitas/filtrar",
       { dataInicio, dataFim }
     );
 

@@ -52,7 +52,23 @@ function showMessage(message, type) {
 document.addEventListener("DOMContentLoaded", () => {
   const cadastroVendaForm = document.getElementById("cadastroVenda");
   const tabelaComissoes = document.getElementById("tabelaComissoes");
-  document.getElementById("exportar").addEventListener("click", () => {
+  const exportarButton = document.getElementById("exportar");
+
+  // Verificar se os elementos necessários existem
+  if (!cadastroVendaForm) {
+    console.error("Elemento 'cadastroVenda' não encontrado.");
+    return;
+  }
+  if (!tabelaComissoes) {
+    console.error("Elemento 'tabelaComissoes' não encontrado.");
+    return;
+  }
+  if (!exportarButton) {
+    console.error("Elemento 'exportar' não encontrado.");
+    return;
+  }
+
+  exportarButton.addEventListener("click", () => {
     exportarPDF();
   });
 
@@ -60,6 +76,8 @@ document.addEventListener("DOMContentLoaded", () => {
   async function carregarComissoes() {
     try {
       const response = await fetch("/api/comissoes");
+      if (!response.ok) throw new Error("Erro ao carregar comissões");
+
       const comissoes = await response.json();
       tabelaComissoes.innerHTML = "";
 
@@ -83,6 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
       adicionarEventosBotoes();
     } catch (error) {
       console.error("Erro ao carregar comissões:", error);
+      showMessage("Erro ao carregar comissões.", "error");
     }
   }
 

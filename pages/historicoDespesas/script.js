@@ -20,14 +20,25 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   try {
-    const historico = await fetchHistoricoDespesas();
+    // Carregar todos os históricos inicialmente
+    const historico = await fetchTodosHistoricoDespesas();
     renderHistorico(historico);
 
+    // Aplicar filtro ao enviar o formulário
     filtroForm.addEventListener("submit", async (event) => {
       event.preventDefault();
       const mesInput = document.getElementById("mes"); // Campo 'mes'
 
-      const mes = mesInput ? mesInput.value : null; // Obter valor do campo 'mes'
+      if (!mesInput) {
+        console.error("Elemento 'mes' não encontrado.");
+        return;
+      }
+
+      const mes = mesInput.value;
+      if (!mes) {
+        alert("Por favor, selecione um mês válido.");
+        return;
+      }
 
       const filtros = { mes };
       const historicoFiltrado = await fetchHistoricoDespesasFiltradas(filtros);
@@ -42,13 +53,26 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 });
 
-async function fetchHistoricoDespesas() {
+async function fetchTodosHistoricoDespesas() {
   try {
-    const response = await fetch("/api/historico-despesas");
-    if (!response.ok) throw new Error("Erro ao buscar histórico de despesas");
-    return await response.json();
+    const response = await fetch("/api/historico/despesas");
+    if (!response.ok) {
+      throw new Error(`Erro na requisição: ${response.statusText}`);
+    }
+
+    // Verificar se a resposta é JSON válida
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      const text = await response.text(); // Capturar a resposta como texto para depuração
+      console.error("Resposta inesperada da API:", text);
+      throw new Error("Resposta da API não é um JSON válido");
+    }
+
+    const data = await response.json();
+    console.log("Todos os históricos de despesas:", data);
+    return data;
   } catch (error) {
-    console.error(`Erro ao buscar histórico de despesas: ${error.message}`);
+    console.error("Erro ao buscar todos os históricos de despesas:", error.message);
     return [];
   }
 }
@@ -56,12 +80,11 @@ async function fetchHistoricoDespesas() {
 async function fetchHistoricoDespesasFiltradas(filtros) {
   if (!filtros.mes) {
     console.error("Parâmetro 'mes' ausente na requisição.");
-    showMessage("Por favor, selecione um mês para filtrar.", "warning");
     return [];
   }
 
   try {
-    const response = await fetch("/api/historico-despesas/filtrar", {
+    const response = await fetch("/api/historico/despesas/filtrar", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(filtros),
@@ -76,8 +99,16 @@ async function fetchHistoricoDespesasFiltradas(filtros) {
 
 function renderHistorico(historico) {
   const tableBody = document.getElementById("historicoTableBody");
+  const totalGastoElement = document.getElementById("totalGasto");
+
   tableBody.innerHTML = ""; // Limpar tabela
   totalGasto = 0;
+
+  if (historico.length === 0) {
+    tableBody.innerHTML = `<tr><td colspan="7" class="text-center">Nenhuma despesa encontrada.</td></tr>`;
+    totalGastoElement.innerText = `Total Gasto: R$ 0,00`;
+    return;
+  }
 
   historico.forEach((despesa) => {
     const row = document.createElement("tr");
@@ -94,23 +125,31 @@ function renderHistorico(historico) {
     totalGasto += despesa.valor;
   });
 
-  document.getElementById(
-    "totalGasto"
-  ).innerText = `Total Gasto: R$ ${totalGasto.toFixed(2)}`;
+  totalGastoElement.innerText = `Total Gasto: R$ ${totalGasto.toFixed(2)}`;
 }
 
 function exportarPDF() {
-  console.log(totalGasto);
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
+
+  // Adicionar título
+  doc.setFontSize(16);
   doc.text("Histórico de Despesas Pagas", 10, 10);
+
+  // Adicionar tabela
   doc.autoTable({
     html: "#historicoTable",
+    startY: 20, // Começar abaixo do título
+    theme: "grid",
+    headStyles: { fillColor: [41, 128, 185] }, // Cor do cabeçalho
     didDrawPage: (data) => {
       // Adicionar o total gasto no final da página
       const pageHeight = doc.internal.pageSize.height;
+      doc.setFontSize(12);
       doc.text(`Total Gasto: R$ ${totalGasto.toFixed(2)}`, 10, pageHeight - 10);
     },
   });
+
+  // Salvar o PDF
   doc.save("historico_despesas.pdf");
 }
