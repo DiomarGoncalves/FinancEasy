@@ -361,6 +361,11 @@ function exportarPDF() {
 
 async function registrarDespesaParcelada(despesa) {
   try {
+    // Validação de campos obrigatórios
+    if (!despesa.estabelecimento || !despesa.data || !despesa.valor || !despesa.numero_parcelas || !despesa.forma_pagamento) {
+      throw new Error("Todos os campos são obrigatórios.");
+    }
+
     const response = await fetch("/api/despesas/parceladas", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -375,11 +380,15 @@ async function registrarDespesaParcelada(despesa) {
 
     const data = await response.json();
     console.log("Despesa parcelada registrada com sucesso:", data);
+
+    // Atualizar o total gasto
+    totalGasto += despesa.valor;
+
     showMessage("Despesa parcelada registrada com sucesso!", "success");
     loadDespesas();
   } catch (error) {
     console.error("Erro ao registrar despesa parcelada:", error.message);
-    showMessage("Erro ao registrar despesa parcelada. Por favor, tente novamente.", "error");
+    showMessage(error.message, "error");
   }
 }
 
