@@ -156,6 +156,14 @@ const db = {
                 usuario_id INTEGER NOT NULL,
                 FOREIGN KEY(usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
             );
+
+            ALTER TABLE cartoes ADD COLUMN IF NOT EXISTS usuario_id INTEGER REFERENCES usuarios(id) ON DELETE CASCADE;
+            ALTER TABLE despesas ADD COLUMN IF NOT EXISTS usuario_id INTEGER REFERENCES usuarios(id) ON DELETE CASCADE;
+            ALTER TABLE receitas ADD COLUMN IF NOT EXISTS usuario_id INTEGER REFERENCES usuarios(id) ON DELETE CASCADE;
+            ALTER TABLE investimentos ADD COLUMN IF NOT EXISTS usuario_id INTEGER REFERENCES usuarios(id) ON DELETE CASCADE;
+            ALTER TABLE reservas ADD COLUMN IF NOT EXISTS usuario_id INTEGER REFERENCES usuarios(id) ON DELETE CASCADE;
+            ALTER TABLE objetivo ADD COLUMN IF NOT EXISTS usuario_id INTEGER REFERENCES usuarios(id) ON DELETE CASCADE;
+            ALTER TABLE comissoes ADD COLUMN IF NOT EXISTS usuario_id INTEGER REFERENCES usuarios(id) ON DELETE CASCADE;
         `);
         console.log("Tabelas criadas com sucesso!");
     } catch (error) {

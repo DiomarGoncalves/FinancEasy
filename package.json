@@ -35,6 +35,7 @@
     "jspdf": "^2.4.0",
     "jspdf-autotable": "^3.5.13",
     "lucide-react": "^0.276.0",
+    "pg": "^8.14.1",
     "save-dev": "^0.0.1-security",
     "sqlite3": "^5.1.7"
   }
