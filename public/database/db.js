@@ -77,7 +77,7 @@ const db = {
                 fonte TEXT NOT NULL,
                 forma_recebimento TEXT NOT NULL CHECK (forma_recebimento IN ('Transferência', 'Pix', 'Dinheiro', 'Cheque')),
                 conta_bancaria TEXT NOT NULL,
-                recorrente BOOLEAN DEFAULT 0,
+                recorrente BOOLEAN DEFAULT FALSE,
                 intervalo_recorrencia TEXT,
                 usuario_id INTEGER NOT NULL,
                 FOREIGN KEY(usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
@@ -92,7 +92,7 @@ const db = {
                 fonte TEXT NOT NULL,
                 forma_recebimento TEXT NOT NULL,
                 conta_bancaria TEXT NOT NULL,
-                recorrente BOOLEAN DEFAULT 0,
+                recorrente BOOLEAN DEFAULT FALSE,
                 intervalo_recorrencia TEXT,
                 data_recebimento DATE NOT NULL
             );

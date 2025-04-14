@@ -6,6 +6,9 @@
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "public/server.js" },
+    { "src": "/login", "dest": "/public/pages/login/login.html" },
+    { "src": "/cadastro", "dest": "/public/pages/cadastro/cadastro.html" },
+    { "src": "/", "dest": "/public/pages/login/login.html" },
     { "src": "/(.*)", "dest": "/public/$1" },
     { "handle": "filesystem" }
   ]
