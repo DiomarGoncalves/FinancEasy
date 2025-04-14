@@ -1,177 +1,166 @@
-const path = require('path');
-const fs = require('fs');
-const sqlite3 = require('sqlite3').verbose();
-const os = require('os'); // Certifique-se de importar o módulo 'os'
+require('dotenv').config(); // Carregar variáveis de ambiente do arquivo .env
+const { Pool } = require('pg');
 
-// Obter o caminho do LocalAppData
-const localAppDataPath = process.env.LOCALAPPDATA || path.join(os.homedir(), '.local', 'share');
-
-// Definir a pasta do banco dentro do LocalAppData
-const appFolder = path.join(localAppDataPath, 'FinancEasyV2');
-
-// Criar a pasta se não existir
-if (!fs.existsSync(appFolder)) {
-    fs.mkdirSync(appFolder, { recursive: true });
-}
-
-// Modificar o caminho do banco de dados para usar o caminho configurado pelo usuário
-const configPath = path.join(appFolder, 'config.json');
-let dbPath = '';
-
-// Carregar o caminho do banco de dados a partir da configuração
-if (fs.existsSync(configPath)) {
-    const config = JSON.parse(fs.readFileSync(configPath));
-    if (config.dbPath) {
-        dbPath = path.join(config.dbPath, 'FinancEasy.db');
-    }
-}
-
-// Criar ou abrir o banco de dados
-if (!dbPath) {
-    dbPath = path.join(appFolder, 'FinancEasy.db'); // Caminho padrão
-}
-
-// Verificar se o arquivo do banco de dados existe, caso contrário, criar um arquivo vazio
-if (!fs.existsSync(dbPath)) {
-    fs.writeFileSync(dbPath, '');
-}
-
-const db = new sqlite3.Database(dbPath, (err) => {
-    if (err) {
-        console.error(`Erro ao abrir o banco de dados: ${err.message}`);
-    } else {
-        console.log(`Banco de dados conectado em: ${dbPath}`);
-    }
+// Configuração do banco de dados PostgreSQL (Neon)
+const pool = new Pool({
+    connectionString: process.env.DATABASE_URL, // URL do banco de dados fornecida
+    ssl: { rejectUnauthorized: false } // Necessário para conexões seguras
 });
 
-db.serialize(() => {
-    // **Ativar suporte a chaves estrangeiras**
-    db.run("PRAGMA foreign_keys = ON");
+// Função para executar queries
+const db = {
+    query: (text, params) => pool.query(text, params),
+};
 
-    // **Tabela de Cartões**
-    db.run(`CREATE TABLE IF NOT EXISTS cartoes (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome TEXT NOT NULL,
-        banco TEXT NOT NULL,
-        limite REAL NOT NULL,
-        vencimento TEXT NOT NULL,
-        limite_gasto REAL DEFAULT 0,
-        limite_disponivel REAL GENERATED ALWAYS AS (limite - limite_gasto) VIRTUAL
-    )`);
+// Criação das tabelas
+(async () => {
+    try {
+        await db.query(`
+            CREATE TABLE IF NOT EXISTS usuarios (
+                id SERIAL PRIMARY KEY,
+                nome TEXT NOT NULL,
+                email TEXT NOT NULL UNIQUE,
+                senha TEXT NOT NULL,
+                data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
 
-    // **Tabela de Despesas**
-    db.run(`CREATE TABLE IF NOT EXISTS despesas (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        estabelecimento TEXT NOT NULL,
-        data TEXT NOT NULL,
-        valor REAL NOT NULL,
-        forma_pagamento TEXT NOT NULL CHECK (forma_pagamento IN ('Crédito', 'Débito', 'Dinheiro', 'Pix')),
-        numero_parcelas INTEGER DEFAULT 1,
-        parcelas_restantes INTEGER DEFAULT 1,
-        valor_parcela REAL NOT NULL,
-        cartao_id INTEGER,
-        paga INTEGER DEFAULT 0,
-        FOREIGN KEY(cartao_id) REFERENCES cartoes(id) ON DELETE SET NULL
-    )`);
+            CREATE TABLE IF NOT EXISTS cartoes (
+                id SERIAL PRIMARY KEY,
+                nome TEXT NOT NULL,
+                banco TEXT NOT NULL,
+                limite NUMERIC NOT NULL,
+                vencimento DATE NOT NULL,
+                limite_gasto NUMERIC DEFAULT 0,
+                limite_disponivel NUMERIC GENERATED ALWAYS AS (limite - limite_gasto) STORED,
+                usuario_id INTEGER NOT NULL,
+                FOREIGN KEY(usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+            );
 
-    // **Tabela de Histórico de Despesas**
-    db.run(`CREATE TABLE IF NOT EXISTS historico_despesas (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        estabelecimento TEXT NOT NULL,
-        data TEXT NOT NULL,
-        valor REAL NOT NULL,
-        forma_pagamento TEXT NOT NULL,
-        numero_parcelas INTEGER DEFAULT 1,
-        parcelas_restantes INTEGER DEFAULT 1,
-        valor_parcela REAL NOT NULL,
-        cartao_id INTEGER,
-        data_pagamento TEXT NOT NULL,
-        FOREIGN KEY(cartao_id) REFERENCES cartoes(id) ON DELETE SET NULL
-    )`);
+            CREATE TABLE IF NOT EXISTS despesas (
+                id SERIAL PRIMARY KEY,
+                estabelecimento TEXT NOT NULL,
+                data DATE NOT NULL,
+                valor NUMERIC NOT NULL,
+                forma_pagamento TEXT NOT NULL CHECK (forma_pagamento IN ('Crédito', 'Débito', 'Dinheiro', 'Pix')),
+                numero_parcelas INTEGER DEFAULT 1,
+                parcelas_restantes INTEGER DEFAULT 1,
+                valor_parcela NUMERIC NOT NULL,
+                cartao_id INTEGER,
+                paga BOOLEAN DEFAULT FALSE,
+                usuario_id INTEGER NOT NULL,
+                FOREIGN KEY(cartao_id) REFERENCES cartoes(id) ON DELETE SET NULL,
+                FOREIGN KEY(usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+            );
 
-    // **Tabela de Receitas**
-    db.run(`CREATE TABLE IF NOT EXISTS receitas (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        descricao TEXT NOT NULL,
-        data TEXT NOT NULL,
-        valor REAL NOT NULL,
-        categoria TEXT NOT NULL,
-        fonte TEXT NOT NULL,
-        forma_recebimento TEXT NOT NULL CHECK (forma_recebimento IN ('Transferência', 'Pix', 'Dinheiro', 'Cheque')),
-        conta_bancaria TEXT NOT NULL,
-        recorrente BOOLEAN DEFAULT 0,
-        intervalo_recorrencia TEXT
-    )`);
+            CREATE TABLE IF NOT EXISTS historico_despesas (
+                id SERIAL PRIMARY KEY,
+                estabelecimento TEXT NOT NULL,
+                data DATE NOT NULL,
+                valor NUMERIC NOT NULL,
+                forma_pagamento TEXT NOT NULL,
+                numero_parcelas INTEGER DEFAULT 1,
+                parcelas_restantes INTEGER DEFAULT 1,
+                valor_parcela NUMERIC NOT NULL,
+                cartao_id INTEGER,
+                data_pagamento DATE NOT NULL,
+                usuario_id INTEGER NOT NULL,
+                FOREIGN KEY(cartao_id) REFERENCES cartoes(id) ON DELETE SET NULL,
+                FOREIGN KEY(usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+            );
 
-    // **Tabela de Histórico de Receitas**
-    db.run(`CREATE TABLE IF NOT EXISTS historico_receitas (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        descricao TEXT NOT NULL,
-        data TEXT NOT NULL,
-        valor REAL NOT NULL,
-        categoria TEXT NOT NULL,
-        fonte TEXT NOT NULL,
-        forma_recebimento TEXT NOT NULL,
-        conta_bancaria TEXT NOT NULL,
-        recorrente BOOLEAN DEFAULT 0,
-        intervalo_recorrencia TEXT,
-        data_recebimento TEXT NOT NULL
-    )`);
+            CREATE TABLE IF NOT EXISTS receitas (
+                id SERIAL PRIMARY KEY,
+                descricao TEXT NOT NULL,
+                data DATE NOT NULL,
+                valor NUMERIC NOT NULL,
+                categoria TEXT NOT NULL,
+                fonte TEXT NOT NULL,
+                forma_recebimento TEXT NOT NULL CHECK (forma_recebimento IN ('Transferência', 'Pix', 'Dinheiro', 'Cheque')),
+                conta_bancaria TEXT NOT NULL,
+                recorrente BOOLEAN DEFAULT 0,
+                intervalo_recorrencia TEXT,
+                usuario_id INTEGER NOT NULL,
+                FOREIGN KEY(usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+            );
 
-    // **Tabela de Contas Bancárias**
-    db.run(`CREATE TABLE IF NOT EXISTS contas_bancarias (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome TEXT NOT NULL,
-        tipo TEXT NOT NULL CHECK (tipo IN ('Conta Corrente', 'Poupança', 'Carteira Digital'))
-    )`);
+            CREATE TABLE IF NOT EXISTS historico_receitas (
+                id SERIAL PRIMARY KEY,
+                descricao TEXT NOT NULL,
+                data DATE NOT NULL,
+                valor NUMERIC NOT NULL,
+                categoria TEXT NOT NULL,
+                fonte TEXT NOT NULL,
+                forma_recebimento TEXT NOT NULL,
+                conta_bancaria TEXT NOT NULL,
+                recorrente BOOLEAN DEFAULT 0,
+                intervalo_recorrencia TEXT,
+                data_recebimento DATE NOT NULL
+            );
 
-    db.run(`CREATE TABLE IF NOT EXISTS investimentos (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome_ativo TEXT NOT NULL,
-        quantidade REAL NOT NULL,
-        valor_investido REAL NOT NULL,
-        data_aquisicao TEXT NOT NULL,
-        tipo_investimento TEXT NOT NULL CHECK (tipo_investimento IN ('Ação', 'FII', 'Cripto')),
-        conta_origem TEXT NOT NULL,
-        observacoes TEXT
-    )`);
+            CREATE TABLE IF NOT EXISTS contas_bancarias (
+                id SERIAL PRIMARY KEY,
+                nome TEXT NOT NULL,
+                tipo TEXT NOT NULL CHECK (tipo IN ('Conta Corrente', 'Poupança', 'Carteira Digital'))
+            );
 
-    // **Tabela de Reservas de Emergência**
-    db.run(`CREATE TABLE IF NOT EXISTS reservas (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        descricao TEXT NOT NULL,
-        valor REAL NOT NULL,
-        data TEXT NOT NULL
-    )`);
+            CREATE TABLE IF NOT EXISTS investimentos (
+                id SERIAL PRIMARY KEY,
+                nome_ativo TEXT NOT NULL,
+                quantidade NUMERIC NOT NULL,
+                valor_investido NUMERIC NOT NULL,
+                data_aquisicao DATE NOT NULL,
+                tipo_investimento TEXT NOT NULL CHECK (tipo_investimento IN ('Ação', 'FII', 'Cripto')),
+                conta_origem TEXT NOT NULL,
+                observacoes TEXT,
+                usuario_id INTEGER NOT NULL,
+                FOREIGN KEY(usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+            );
 
-    // **Tabela de Objetivo de Poupança**
-    db.run(`CREATE TABLE IF NOT EXISTS objetivo (
-        id INTEGER PRIMARY KEY CHECK (id = 1),
-        valor REAL NOT NULL
-    )`);
+            CREATE TABLE IF NOT EXISTS reservas (
+                id SERIAL PRIMARY KEY,
+                descricao TEXT NOT NULL,
+                valor NUMERIC NOT NULL,
+                data DATE NOT NULL,
+                usuario_id INTEGER NOT NULL,
+                FOREIGN KEY(usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+            );
 
-    // **Tabela de Comissões**
-    db.run(`CREATE TABLE IF NOT EXISTS comissoes (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nf TEXT NOT NULL,
-        pedidoNectar TEXT NOT NULL,
-        notaNectar TEXT NOT NULL,
-        valorVenda REAL NOT NULL,
-        dataVenda TEXT NOT NULL,
-        recebido INTEGER DEFAULT 0
-    )`);
+            CREATE TABLE IF NOT EXISTS objetivo (
+                id SERIAL PRIMARY KEY CHECK (id = 1),
+                valor NUMERIC NOT NULL,
+                usuario_id INTEGER NOT NULL,
+                FOREIGN KEY(usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+            );
 
-    // **Tabela de Histórico de Comissões**
-    db.run(`CREATE TABLE IF NOT EXISTS historico_comissoes (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nf TEXT NOT NULL,
-        pedidoNectar TEXT NOT NULL,
-        notaNectar TEXT NOT NULL,
-        valorVenda REAL NOT NULL,
-        dataVenda TEXT NOT NULL,
-        valorComissao REAL NOT NULL,
-        dataRecebimento TEXT NOT NULL
-    )`);
-});
+            CREATE TABLE IF NOT EXISTS comissoes (
+                id SERIAL PRIMARY KEY,
+                nf TEXT NOT NULL,
+                pedidoNectar TEXT NOT NULL,
+                notaNectar TEXT NOT NULL,
+                valorVenda NUMERIC NOT NULL,
+                dataVenda DATE NOT NULL,
+                recebido BOOLEAN DEFAULT FALSE,
+                usuario_id INTEGER NOT NULL,
+                FOREIGN KEY(usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+            );
+
+            CREATE TABLE IF NOT EXISTS historico_comissoes (
+                id SERIAL PRIMARY KEY,
+                nf TEXT NOT NULL,
+                pedidoNectar TEXT NOT NULL,
+                notaNectar TEXT NOT NULL,
+                valorVenda NUMERIC NOT NULL,
+                dataVenda DATE NOT NULL,
+                valorComissao NUMERIC NOT NULL,
+                dataRecebimento DATE NOT NULL,
+                usuario_id INTEGER NOT NULL,
+                FOREIGN KEY(usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+            );
+        `);
+        console.log("Tabelas criadas com sucesso!");
+    } catch (error) {
+        console.error("Erro ao criar tabelas:", error);
+    }
+})();
 
 module.exports = db;
