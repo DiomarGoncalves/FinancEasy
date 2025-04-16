@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cartões de Crédito</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-900 text-white">
+  <div class="flex">
+  <!-- Menu Lateral -->
+  <aside class="w-64 bg-gray-900 border-r border-gray-800 flex flex-col p-4 space-y-2">
+    <!-- Logo -->
+    <div class="flex items-center justify-between mb-6">
+      <span class="text-2xl font-bold tracking-tight text-white">FinanceEasy</span>
+    </div>
+
+    <!-- Botão Novo -->
+    <button class="flex items-center justify-center w-full bg-purple-600 text-white py-2 rounded-full shadow-md hover:bg-purple-700 transition">
+      + Novo
+    </button>
+
+    <!-- Links principais -->
+    <nav class="flex flex-col space-y-2 mt-6 text-sm">
+      <a href="index.html" class="flex items-center space-x-2 hover:text-purple-400">
+        <span>🏠</span>
+        <span>Dashboard</span>
+      </a>
+      <a href="contas/index.html" class="flex items-center space-x-2 hover:text-purple-400">
+        <span>🏦</span>
+        <span>Contas</span>
+      </a>
+      <a href="transacoes/index.html" class="flex items-center space-x-2 hover:text-purple-400">
+        <span>📋</span>
+        <span>Transações</span>
+      </a>
+      <a href="cartao-credito/index.html" class="flex items-center space-x-2 hover:text-purple-400">
+        <span>💳</span>
+        <span>Cartões de crédito</span>
+      </a>
+      <a href="planejamento/index.html" class="flex items-center space-x-2 hover:text-purple-400">
+        <span>📅</span>
+        <span>Planejamento</span>
+      </a>
+      <a href="relatorios/index.html" class="flex items-center space-x-2 hover:text-purple-400">
+        <span>📈</span>
+        <span>Relatórios</span>
+      </a>
+
+      <!-- Mais opções com submenu -->
+      <details class="group">
+        <summary class="flex items-center justify-between cursor-pointer hover:text-purple-400">
+          <div class="flex items-center space-x-2">
+            <span>⋯</span>
+            <span>Mais opções</span>
+          </div>
+          <span>▼</span>
+        </summary>
+        <div class="ml-6 mt-2 flex flex-col space-y-2 text-sm text-gray-300">
+          <a href="mais-opcoes/objetivos.html" class="hover:text-purple-400">🎯 Objetivos</a>
+          <a href="mais-opcoes/categorias.html" class="hover:text-purple-400">📂 Categorias</a>
+          <a href="mais-opcoes/tags.html" class="hover:text-purple-400">🏷️ Tags</a>
+          <a href="mais-opcoes/calendario.html" class="hover:text-purple-400">🗓️ Calendário</a>
+          <a href="mais-opcoes/desempenho.html" class="hover:text-purple-400">📊 Meu Desempenho</a>
+          <a href="mais-opcoes/importar-transacoes.html" class="hover:text-purple-400">⬆️ Importar transações</a>
+          <a href="mais-opcoes/exportar-transacoes.html" class="hover:text-purple-400">⬇️ Exportar transações</a>
+        </div>
+      </details>
+
+      <a href="configuracoes/index.html" class="flex items-center space-x-2 hover:text-purple-400">
+        <span>⚙️</span>
+        <span>Configurações</span>
+      </a>
+      <a href="ajuda/index.html" class="flex items-center space-x-2 hover:text-purple-400">
+        <span>❓</span>
+        <span>Central de Ajuda</span>
+      </a>
+    </nav>
+
+    <!-- Versão no rodapé -->
+    <div class="mt-auto text-xs text-gray-500 text-center pt-4">
+      web-2.158.2
+    </div>
+  </aside>
+    <!-- Conteúdo principal -->
+  <main class="ml-60 p-6">
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-semibold">Cartões de Crédito</h1>
+      <button onclick="openModal()" class="bg-yellow-500 text-black px-4 py-2 rounded-lg hover:bg-yellow-400">
+        Novo cartão
+      </button>
+    </div>
+
+    <!-- Cards de cartões -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Cartão exemplo -->
+      <div class="bg-zinc-800 p-4 rounded-xl shadow-lg">
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-zinc-400">cartão nu bank</span>
+          <button class="text-zinc-500 hover:text-white">⋮</button>
+        </div>
+        <p class="text-xs mt-2">Fatura paga</p>
+        <p class="text-sm text-red-400">R$ 0,00</p>
+        <p class="text-xs text-zinc-400 mt-2">Data de pagamento: 14 de abril de 2025</p>
+
+        <div class="w-full bg-zinc-700 h-2 rounded-full mt-4">
+          <div class="bg-green-400 h-2 rounded-full" style="width: 34.2%"></div>
+        </div>
+        <p class="text-xs text-zinc-400 mt-1">Limite disponível: R$ 1.052,73</p>
+
+        <a href="#" class="text-right text-sm text-cyan-400 hover:underline mt-2 block">FATURA PAGA</a>
+      </div>
+
+      <!-- Outros cartões ... -->
+    </div>
+  </main>
+
+  <!-- Modal -->
+  <div id="modalCartao" class="fixed inset-0 bg-black/60 flex items-center justify-center hidden z-50">
+    <div class="bg-zinc-900 p-6 rounded-2xl w-full max-w-md shadow-xl text-white">
+      <h2 class="text-xl font-bold mb-4">Novo cartão de crédito</h2>
+      
+      <form id="formNovoCartao" class="space-y-4">
+        <input type="number" placeholder="Limite" class="w-full p-2 rounded bg-zinc-800 border border-zinc-700" />
+        <input type="text" placeholder="Descrição" class="w-full p-2 rounded bg-zinc-800 border border-zinc-700" />
+        <select class="w-full p-2 rounded bg-zinc-800 border border-zinc-700">
+          <option value="">Selecione a bandeira</option>
+          <option value="visa">Visa</option>
+          <option value="master">Mastercard</option>
+        </select>
+        <input type="text" placeholder="Categoria" class="w-full p-2 rounded bg-zinc-800 border border-zinc-700" />
+        <input type="number" placeholder="Dia de fechamento" class="w-full p-2 rounded bg-zinc-800 border border-zinc-700" />
+        <input type="number" placeholder="Dia do vencimento" class="w-full p-2 rounded bg-zinc-800 border border-zinc-700" />
+
+        <div class="flex justify-end gap-2 mt-4">
+          <button type="button" onclick="closeModal()" class="px-4 py-2 rounded bg-zinc-700 hover:bg-zinc-600">Cancelar</button>
+          <button type="submit" class="px-4 py-2 rounded bg-yellow-500 text-black hover:bg-yellow-400">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const modal = document.getElementById('modalCartao');
+
+    function openModal() {
+      modal.classList.remove('hidden');
+    }
+
+    function closeModal() {
+      modal.classList.add('hidden');
+    }
+
+    document.getElementById('formNovoCartao').addEventListener('submit', (e) => {
+      e.preventDefault();
+      // lógica de envio para API
+      closeModal();
+    });
+  </script>
+
+</body>
+</html>

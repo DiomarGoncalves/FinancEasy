@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login - FinancEasy</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <script>
+    async function fetchClientId() {
+      const response = await fetch("/api/client-id");
+      const data = await response.json();
+      return data.client_id;
+    }
+
+    function handleCredentialResponse(response) {
+      fetch("/api/auth/google", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ credential: response.credential }),
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+          window.location.href = "/dashboard.html";
+        }
+      });
+    }
+
+    window.onload = async function () {
+      const clientId = await fetchClientId();
+      google.accounts.id.initialize({
+        client_id: clientId,
+        callback: handleCredentialResponse
+      });
+      google.accounts.id.renderButton(
+        document.getElementById("google-button"),
+        { theme: "outline", size: "large", width: 280 }
+      );
+    }
+  </script>
+</head>
+<body class="bg-gray-900 flex items-center justify-center min-h-screen">
+  <div class="bg-gray-800 border-2 border-yellow-400 rounded-xl shadow-xl p-10 w-full max-w-md text-center">
+    <img src="assets/android-chrome-512x512.png" alt="Logo do sistema" 
+     class="mx-auto h-20 w-20 mb-6 rounded-full border-2 border-yellow-400 shadow-md">
+    <h1 class="text-2xl font-bold text-yellow-400 mb-2">Bem-vindo ao FinancEasy</h1>
+    <p class="text-sm text-gray-300 mb-6">Acesse sua conta com segurança usando o Google</p>
+    <div id="google-button" class="flex justify-center"></div>
+  </div>
+</body>
+</html>
